@@ -1,1 +1,21 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Unit test / coverage reports
+.coverage
+.pytest_cache/
+
+# Environments
+.env
+.venv
+
+# Pycharm settings
 .idea/
+
+# Log files
+logs/
+
+# User folders
+ole/
