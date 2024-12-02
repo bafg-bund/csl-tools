@@ -1,0 +1,17 @@
+# Required packages. Use: <pip install -r requirements.txt>
+setuptools~=70.3.0
+argparse
+os
+logging
+csv
+re
+pandas~=2.2.2
+numpy~=2.0.0
+sqlalchemy~=2.0.31
+datetime
+pytest~=8.2.2
+rdkit
+git+https://github.com/berlinguyinca/spectra-hash.git@174fbf289a0357535f9bacda282b9a2dbb7807cc#egg=splash&subdirectory=python
+tqdm~=4.66.5
+joblib~=1.4.2
+pygam~=0.9.1

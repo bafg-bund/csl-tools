@@ -1,0 +1,22 @@
+# Set default configurations here
+
+import os
+
+# Default paths
+# DEFAULT_CSL_PATH = "C:/Users/lessmann/C_Daten/PycharmProjects/collective-spec-lib/tests/testdata/csl_versions/CSL_v24.2.db"
+DEFAULT_CSL_PATH = "C:/Users/lessmann/C_Daten/PycharmProjects/collective-spec-lib/tests/data/CSL_v24.0.db"
+
+# Root directory of the project
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Dictionary with pairs of institution and chromatographic method
+# If institutions are added or modified, the respective mappings need to be changed here and in the following sections:
+# + Mapping for RT models in rtscan_functions.update_workflow.py
+# + Mapping of institution code to institution notation in utils.sql_utils.py (inst_code_csl_mapping)
+DEFAULT_PAIRS_INST_CHROM = {
+    'bfg': 'dx.doi.org/10.1016/j.chroma.2015.11.014',
+    'uba': 'uba_nts_rp1',
+    'lfuby': 'lfu_nts_rp1',
+    'lanuv': 'lanuv_nts',
+    'lubw': 'lubw_nts_rp1'
+}

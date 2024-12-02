@@ -1,0 +1,192 @@
+def check_duplicate(session, entry):
+    """
+    Checks if the experimental information are already present in the CSL. Constructs and executes a query using the
+    experimental information from the data entry.
+
+    The query is constructed with join and filter conditions:
+    1. Construct query that will return relevant tables/columns
+    2. Join SQL tables by linking them using a foreign key relationship
+       (e.g. tables "Experiment" and "Parameter" linked by the foreign key "parameter_id")
+    3. Filter SQL entries by experimental information and either the InChIKey or the CAS registry number (CAS RN)
+
+    Args:
+        session (obj)         : SQLAlchemy session object (sqlalchemy.orm.session.Session)
+        entry (pandas.series) : Data of one entry (pandas.core.series.Series)
+
+    Returns:
+        res_count (int) : Number of matches returned by executing the query.
+                          Returns -1 if matching was not attempted due to missing CAS RN and InChIKey.
+    """
+    from utils.sql_utils import Experiment, Parameter, Compound
+    from sqlalchemy import func
+
+    qry = session.query(
+        Compound.CAS, Experiment.isotope, Parameter.instrument, Parameter.ionisation,
+        Parameter.CE, Parameter.CES, Parameter.col_type, Parameter.ce_unit,
+        Parameter.polarity, Experiment.adduct
+    ). \
+        join(Experiment, Compound.compound_id == Experiment.compound_id). \
+        join(Parameter, Experiment.parameter_id == Parameter.parameter_id)
+
+    qry = qry.filter(Experiment.adduct == entry['adduct_i'],
+                     Experiment.isotope == entry['var_isotope'],
+                     Parameter.instrument == entry['var_instrument'],
+                     Parameter.ionisation == entry['ionization_i'],
+                     Parameter.polarity == entry['pol_i'],
+                     Parameter.CE == entry['ce_i'],
+                     Parameter.CES == entry['ces_i'],
+                     Parameter.col_type == entry['var_col_type'],
+                     Parameter.ce_unit == entry['var_ce_unit'])
+
+    inchikey_main_i = entry['inchikey_main_i']
+    cas_i = entry['cas_i']
+
+    if inchikey_main_i and not cas_i:
+        # Add query filter using the main layer of the InChIkey
+        qry = qry.filter(func.substr(Compound.inchikey, 1, func.length(inchikey_main_i)) == inchikey_main_i)
+        res_count = qry.count()
+    elif not inchikey_main_i and cas_i:
+        # Add query filter using the CAS RN
+        qry = qry.filter(Compound.CAS == cas_i)
+        res_count = qry.count()
+    elif inchikey_main_i and cas_i:
+        # Do the query once using the main layer of the InChIkey and the CAS RN
+        qry1 = qry.filter(func.substr(Compound.inchikey, 1, func.length(inchikey_main_i)) == inchikey_main_i)
+        qry2 = qry.filter(Compound.CAS == cas_i)
+        # Combine results
+        combined_results = qry1.all() + qry2.all()
+        unique_results = list(set(combined_results))
+        # Count results
+        res_count = len(unique_results)
+    else:  # If there is no InChIkey (Main Layer) AND no CAS RN
+        res_count = -1
+    return res_count
+
+
+def add_exp_to_session(session, entry, inst_def):
+    """
+    Adds the new experimental information to the following tables in the CSL:
+    Experiment group
+    - Checks if the experiment group exists in the CSL and adds it if necessary.
+    Compound group
+    - Checks if the compound group exists in the CSL and adds it if necessary.
+        Todo: Under which conditions would the compound group be "Biocide" or "Pharma" (which workflow)?
+    Compound
+    - Checks if the compound (and a link to compound group) exists in the CSL and adds an entry if necessary.
+    Retention time
+    - Checks for an existing retention time and uses the retention time from the file if it doesn't exist.
+        Todo: RT from file and from query can be different. What is better to use?
+    Experimental parameters
+    - Searches for experimental parameters and add them from the file if they don't exist.
+        Todo: How do you know that this is the experiment of the same compound without filtering for InChIKey or CAS RN?
+        Todo: Or does it only matters, that these parameters exist (for any experiment)?
+    Experiment
+    - Creates a new experiment entry in the CSL (also adding the current time)
+    Fragments
+    - Adding all fragment information from the file
+
+    Args:
+        session (obj)         : SQLAlchemy session object (sqlalchemy.orm.session.Session)
+        entry (pandas.series) : Data of one entry (pandas.core.series.Series)
+        inst_def (dict)       : Institution-specific defaults used for keeping format, and csl-matching/commits.
+
+    Returns:
+        (No return variables, but the session object is updated)
+    """
+    from datetime import datetime
+    from sqlalchemy import func
+    from utils.sql_utils import (Experiment, Fragment, Parameter, Compound, RetentionTime, CompoundGroup, ExperimentGroup)
+    import logging
+    logger = logging.getLogger(__name__)
+
+    # Prepare all variables
+    expg_def = inst_def['def_expg_csl']
+    compg_def = inst_def['def_compg_csl']
+    comp_i = entry['comp_i']
+    formula_i = entry['formula_i']
+    smiles_i = entry['smiles_i']
+    inchikey_i = entry['inchikey_i']
+    chrom_method = entry['var_chrom_method']
+    rt_i = entry['rt_i']
+    instrument = entry['var_instrument']
+    pol_i = entry['pol_i']
+    ce_i = entry['ce_i']
+    ces_i = entry['ces_i']
+    ce_unit = entry['var_ce_unit']
+    col_type = entry['var_col_type']
+    ionization_i = entry['ionization_i']
+    mz_i = entry['mz_i']
+    adduct_i = entry['adduct_i']
+    isotope = entry['var_isotope']
+    spec_i = entry['spec_i']
+
+    # Check if the experiment group exists (e.g. 'LfU', 'UBA', 'BfG') in CSL and add if necessary.
+    exp_group = session.query(ExperimentGroup).filter_by(name=expg_def).one_or_none()
+    if not exp_group:
+        logger.info(f'Missing "experimentGroup.name" in the CSL. Adding default value: "{expg_def}"')
+        exp_group = ExperimentGroup(name=expg_def)
+        session.add(exp_group)
+
+    # Check if the compound group exists (e.g. 'LfU', 'Pharmaceutical', 'Biocide') in the CSL and add if necessary.
+    # Todo: Under which conditions would the compound group be "Biocide" or "Pharma" (which workflow)?
+    comp_group = session.query(CompoundGroup).filter_by(name=compg_def).one_or_none()
+    if not comp_group:
+        logger.info('Missing "compoundGroup.name" in CSL. Adding default value: "{}"'.format(compg_def))
+        comp_group = CompoundGroup(name=compg_def)
+        session.add(comp_group)
+
+    # Check if the compound (and a link to compound group) exists in the CSL and adds an entry if necessary.
+    inchikey_main_i = entry['inchikey_main_i']
+    cas_i = entry['cas_i']
+    if inchikey_main_i:  # InChIKey is preferred
+        # Query compound by using the main layer of the InChIKey
+        comp_res = session.query(Compound).filter(
+            func.substr(Compound.inchikey, 1, func.length(inchikey_main_i)) == inchikey_main_i).one_or_none()
+    elif cas_i:
+        # Query compound by using the CAS RN
+        comp_res = session.query(Compound).filter_by(CAS=cas_i).one_or_none()
+    else:
+        comp_res = []
+    if comp_res:  # If the compound exists in the CSL
+        # Check if the compound group (e.g. 'LfU') exists for this compound
+        if comp_group not in comp_res.groups:
+            logger.info(f'Adding "{compg_def}" to the compound group of "{comp_i}"')
+            comp_res.groups.append(comp_group)
+    else:  # If the compound was not found in the CSL
+        logger.info(f'Compound "{comp_i}" not found in CSL. Adding entry.')
+        comp_res = Compound(formula=formula_i, CAS=cas_i, SMILES=smiles_i, name=comp_i,
+                            groups=[comp_group], inchikey=inchikey_i)
+        # Add compound entry to session
+        session.add(comp_res)
+
+    # Check for existing retention time (filter by compound_id and chrom. method). Use RT from file if it doesn't exist.
+    # Todo: RT from file and from query can be different. What is better to use?
+    rt_res = session.query(RetentionTime).filter_by(compound_id=comp_res.compound_id, chrom_method=chrom_method
+                                                     ).one_or_none()
+    if not rt_res:
+        logger.info(f'Retention time for compound ID "{comp_res.compound_id}" and chromatographic method '
+                    f'"{chrom_method}" not found in CSL. Adding retention time from data entry.')
+        rt_res = RetentionTime(chrom_method=chrom_method, rt=rt_i, compound=comp_res)
+        session.add(rt_res)
+
+    # Search experimental parameters and add then from the file if they don't exist
+    para_res = session.query(Parameter).filter_by(instrument=instrument, polarity=pol_i, CE=ce_i, CES=ces_i,
+                                                  ce_unit=ce_unit, col_type=col_type, ionisation=ionization_i
+                                                  ).one_or_none()
+    # Todo: How do you know this is the experiment of the same compound without filtering for InChIKey or CAS RN?
+    # Todo: Or does it only matters, that these parameters exist (for any experiment)?
+    if not para_res:
+        logger.info('Experimental parameters not found in CSL. Adding parameters from data entry.')
+        para_res = Parameter(instrument=instrument, polarity=pol_i, CE=ce_i, CES=ces_i, ce_unit=ce_unit,
+                             col_type=col_type, ionisation=ionization_i)
+        session.add(para_res)
+
+    # Create a new experiment entry in the CSL (also adding the current time)
+    exp = Experiment(mz=mz_i, compound=comp_res, parameter=para_res, adduct=adduct_i, groups=[exp_group],
+                     time_added=datetime.today(), isotope=isotope)
+    session.add(exp)
+
+    # Add spectrum to the experiment
+    for frag in spec_i.itertuples():
+        frag_i = Fragment(mz=frag.mz, int=frag.int, experiment=exp)
+        session.add(frag_i)
