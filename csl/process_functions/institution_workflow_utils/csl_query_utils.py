@@ -93,9 +93,9 @@ def add_exp_to_session(session, entry, inst_def):
     Returns:
         (No return variables, but the session object is updated)
     """
+    from utils.sql_utils import (Experiment, Fragment, Parameter, Compound, RetentionTime, CompoundGroup, ExperimentGroup)
     from datetime import datetime
     from sqlalchemy import func
-    from utils.sql_utils import (Experiment, Fragment, Parameter, Compound, RetentionTime, CompoundGroup, ExperimentGroup)
     import logging
     logger = logging.getLogger(__name__)
 

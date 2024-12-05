@@ -1,4 +1,4 @@
-from .institution_workflow import InstitutionWorkflow
+from process_functions import InstitutionWorkflow
 
 
 class UbaWorkflow(InstitutionWorkflow):

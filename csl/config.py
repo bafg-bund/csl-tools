@@ -3,11 +3,10 @@
 import os
 
 # Default paths
-# DEFAULT_CSL_PATH = "C:/Users/lessmann/C_Daten/PycharmProjects/collective-spec-lib/tests/testdata/csl_versions/CSL_v24.2.db"
-DEFAULT_CSL_PATH = "C:/Users/lessmann/C_Daten/PycharmProjects/collective-spec-lib/tests/data/CSL_v24.0.db"
+DEFAULT_CSL_PATH = "C:/Users/lessmann/Data/csl/CSL_v24.0.db"
 
 # Root directory of the project
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Dictionary with pairs of institution and chromatographic method
 # If institutions are added or modified, the respective mappings need to be changed here and in the following sections:

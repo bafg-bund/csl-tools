@@ -1,6 +1,6 @@
-from .institution_workflow import InstitutionWorkflow
+from process_functions import InstitutionWorkflow
 from utils.sql_utils import create_session
-from .institution_workflow_utils import *
+from process_functions.institution_workflow_utils import *
 
 
 class LanuvWorkflow(InstitutionWorkflow):

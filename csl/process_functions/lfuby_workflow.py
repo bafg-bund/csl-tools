@@ -1,53 +1,43 @@
-from .institution_workflow import InstitutionWorkflow
+from process_functions import InstitutionWorkflow
 from utils.sql_utils import create_session
-from .institution_workflow_utils import *
+from process_functions.institution_workflow_utils import *
 
 
-class LubwWorkflow(InstitutionWorkflow):
+class LfubyWorkflow(InstitutionWorkflow):
     def process(self):
-        """Workflow to process MS2 data files from the institution lubw (Landesanstalt für Umwelt Baden-Württemberg)."""
+        """Workflow to process MS2 data files from the institution lfuby (Bayerisches Landesamt für Umwelt)."""
 
         import logging
         logger = logging.getLogger(__name__)
-        logger.info('Executing lubw workflow to process MS2 data files')
+        logger.info('Executing lfuby workflow to process MS2 data files')
 
         # Load institution defaults and settings
-        var_regex = var_regex_lubw()
-        var_fix = var_fix_lubw()
-        inst_def = defaults_lubw()
-        spec_adduct = adduct_notation_lubw()
+        var_regex = var_regex_lfuby()
+        var_fix = var_fix_lfuby()
+        inst_def = defaults_lfuby()
+        spec_adduct = adduct_notation_lfuby()
 
         # Read files
         logger.info('Reading file(s)')
         extract_data = self.read_files(var_regex)
-        # todo: Reading function (extract_data_regex_lubw) adjustments:
-        #       - splitting identifier such as "=" and "[|]" for LUBW (could be set in config)
-        #         wait for LANUV workflow to see if its worth it to combine
-        #         line: delim = '=' if '=' in line else '[|]'
-        #       - chunk_identifier differs (e.g. 'MS:1009003|Name' for lubw and 'Name :' for lfuby)
-        #         could be also set in config file
-        #       -  some strings in docstring
         if not extract_data.empty:
             # Adding default information
             logger.info('Adding fixed information to extracted data')
-            extract_data_add = self.add_fixed_variables(extract_data, var_fix)  # todo worked without mod
+            extract_data_add = self.add_fixed_variables(extract_data, var_fix)
 
             # Processing files
             logger.info('Processing data')
             form_data = self.process_data(extract_data_add, inst_def, spec_adduct)
-            # todo worked without mod
-            #  (but needs "QF" in adduct_name as well as an empty special adduct dict in <inst>_config,
-            #  even though adduct recognition is not applied)
 
             # Match extracted data with CSL
             logger.info('Matching extracted experiments with CSL')
-            form_data_match, session = self.match_with_csl(form_data, inst_def)  # todo worked without modification
+            form_data_match, session = self.match_with_csl(form_data, inst_def)
 
             # Commit session to CSL
             logger.info('Preparing to commit session changes to CSL')
-            self.commit_to_csl(session, form_data_match)  # todo worked without modification
+            self.commit_to_csl(session, form_data_match)
 
-        logger.info('End of lubw workflow')
+        logger.info('End of lfuby workflow')
 
     def read_files(self, var_regex):
         """
@@ -79,7 +69,7 @@ class LubwWorkflow(InstitutionWorkflow):
         # Data extraction based on lfuby specific regular expressions
         data_extract_all = []
         for file in file_paths:
-            data_extract_file = extract_data_regex_lubw(file, var_regex)
+            data_extract_file = extract_data_regex_lfuby(file, var_regex)
             data_extract_file['file_path'] = file  # Add current file path for every entry
             data_extract_all.append(data_extract_file)
 
@@ -89,7 +79,7 @@ class LubwWorkflow(InstitutionWorkflow):
 
         return data_extract_all
 
-# noinspection PyMethodMayBeStatic
+    # noinspection PyMethodMayBeStatic
     def add_fixed_variables(self, extract_data, var_fix):
         """Adds fixed information (specified in <institution>_config.py) to each entry."""
         extract_data_add = extract_data
@@ -146,7 +136,7 @@ class LubwWorkflow(InstitutionWorkflow):
             # Adduct format conversion
             adduct_i = format_adduct(adduct_name, spec_adduct, inst_def['def_qf'], pol_i)
             if not adduct_i:
-                logger.warning(f'Adduct name not detected. Check fields for compound name and ion mode.')
+                logger.warning(f'Adduct name not detected. Check fields for compound name and ion mode')
                 entry_err = True
             else:
                 logger.info(f'Adduct name: {adduct_name}; Formatted adduct name: {adduct_i}')
@@ -156,11 +146,11 @@ class LubwWorkflow(InstitutionWorkflow):
             if not ce_i or not ce_i and not ces_i:
                 logger.warning(
                     f'No collision energy (CE) or unexpected number of CE or non-equal difference in CE spread. '
-                    f'Check field for collision energy.')
+                    f'Check field for collision energy')
                 entry_err = True
             elif ces_warn:
                 logger.warning(f'Unexpected collision energy spread. Verify field for collision energy. '
-                               f'\n''Will NOT automatically skip file due to this warning.')
+                               f'\n''Will NOT automatically skip file due to this warning')
                 entry_warn = True
 
             # Ionization type
@@ -184,7 +174,7 @@ class LubwWorkflow(InstitutionWorkflow):
             # CAS registry number
             cas_i = get_cas(entry['var_cas'])
             if not cas_i:
-                logger.warning('CAS registry number not detected or malformed.')
+                logger.warning('CAS registry number not detected or malformed')
                 entry_warn = True
 
             # Set error flag to True if no InChIKey and no CAS registry number found
@@ -194,25 +184,25 @@ class LubwWorkflow(InstitutionWorkflow):
             # SMILES
             smiles_i = get_smiles(entry['var_smiles'])
             if not smiles_i:
-                logger.warning('Smiles not detected.')
+                logger.warning('Smiles not detected')
                 entry_err = True
 
             # Precursor mass
             mz_i = get_precursor_mz(entry['var_mz'])
             if not mz_i:
-                logger.warning('Precursor mass not detected.')
+                logger.warning('Precursor mass not detected')
                 entry_err = True
 
             # Retention time
             rt_i = get_retention_time(entry['var_rt'])
             if not rt_i:
-                logger.warning('Retention time not detected.')
+                logger.warning('Retention time not detected')
                 entry_err = True
 
             # Spectra / Peaks
             spec_i = get_peaks(entry['var_peak'])
             if spec_i.empty:
-                logger.warning('No spectra detected.')
+                logger.warning('No spectra detected')
                 entry_err = True
 
             # Temporary save formatted data from one entry in dictionary
