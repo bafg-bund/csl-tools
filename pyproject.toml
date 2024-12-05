@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "csl"
+version = "0.0.1"
+description = "Import, export and curation of spectral data for the CSL (Collective Spectral Library)."
+authors = [
+    { name = "Ole Lessmann", email = "lessmann@bafg.de" },
+    { name = "Björn Ehlig", email = "ehlig@bafg.de" },
+    { name = "Kevin S. Jewell", email = "jewell@bafg.de" },
+]
+dependencies = [
+    "pandas<2.2.2",
+    "numpy<2.0.0",
+    "sqlalchemy<2.0.31",
+    "pytest<8.2.2",
+    "rdkit<2024.3.5",
+    "tqdm<4.66.5",
+    "joblib<1.4.2",
+    "pygam<0.9.1",
+    "splash @ git+https://github.com/berlinguyinca/spectra-hash.git@174fbf289a0357535f9bacda282b9a2dbb7807cc#egg=splash&subdirectory=python"
+]
+
+[tool.setuptools.packages.find]
+where = ["csl"]
