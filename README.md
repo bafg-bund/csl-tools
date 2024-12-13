@@ -71,14 +71,23 @@ python main.py process [institution] [data_path] [--csl_path <path>]
 ```
 
 #### Arguments
-- [institutions]: Choose from `lfuby`, `bfg`, `lubw`, `uba`, `lanuv`.  
-(Currently only `lfuby` and `lubw` working)
+- [institutions]: Specify import format (currently institutions). Choose from:
+  - `lfuby`: LfU Bayern import format (ThermoFisher/mzVault).
+  - `lubw`: LUBW import format (ThermoFisher/mzVault).
+  - `bfg`: BfG import format (not implemented).
+  - `uba`: UBA import format (not implemented).
+  - `lanuv`: LANUV import format (SCIEX/LibraryView) (not implemented).
 - [data_path]: (Optional) Path to data file or directory (Default: Opens dialog to select files)').
 - [--csl_path _path_]: (Optional) Path to CSL file (Default: Specified in `config.py`).
 
-#### Example
+#### Examples
+Process one data file from the LUBW:
 ```bash
 python main.py process lubw C:\path\to\data.msp --csl_path C:\path\to\csl.db
+```
+Process data from the LfU Bayern. Dialog window will open for file selection.
+```bash
+python main.py process lfuby --csl_path C:\path\to\csl.db
 ```
 
 ### `export`
@@ -88,7 +97,10 @@ python main.py export [format] [out_path] [csl_path]
 ```
 
 #### Arguments
-- [format]: Specify the export format. Choose from `txt`, `envi`, `mbank` (Needs to be updated)
+- [format]: Specify the export format. Choose from:
+  - `txt`: (not implemented).
+  - `envi`: (not implemented).
+  - `mbank`: (not implemented).
 - [out_path]: Path to the directory where the exported file will be saved.
 - [csl_path]: (Optional) Path to CSL file (Default: Specified in `config.py`).
 
@@ -105,9 +117,9 @@ python main.py rtscan [operation] [csl_path]
 
 #### Arguments
 - [operation]: Specify the operation. Choose from:
-  - `check`: Checks the consistency of non-experimental retention time data. (not implemented)
+  - `check`: Checks the consistency of non-experimental retention time data (not implemented).
   - `update`: Calculates missing non-experimental retention times based on available experimental data.
-  - `recalc`: Re-calculates all non-experimental retention times based on available experimental data. (not implemented)
+  - `recalc`: Re-calculates all non-experimental retention times based on available experimental data (not implemented).
 - [csl_path]: (Optional) Path to CSL file (Default: Specified in `config.py`).
 
 #### Example
@@ -120,17 +132,7 @@ python main.py rtscan update C:\path\to\csl.db
 - Use the --help/--h flag with any command to see additional usage information: `python main.py [command] --help`
 
 ## Roadmap
-
-Planned for release v0.1:
-- Import LfU (mzVault/ThermoFisher) -> done
-- Import LUBW (mzVault/ThermoFisher) -> testing
-- Import MassBank documents
-- Modeling and correction of retention times -> done
-- Export MSP documents (mzVault/ThermoFisher)
-
-Planned for future release:
-- Export enviMass "target list"
-- Import LibraryView documents (SCIEX)
+[Goals for future releases](https://gitlab.lan.bafg.de/nts/collective-spectral-library/-/wikis/Goals-for-future-releases)
 
 
 ## Contributing with spectral data
