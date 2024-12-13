@@ -62,7 +62,6 @@ def check_duplicate(session, entry):
         res_count = -1
     return res_count
 
-
 def add_exp_to_session(session, entry, inst_def):
     """
     Adds the new experimental information to the following tables in the CSL:
