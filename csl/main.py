@@ -4,25 +4,15 @@
 # This script provides command-line interface (CLI) options for processing MS2 data files from various institutions
 # and exporting the Collective Spectral Library (CSL) in different formats.
 #
-# Commands: todo: each command and the options should be described in more detail in the readme (?)
+# Commands:
 #     process : Processes MS2 data files based on the institution type.
 #     export  : Exports the CSL to the specified formats.
 #     rtscan  : Operates on retention time data saved in the CSL.
 #
 # Usage:
 #     python main.py <command> [options]
-#
-# Examples:
-# - Process raw txt file(s):
-# python main.py process lfuby C:\Users\lessmann\C_Daten\PycharmProjects\collective-spec-lib\tests\testdata
-# python main.py process lfuby --csl_path C:/Users/lessmann/C_Daten/PycharmProjects/collective-spec-lib/tests/testdata/lfuby_testfiles/CSL_v24.0.db
-#
-# - Run export for text file output:
-# python main.py export txt C:\Users\lessmann\C_Daten\PycharmProjects\collective-spec-lib\tests\exporttest\msp
-# - Run export for envimass target list
-# python main.py export envi C:\Users\lessmann\C_Daten\PycharmProjects\collective-spec-lib\tests\exporttest\envi_target
-#
 # """
+
 from argparse import ArgumentParser, Namespace
 from config import *
 from main_functions.process import run_process_workflow
@@ -64,16 +54,16 @@ process_parser.add_argument('--csl_path', type=str, default=DEFAULT_CSL_PATH,
 export_parser = subparsers.add_parser('export', help='Exports the CSL to various formats')
 export_parser.add_argument('format', type=str, choices=['txt', 'envi', 'mbank'],
                            help='Specify export format',)
-export_parser.add_argument('out_path', type=str, help='Path to the export directory')
+export_parser.add_argument('out_path', type=str, help='Path to the directory where the exported file will be saved')
 export_parser.add_argument('csl_path', type=str, default=DEFAULT_CSL_PATH,
-                           nargs='?', help='(Optional) Path to CSL file')
+                           nargs='?', help='(Optional) Path to CSL file (Default: Specified in config.py)')
 
 # Define 'rtscan' command and its arguments
 rtscan_parser = subparsers.add_parser('rtscan', help='Operates on retention time data saved in the CSL')  # todo descr
 rtscan_parser.add_argument('operation', type=str, choices=['check', 'update', 'recalc'],
                            help='Specify operation type',)  # todo: where to describe each option?
 rtscan_parser.add_argument('csl_path', type=str, default=DEFAULT_CSL_PATH,
-                           nargs='?', help='(Optional) Path to CSL file')
+                           nargs='?', help='(Optional) Path to CSL file (Default: Specified in config.py)')
 
 # Parse the command-line arguments
 args: Namespace = parser.parse_args()

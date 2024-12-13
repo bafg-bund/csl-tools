@@ -3,7 +3,9 @@
 import os
 
 # Default paths
-DEFAULT_CSL_PATH = "C:/Users/lessmann/Data/csl/CSL_v24.0.db"
+DEFAULT_CSL_PATH = "C:/Users/lessmann/Data/collective-spectral-library/csl/CSL_v24.4.db"
+# Todo: Currently defaults to my local version. Should be handled differently later.
+#  For now, please simply specify it in your commands (see Readme.md)
 
 # Root directory of the project
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
