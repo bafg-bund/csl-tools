@@ -52,7 +52,7 @@ process_parser.add_argument('--csl_path', type=str, default=DEFAULT_CSL_PATH,
 
 # Define 'export' command and its arguments
 export_parser = subparsers.add_parser('export', help='Exports the CSL to various formats')
-export_parser.add_argument('format', type=str, choices=['txt', 'envi', 'mbank'],
+export_parser.add_argument('format', type=str, choices=['thermo', 'envi', 'mbank'],
                            help='Specify export format',)
 export_parser.add_argument('out_path', type=str, help='Path to the directory where the exported file will be saved')
 export_parser.add_argument('csl_path', type=str, default=DEFAULT_CSL_PATH,

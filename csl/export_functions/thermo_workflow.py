@@ -3,7 +3,7 @@ from utils.sql_utils import create_session, Experiment
 from .format_workflow_utils import *
 
 
-class TxtWorkflow(FormatWorkflow):
+class ThermoWorkflow(FormatWorkflow):
     def export(self):
         """Workflow to export CSL data to a text file."""
 
@@ -12,13 +12,13 @@ class TxtWorkflow(FormatWorkflow):
         from tqdm import tqdm
         import logging
         logger = logging.getLogger(__name__)
-        logger.info('Executing txt export workflow')
+        logger.info('Executing thermo export workflow')
 
         # Temporary settings
         chrom_method = "dx.doi.org/10.1016/j.chroma.2015.11.014"  # Todo: needs to be a command later
 
         # Generate the output file name based on the CSL version and the current date
-        export_method = f"txt"
+        export_method = f"thermo"
         csl_version = os.path.splitext(os.path.basename(self.path_csl))[0]
         date_code = datetime.now().strftime("%y%m%d")
         fname_out = os.path.join(self.path_out, f'{date_code}_{csl_version}_{export_method}.txt')
@@ -60,4 +60,4 @@ class TxtWorkflow(FormatWorkflow):
         # Close the session after processing all experiments
         session.close()
 
-        logger.info('End of text export workflow')
+        logger.info('End of thermo export workflow')

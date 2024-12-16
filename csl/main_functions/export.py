@@ -25,7 +25,7 @@ setup_logger(log_fpath)  # Sets basic logger configuration and adds stream handl
 
 # Define workflow dictionary
 WORKFLOWS = {
-    "txt": TxtWorkflow,
+    "thermo": ThermoWorkflow,
     "envi": EnviWorkflow,
     "mbank": MbankWorkflow
 }

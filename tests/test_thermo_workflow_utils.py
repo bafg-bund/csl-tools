@@ -1,6 +1,6 @@
 import pytest
 
-from export_functions.format_workflow_utils.nist_workflow_utils import *
+from export_functions.format_workflow_utils.thermo_workflow_utils import *
 
 
 @pytest.mark.parametrize("adduct_form, expected_precursor_charge",
