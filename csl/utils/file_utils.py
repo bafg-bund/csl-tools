@@ -17,7 +17,7 @@ def validate_file_path(fpath):
         raise FileNotFoundError(f"File at {fpath} does not exist.")
 
 
-def update_version(filename, update_type):
+def update_version_filename(filename, update_type):
     """
     Updates the filename based on update type and current year.
     The filename needs to contain the version identifier 'v' and a version number ('year.major.minor')
@@ -37,6 +37,9 @@ def update_version(filename, update_type):
     import re
     from datetime import datetime
     import os
+
+    # Make sure it's the basename
+    filename = os.path.basename(filename)
 
     # Extract the version number
     version_pattern = r"CSL_v(\d+)\.(\d+)(?:\.(\d+))?.db"
@@ -75,3 +78,23 @@ def update_version(filename, update_type):
             f'{os.path.splitext(filename)[0]}_{update_type}_edit{os.path.splitext(filename)[-1]}'
 
     return updated_filename
+
+
+def get_csl_version(csl_path):
+    """Extracts the CSL version from the file path of the CSL."""
+    import os
+    import re
+
+    # Make sure it's the basename
+    filename = os.path.basename(csl_path)
+
+    # Extract the CSL version number
+    version_pattern = r"CSL_v([0-9.]+)\.db"
+    match = re.match(version_pattern, filename)
+
+    if match:
+        csl_version = match.group(1)
+    else:
+        raise ValueError(f"Filename '{filename}' does not match the expected pattern 'CSL_v<version>.db'.")
+
+    return csl_version

@@ -31,12 +31,12 @@ WORKFLOWS = {
 }
 
 
-def run_export_workflow(format_out, path_out, path_csl):
+def run_export_workflow(format, path_out, path_csl):
     """
     Executes the appropriate workflow for exporting CSL data as various formats.
 
     Args:
-        format_out (str) : Export format.
+        format (str)     : Export format.
         path_out (str)   : Path to export directory.
         path_csl (str)   : Path to the CSL file.
     """
@@ -46,6 +46,6 @@ def run_export_workflow(format_out, path_out, path_csl):
     validate_file_path(path_out)
 
     # Select and execute the appropriate workflow based on the institution
-    workflow_class = WORKFLOWS[format_out]
+    workflow_class = WORKFLOWS[format]
     workflow = workflow_class(path_out, path_csl)
     workflow.export()

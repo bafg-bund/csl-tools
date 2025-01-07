@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "csl"
-version = "0.0.1"
+version = "0.1.0dev1"
 description = "Import, export and curation of spectral data for the CSL (Collective Spectral Library)."
 authors = [
     { name = "Ole Lessmann", email = "lessmann@bafg.de" },

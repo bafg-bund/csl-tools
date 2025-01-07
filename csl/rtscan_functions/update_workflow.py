@@ -1,5 +1,5 @@
 from .operation_workflow import OperationWorkflow
-from utils.file_utils import update_version
+from utils.file_utils import update_version_filename
 from utils.sql_utils import inst_code_csl_mapping, create_session
 from .rtscan_workflow_utils.rtscan_utils import *
 from config import DEFAULT_PAIRS_INST_CHROM
@@ -46,7 +46,7 @@ class UpdateWorkflow(OperationWorkflow):
         # Backup the database file with updated filename
         filename = os.path.basename(self.path_csl)
         release_type = 'minor'  # Fixed release type for rtscan operations
-        updated_filename = update_version(filename, release_type)
+        updated_filename = update_version_filename(filename, release_type)
         new_path_csl = str(os.path.join(os.path.dirname(self.path_csl), updated_filename))
         shutil.copy(self.path_csl, new_path_csl)
 

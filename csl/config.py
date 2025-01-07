@@ -2,6 +2,9 @@
 
 import os
 
+# Python package version
+pycsl_version = '0.1.0.dev1'
+
 # Default paths
 DEFAULT_CSL_PATH = "C:/Users/lessmann/Data/collective-spectral-library/csl/CSL_v24.4.db"
 # Todo: Currently defaults to my local version. Should be handled differently later.

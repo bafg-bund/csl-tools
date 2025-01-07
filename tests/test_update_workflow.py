@@ -27,7 +27,7 @@ def test_rtscan(mock_session, mock_inst_method_pairs, mock_inst_notation_pairs, 
     with patch('rtscan_functions.update_workflow.DEFAULT_PAIRS_INST_CHROM', mock_inst_method_pairs), \
          patch('rtscan_functions.update_workflow.inst_code_csl_mapping') as mock_default_inst_mapping, \
          patch('rtscan_functions.update_workflow.check_order_pred_bfg_rt') as mock_check_order_pred_bfg_rt, \
-         patch('rtscan_functions.update_workflow.update_version') as mock_update_version, \
+         patch('rtscan_functions.update_workflow.update_version_filename') as mock_update_version_filename, \
          patch('shutil.copy'), \
          patch('rtscan_functions.update_workflow.create_session') as mock_create_session, \
          patch('rtscan_functions.update_workflow.get_inst_rt_info') as mock_get_inst_rt_info, \
@@ -43,7 +43,7 @@ def test_rtscan(mock_session, mock_inst_method_pairs, mock_inst_notation_pairs, 
         mock_create_session.return_value = mock_session
         mock_session.query(RetentionTime.compound_id).all.return_value = [[1443]]
         mock_check_order_pred_bfg_rt.return_value = ['lfuby', 'uba', 'lanuv']
-        mock_update_version.return_value = 'mock_filename'
+        mock_update_version_filename.return_value = 'mock_filename'
         mock_get_inst_rt_info.return_value = (mock_inst_rt, mock_inst_exp_rt, mock_inst_pred_rt)
         mock_check_exp_data.return_value = ([], [], [])
         mock_check_pred_flags.return_value = []
