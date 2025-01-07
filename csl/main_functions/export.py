@@ -2,12 +2,9 @@
 Main function to export CSL data as various formats.
 
 Export Classes:
-    txt   : Workflow for exporting the CSL as a merged txt file.
-    envi  : Workflow for exporting the CSL as a target list usable for envimass.
-    mbank : Workflow for exporting the CSL for massbank.
-
-    MassBank: 
-
+    thermo : Workflow for exporting the CSL as a txt file readable by mzVault.
+    envi   : Workflow for exporting the CSL as a target list usable for enviMass.
+    mbank  : Workflow for exporting the CSL as txt files for MassBank.
 """
 
 import os.path
@@ -31,12 +28,13 @@ WORKFLOWS = {
 }
 
 
-def run_export_workflow(format, path_out, path_csl):
+def run_export_workflow(format, inst, path_out, path_csl):
     """
     Executes the appropriate workflow for exporting CSL data as various formats.
 
     Args:
         format (str)     : Export format.
+        inst (str)       : Institution type, used to filter export data.
         path_out (str)   : Path to export directory.
         path_csl (str)   : Path to the CSL file.
     """
@@ -47,5 +45,5 @@ def run_export_workflow(format, path_out, path_csl):
 
     # Select and execute the appropriate workflow based on the institution
     workflow_class = WORKFLOWS[format]
-    workflow = workflow_class(path_out, path_csl)
+    workflow = workflow_class(inst, path_out, path_csl)
     workflow.export()

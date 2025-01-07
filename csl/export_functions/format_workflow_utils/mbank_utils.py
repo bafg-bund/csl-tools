@@ -5,7 +5,6 @@ from config import DEFAULT_PAIRS_INST_CHROM
 from dataclasses import dataclass
 from typing import Optional, Union, List
 
-
 def extract_experiment_chunk(session, exp_id, chrom_method, csl_version, pycsl_version):
     """
     Extracts data for a specific experiment id and formats data to meet MassBank requirements.
@@ -36,6 +35,7 @@ def extract_experiment_chunk(session, exp_id, chrom_method, csl_version, pycsl_v
     export_chunk = build_export_chunk(FormattedData, csl_version, pycsl_version)
 
     return export_chunk
+
 
 @dataclass
 class SqlQueryResult:

@@ -1,5 +1,5 @@
 from export_functions.format_workflow import FormatWorkflow
-from utils.sql_utils import create_session, Experiment, ExperimentGroup, expGroupExp
+from utils.sql_utils import inst_code_csl_mapping, create_session, Experiment, ExperimentGroup, expGroupExp
 from export_functions.format_workflow_utils import *
 from utils.file_utils import get_csl_version
 from config import pycsl_version
@@ -21,22 +21,23 @@ class MbankWorkflow(FormatWorkflow):
         session = create_session(self.path_csl)
 
         # Query to get experiment IDs with specific ExperimentGroup name
-        inst = 'BfG'  # Todo: needs to be a command later
+        inst_notation_pairs = inst_code_csl_mapping()
         stmt = (
             select(Experiment.experiment_id)
             .join(expGroupExp, Experiment.experiment_id == expGroupExp.c.experiment_id)
             .join(ExperimentGroup, expGroupExp.c.experimentGroup_id == ExperimentGroup.experimentGroup_id)
-            .where(ExperimentGroup.name == inst)
-        )  # Todo: improve statement
+            .where(ExperimentGroup.name == inst_notation_pairs[self.inst])
+        )
 
         # Execute the query
         experiment_ids = session.execute(stmt).scalars().all()
+        logger.info(f"Found {len(experiment_ids)} experiment ID's for {inst_notation_pairs[self.inst]}")
 
         # Start CSL data extraction
         logger.info("Starting CSL data export")
 
         # Temporary settings
-        chrom_method = "dx.doi.org/10.1016/j.chroma.2015.11.014"  # Todo: needs to be a command later
+        chrom_method = "dx.doi.org/10.1016/j.chroma.2015.11.014"  # Todo: needs to be a command
 
         # Get CSL version number
         csl_version = get_csl_version(self.path_csl)
