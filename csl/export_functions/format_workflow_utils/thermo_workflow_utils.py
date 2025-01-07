@@ -13,12 +13,12 @@ def extract_experiment_text_chunk(session, exp_id, chrom_method):
     Todo: - No comment (and other) lines; problem in mzVault?
 
     Args:
-        session (obj): SQLAlchemy session object connected to the database.
+        session (obj): SQLAlchemy session object connected to the CSL database.
         exp_id (int): Experiment ID used to query the database.
-        chrom_method (str): Chromatographic method identifier used to retrieve retention time.
+        chrom_method (str): Chromatographic method identifier.
 
     Returns:
-        str: A formatted text chunk containing the experiment data.
+        export_chunk (str): Formatted text chunk for the document.
     """
 
     from utils.sql_utils import (Experiment, Fragment, RetentionTime, ExperimentGroup, expGroupExp,
@@ -68,7 +68,7 @@ def extract_experiment_text_chunk(session, exp_id, chrom_method):
     mol = Chem.MolFromSmiles(compound.SMILES)
     exact_mass = round(Descriptors.ExactMolWt(mol), 4)
 
-    # Get instrument type and
+    # Get instrument type and name
     instrument_type = parameter.instrument.split()[0]
     instrument_name = " ".join(parameter.instrument.split()[1:])
 

@@ -11,6 +11,7 @@ class ThermoWorkflow(FormatWorkflow):
         import os.path
         from tqdm import tqdm
         import logging
+
         logger = logging.getLogger(__name__)
         logger.info('Executing thermo export workflow')
 
@@ -26,7 +27,7 @@ class ThermoWorkflow(FormatWorkflow):
         # Start CSL connection and data extraction
         logger.info("Starting CSL data extraction")
 
-        # Connect to the database
+        # Connect to the CSL database
         session = create_session(self.path_csl)
 
         # Retrieve all experiment IDs

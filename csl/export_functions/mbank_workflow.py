@@ -38,20 +38,26 @@ class MbankWorkflow(FormatWorkflow):
         # Temporary settings
         chrom_method = "dx.doi.org/10.1016/j.chroma.2015.11.014"  # Todo: needs to be a command later
 
-        # Get version numbers
+        # Get CSL version number
         csl_version = get_csl_version(self.path_csl)
 
-        # Process experiment IDs and generate files
+        # Process experiment IDs and generate txt files
         for i, exp_id in tqdm(enumerate(experiment_ids), total=len(experiment_ids), ncols=77):
             try:
+                # Extracts data for a specific experiment id and formats data to meet MassBank requirements.
                 export_data = extract_experiment_chunk(session, exp_id, chrom_method, csl_version, pycsl_version)
+
+                # Skip experiment ID if compound is an internal standard (export_data is None)
                 if not export_data:
                     logger.info(f'Skipping {exp_id} (internal standard)')
                     continue
+
+                # Write txt file
                 file_name = re.search(r"ACCESSION: (.+?)\n", export_data).group(1)
                 fname_out = os.path.join(self.path_out, f'{file_name}.txt')
                 with open(fname_out, 'a') as f:
                     f.writelines(export_data)
+
             except Exception as e:
                 logger.error(f"There was an error processing experiment ID {exp_id}: {str(e)}")
 

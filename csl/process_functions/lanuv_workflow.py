@@ -102,7 +102,7 @@ class LanuvWorkflow(InstitutionWorkflow):
     def process_data(self, extract_data, inst_def, spec_adduct):
         """
         Formats the previously extracted and collected data based in institution-specific variables to match the
-        required format for csl-matching/commits. For information on format requirements of txt-files see:
+        required format for csl-matching/commits. For information on format requirements of txt files see:
         https://gitlab.lan.bafg.de/nts/ntsportal/-/wikis/Processing-new-files-for-the-CSL
 
         Data entries are checked for errors and marked with flags in DataFrame:
