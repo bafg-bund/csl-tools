@@ -89,7 +89,7 @@ def get_csl_version(csl_path):
     filename = os.path.basename(csl_path)
 
     # Extract the CSL version number
-    version_pattern = r"CSL_v([0-9.]+)\.db"
+    version_pattern = r"CSL_v([0-9.]+)(?:[_a-zA-Z]*)?\.db"
     match = re.match(version_pattern, filename)
 
     if match:
