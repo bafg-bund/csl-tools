@@ -165,7 +165,7 @@ def add_exp_to_session(session, entry, inst_def):
     if not rt_res:
         logger.info(f'Retention time for compound ID "{comp_res.compound_id}" and chromatographic method '
                     f'"{chrom_method}" not found in CSL. Adding retention time from data entry.')
-        rt_res = RetentionTime(chrom_method=chrom_method, rt=rt_i, compound=comp_res)
+        rt_res = RetentionTime(chrom_method=chrom_method, rt=rt_i, compound=comp_res, predicted='FALSE')
         session.add(rt_res)
 
     # Search experimental parameters and add then from the file if they don't exist
