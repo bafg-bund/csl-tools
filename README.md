@@ -61,7 +61,7 @@ and curation of retention time data.
 ```bash
 python main.py [command] [options]
 ```
-_Note_: You might have to navigate to the directory `csl`, where `main.py`is located.
+> You might have to navigate to the directory `csl`, where `main.py`is located.
 Alternatively use `csl/main.py` directly in your commands.
 
 
@@ -74,7 +74,7 @@ python main.py process [institution] [data_path] [--csl_path <path>]
 ```
 
 #### Arguments
-- [institutions]: Specify import format (currently institutions). Choose from:
+- [institution]: Specify import format (currently institution). Choose from:
   - `lfuby`: LfU Bayern import format (ThermoFisher/mzVault).
   - `lubw`: LUBW import format (ThermoFisher/mzVault).
   - `bfg`: BfG import format (not implemented).
@@ -103,13 +103,17 @@ python main.py export [format] [out_path] [csl_path]
 - [format]: Specify the export format. Choose from:
   - `txt`: (not implemented).
   - `envi`: (not implemented).
-  - `mbank`: (not implemented).
-- [out_path]: Path to the directory where the exported file will be saved.
+  - `mbank`: MassBank export format.
+- [institution]: Specify subset of spectral data by data provider (institution). Choose from:
+  - `bfg`: BfG (Federal Institute of Hydrology)
+  - `lfuby`: LfU Bayern (Bavarian Environment Agency)
+  - `uba`: UBA (Federal Environment Agency)
+- [out_path]: Path to the directory where the exported file(s) will be saved.
 - [csl_path]: (Optional) Path to CSL file (Default: Specified in `config.py`).
 
 #### Example
 ```bash
-python main.py export txt C:\path\to\output_dir C:\path\to\csl.db
+python main.py export mbank bfg C:\path\to\output_dir C:\path\to\csl.db
 ```
 
 ### `rtscan`
