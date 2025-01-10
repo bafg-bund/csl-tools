@@ -1,0 +1,45 @@
+from main_functions.export import run_export_workflow
+from config import ROOT_DIR
+import os
+import re
+import glob
+from datetime import datetime
+
+def test_export_mbank_bfg():
+    """Tests correct export of BfG experiments as MassBank documents."""
+    # Prepare paths
+    csl_path = os.path.join(ROOT_DIR,'tests/integration/fixtures/CSL_v0_export_mbank.db')
+    out_path = os.path.join(ROOT_DIR,'tests/integration/temp')
+
+    # Make sure temp directory is clean
+    files = glob.glob(os.path.join(out_path, '*'))
+    if files:
+        for f in files:
+            os.remove(f)
+
+    # Export mbank workflow
+    run_export_workflow(format='mbank', inst='bfg',
+                        path_out=out_path,
+                        path_csl=csl_path)
+
+    # Assert that only one file was produced
+    files = glob.glob(os.path.join(out_path, '*'))  # List all files in the output folder
+    assert len(files) == 1, f"Expected 1 file, but found {len(files)}: {files}"
+
+    # Assert that file content is as expected
+    with open(files[0], 'r') as f:
+        content = f.read()
+    # Check all mandatory tags (https://github.com/MassBank/MassBank-web/blob/main/Documentation/MassBankRecordFormat.md#table-1--massbank-record-format-summary)
+    mandatory_tags = ["ACCESSION", "RECORD_TITLE", "DATE", "AUTHORS", "LICENSE", "CH$NAME", "CH$COMPOUND_CLASS",
+                      "CH$FORMULA", "CH$EXACT_MASS", "CH$SMILES", "CH$IUPAC", "AC$INSTRUMENT", "AC$INSTRUMENT_TYPE",
+                      "AC$MASS_SPECTROMETRY: MS_TYPE", "AC$MASS_SPECTROMETRY: ION_MODE", "PK$SPLASH", "PK$NUM_PEAK",
+                      "PK$PEAK"]
+    for tag in mandatory_tags:
+        assert tag in content, f"Mandatory tag '{tag}' not in file content"
+    # Check that current date is in content
+    match_date = re.search(r'\bDATE: (\d{4}\.\d{2}\.\d{2})', content)
+    assert match_date.group(1) == datetime.now().strftime('%Y.%m.%d'), "Date string does not match"
+
+    # Cleanup temp directory
+    for f in files:
+        os.remove(f)
