@@ -210,7 +210,7 @@ def extract_and_format_mbank_data(exp_id, chrom_method, sql_data: SqlQueryResult
     if chrom_method == all_methods['bfg']:
         chrom_chunk = \
             (f"AC$CHROMATOGRAPHY: COLUMN_NAME Zorbax Eclipse Plus C18 2.1 mm x 150 mm, 3.5 um, Agilent\n"
-             f"AC$CHROMATOGRAPHY: COLUMN_TEMPERATURE 40 °C\n"
+             f"AC$CHROMATOGRAPHY: COLUMN_TEMPERATURE 40 deg C\n"
              f"AC$CHROMATOGRAPHY: FLOW_GRADIENT 0 min min 98% A, 1 min 98% A, 2 min 80% A, 16.5 min 2% A, 22 min 2% A, 22.1 min 98% A, 27 min 98% A\n"
              f"AC$CHROMATOGRAPHY: FLOW_RATE 0.3 mL/min\n"
              f"AC$CHROMATOGRAPHY: RETENTION_TIME {rt} min\n"

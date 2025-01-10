@@ -200,7 +200,7 @@ def extract_compound_class(compound_groups):
 def extract_contributors_copyright(exp_groups):
 
     if 'BfG' in exp_groups:
-        authors = 'Björn Ehlig; Kevin S. Jewell; Arne Wick'
+        authors = 'Bjoern Ehlig; Kevin S. Jewell; Arne Wick'
         inst_copyright = 'Copyright 2023 Federal Institute of Hydrology, Koblenz, Germany'
         contrib_prefix = 'BAFG'
         inst_license = 'dl-de/by-2-0'
