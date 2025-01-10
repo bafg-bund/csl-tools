@@ -8,7 +8,7 @@ def test_csl_query_envi(mock_session, mock_df_envi):
          patch('pandas.read_sql') as mock_read_sql:
 
         # Instantiate EnviWorkflow with dummy paths for testing
-        workflow = EnviWorkflow(path_out='dummy_path_out', path_csl='dummy_csl_path')
+        workflow = EnviWorkflow(inst='dummy_inst', path_out='dummy_path_out', path_csl='dummy_csl_path')
 
         # Mock session query returns
         mock_create_session.return_value = mock_session
@@ -41,7 +41,7 @@ def test_process_data_envi(mock_df_envi):
     fragment_cutoff_percent = 20
 
     # Instantiate EnviWorkflow with dummy paths for testing
-    workflow = EnviWorkflow(path_out='dummy_path_out', path_csl='dummy_csl_path')
+    workflow = EnviWorkflow(inst='dummy_inst', path_out='dummy_path_out', path_csl='dummy_csl_path')
 
     # Call the function
     df_formatted = workflow.process_data_envi(mock_df_envi, mock_fragment_data, fragment_cutoff_percent)

@@ -1,7 +1,6 @@
 import pytest
 import pandas as pd
 from unittest.mock import patch, MagicMock
-
 from process_functions import LfubyWorkflow
 
 

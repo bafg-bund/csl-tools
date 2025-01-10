@@ -25,3 +25,11 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = ["csl"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests/unit",
+    "tests/integration",
+]

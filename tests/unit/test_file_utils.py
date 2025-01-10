@@ -1,10 +1,9 @@
 import pytest
-from utils import *
 from unittest.mock import patch
-
+from utils import *
 
 def test_validate_file_path_not_exists():
-    """Tests if validate_file_path returns the expected FileNotFoundError when path does not exist"""
+    """Tests if validate_file_path returns the expected FileNotFoundError when path does not exist."""
     with patch('os.path.exists', return_value=False):
         path = "some/path"
         with pytest.raises(FileNotFoundError, match=f'File at {path} does not exist.'):
@@ -31,3 +30,23 @@ def test_update_version_filename(filename, update_type, year, expected_updated_f
         update_filename = update_version_filename(filename, update_type)
         # Assert
         assert update_filename == expected_updated_filename
+
+
+@pytest.mark.parametrize("csl_path, expected_csl_version",
+                         [('CSL_v24.0.4.db', '24.0.4'),
+                          ('CSL_v0.db', '0'),
+                          ('CSL_v25.1_subset.db', '25.1'),
+                          ('CSL_v25.1test.db', '25.1'),
+                          ('CSL_v0sub_test.db', '0'),
+                          ('C:User/user/CSL_v2.8_test/CSL_v25.7.db', '25.7')
+                          ])
+def test_get_csl_version(csl_path, expected_csl_version):
+    """Tests correct version extraction based on CSL path or CSL filename."""
+    csl_version = get_csl_version(csl_path)
+    assert csl_version == expected_csl_version
+
+@pytest.mark.parametrize("csl_path", ['CSL_v_test.db', 'CSL_v0.1'])
+def test_get_csl_version_error(csl_path):
+    """Tests correct error if filename does not match expected pattern."""
+    with pytest.raises(ValueError):
+        get_csl_version(csl_path)
