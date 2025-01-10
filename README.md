@@ -1,7 +1,7 @@
 # Python package for the Collective Spectral Library (CSL)
 
 ## Name
-py-csl
+pycsl
 
 ## Description
 Import, export and curation of spectral data for the Collective Spectral Library (CSL).
@@ -61,6 +61,9 @@ and curation of retention time data.
 ```bash
 python main.py [command] [options]
 ```
+_Note_: You might have to navigate to the directory `csl`, where `main.py`is located.
+Alternatively use `csl/main.py` directly in your commands.
+
 
 ### Commands:  
 
