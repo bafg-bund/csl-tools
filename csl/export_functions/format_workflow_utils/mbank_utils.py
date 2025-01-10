@@ -4,6 +4,8 @@ from utils.sql_utils import Experiment, Compound, Parameter, Fragment, expGroupE
 from config import DEFAULT_PAIRS_INST_CHROM
 from dataclasses import dataclass
 from typing import Optional, Union, List
+from splash import Spectrum, SpectrumType, Splash
+
 
 def extract_experiment_chunk(session, exp_id, chrom_method, csl_version, pycsl_version):
     """
@@ -57,7 +59,7 @@ class FormattedData:
     inst_copyright: str
     comment_chunk: str
     compound_name: str
-    compound_class: Optional[Union[str, List[str]]]  # Can be a single str, a list of str, or None
+    compound_classes: Optional[Union[str, List[str]]]  # Can be a single str, a list of str, or None
     formula: str
     exact_mass: float
     smiles: str
@@ -107,10 +109,6 @@ def sql_queries_export(session, exp_id, chrom_method):
     # Get experiment groups
     exp_groups = session.query(ExperimentGroup.name).join(expGroupExp) \
         .filter(expGroupExp.c.experiment_id == exp_id).all()
-    exp_groups = [group.name for group in exp_groups]
-    if len(exp_groups) > 1:
-        raise ValueError(
-            f"Experiment groups > 1 not allowed. Check experiment ID {exp_id}")
 
     # Get compound groups
     compound_groups = session.query(CompoundGroup.name).join(compGroupComp) \
@@ -163,7 +161,7 @@ def extract_and_format_mbank_data(exp_id, chrom_method, sql_data: SqlQueryResult
     inchi = sql_data.compound.inchi
     inchikey = sql_data.compound.inchikey
     formula = format_formula(adduct, sql_data.compound.formula)
-    compound_class = get_compound_class(sql_data.compound_groups)
+    compound_classes = get_compound_classes(sql_data.compound_groups)
 
     # Retention time
     rt = sql_data.retention_time.rt  # Todo: Currently: error and skip if no RT exists. How is it handled in RMassBank?
@@ -178,8 +176,14 @@ def extract_and_format_mbank_data(exp_id, chrom_method, sql_data: SqlQueryResult
     ion_mode = get_ion_mode(sql_data.parameter.polarity)
     frag_mode = get_fragmentation_mode(sql_data.parameter.col_type)
 
+    # Experiment groups
+    exp_groups = [group.name for group in sql_data.exp_groups]
+    if len(exp_groups) > 1:
+        raise ValueError(
+            f"Experiment groups > 1 not allowed. Check experiment ID {exp_id}")
+
     # Legal stuff
-    authors, inst_copyright, contrib_prefix, inst_license = get_contributors_copyright(sql_data.exp_groups)
+    authors, inst_copyright, contrib_prefix, inst_license = get_contributors_copyright(exp_groups[0])
     if not authors:
         raise ValueError(f"Unknown contributor for experiment ID {exp_id}")
 
@@ -216,7 +220,7 @@ def extract_and_format_mbank_data(exp_id, chrom_method, sql_data: SqlQueryResult
         chrom_chunk = f"AC$CHROMATOGRAPHY: RETENTION_TIME {rt} min\n"
 
     return FormattedData(accession, title, date, authors, inst_license, inst_copyright,
-                         comment_chunk, compound_name, compound_class, formula, exact_mass,
+                         comment_chunk, compound_name, compound_classes, formula, exact_mass,
                          smiles, inchi, cas, inchikey, instrument_name, instrument_type,
                          def_mslevel, ion_mode, ce, frag_mode, ionization, chrom_chunk,
                          precursor_mz, adduct, splash_code, nr_peaks, spectrum)
@@ -248,8 +252,8 @@ def build_export_chunk(f_data: FormattedData, csl_version, pycsl_version):
 
     export_chunk += f"CH$NAME: {f_data.compound_name}\n"
 
-    if f_data.compound_class:
-        export_chunk += f"CH$COMPOUND_CLASS: {f_data.compound_class}\n"
+    if f_data.compound_classes:
+        export_chunk += f"CH$COMPOUND_CLASS: {f_data.compound_classes}\n"
 
     export_chunk += \
         (f"CH$FORMULA: {f_data.formula}\n"
@@ -315,8 +319,8 @@ def format_spectrum(spectrum):
     # Remove zeros in intensity
     spectrum_nozero = [entry for entry in spectrum if entry[1] != 0]
     # Round values to 4 decimals for mz and intensity.
-    updated_spectrum = [(round(mz,4), round(intensity,4), rel_int) for (mz, intensity, rel_int) in spectrum_nozero]
-    return updated_spectrum
+    formatted_spectrum = [(round(mz,4), round(intensity,4), rel_int) for (mz, intensity, rel_int) in spectrum_nozero]
+    return formatted_spectrum
 
 
 def get_splash_code(spectrum):
@@ -327,7 +331,6 @@ def get_splash_code(spectrum):
 
     Intensity values are multiplied by 1000 before spectral hash code generation to avoid splash code issues.
     """
-    from splash import Spectrum, SpectrumType, Splash
 
     # Multiply intensities by 1000 to avoid splash code issues
     temp_spectrum = []
@@ -369,18 +372,18 @@ def format_formula(adduct, formula):
     return formula
 
 
-def get_compound_class(compound_groups):
+def get_compound_classes(compound_groups):
     """Extracts the non-institute compound classes from a list of compound groups."""
     inst_notation_pairs = inst_code_csl_mapping()
 
     compound_groups = [group.name for group in compound_groups]
     compound_groups_filtered = [cg for cg in compound_groups if cg not in inst_notation_pairs.values()]
 
-    if compound_groups:
-        compound_class = "; ".join(compound_groups_filtered)
+    if compound_groups_filtered:
+        compound_classes = "; ".join(compound_groups_filtered)
     else:
-        compound_class = None
-    return compound_class
+        compound_classes = None
+    return compound_classes
 
 
 def get_ion_mode(pol):
@@ -405,31 +408,34 @@ def get_fragmentation_mode(col_type):
     return frag_mode
 
 
-def get_contributors_copyright(exp_groups):
+def get_contributors_copyright(exp_group):
     """
-    Returns legal information based on experiment groups. Todo: change to institute str.
+    Returns legal information based on experiment group.
+
+    Args:
+        exp_group (str) : Experiment group.
 
     Returns:
         authors (str) : Contributors.
         inst_copyright (str) : Copyright statement.
-        contrib_prefix (str) : Contributor prefix.
-        inst_license (str) : Type of licence for the institutes data.
+        contrib_prefix (str) : Contributor prefix in MassBank format.
+        inst_license (str) : Type of licence for the institute's data.
     """
     from datetime import datetime
     inst_notation_pairs = inst_code_csl_mapping()
 
     current_year = datetime.now().strftime('%Y')
-    if inst_notation_pairs['bfg'] in exp_groups:
-        authors = 'Ole Lessmann; Kevin S. Jewell; Björn Ehlig; Arne Wick'
+    if inst_notation_pairs['bfg'] == exp_group or 'bfg' == exp_group:
+        authors = 'Ole Lessmann; Kevin S. Jewell; Bjoern Ehlig; Arne Wick'
         inst_copyright = f'Copyright {current_year} Federal Institute of Hydrology, Koblenz, Germany'
         contrib_prefix = 'BAFG'  # Todo: change?
         inst_license = 'dl-de/by-2-0'
-    elif inst_notation_pairs['lfuby'] in exp_groups:
+    elif inst_notation_pairs['lfuby'] == exp_group or 'lfuby' == exp_group:
         authors = 'André Macherius; Uwe Kunkel'
         inst_copyright = f'Copyright {current_year} Bavarian Environment Agency, Augsburg, Germany'
         contrib_prefix = 'LFUBY'
         inst_license = None  # Todo licence for lfuby?
-    elif inst_notation_pairs['uba'] in exp_groups:
+    elif inst_notation_pairs['uba'] == exp_group or 'uba' == exp_group:
         authors = 'Eric Rosenheinrich; Anja Duffeck'
         inst_copyright = f'Copyright {current_year} Federal Environment Agency, Berlin, Germany'
         contrib_prefix = 'UBA'
