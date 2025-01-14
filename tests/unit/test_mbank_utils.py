@@ -176,7 +176,7 @@ def test_build_export_chunk(mock_formatted_data_mbank):
         "PK$PEAK: m/z int. rel.int.\n"
         "  100.0 150.0 10.0\n"
         "  200.0 250.0 20.0\n"
-        "//")
+        "//\n")
 
     # Call the function
     export_chunk = build_export_chunk(mock_formatted_data_mbank, csl_version, pycsl_version)

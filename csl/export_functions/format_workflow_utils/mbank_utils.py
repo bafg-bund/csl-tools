@@ -6,17 +6,44 @@ from dataclasses import dataclass
 from typing import Optional, Union, List
 from splash import Spectrum, SpectrumType, Splash
 
+def get_mbank_exp_ids(path_mbank_files):
+    """
+    Retrieve current MassBank experiment IDs (=accession numbers).
 
-def extract_experiment_chunk(session, exp_id, chrom_method, csl_version, pycsl_version):
+    Args:
+        path_mbank_files (str) : Path to directory with existing MassBank files.
+
+    Returns:
+        dict_mbank_exp_id_fn (dict) : Pairs of existing of accession strings and experiment IDs.
+    """
+    import os
+    import re
+    from pathlib import Path
+
+    # Get all filenames
+    filenames = [file for file in os.listdir(path_mbank_files) if file.endswith(".txt")]
+
+    # Pattern to extract the experiment ID after the date (YYMMDD)
+    pattern = r"MSBNK-BAFG-CSL\d{6}(\d+)"
+
+    # Create a dictionary with extracted experiment ID as keys and filenames as values
+    dict_mbank_exp_id_fn = {
+        int(re.search(pattern, fn).group(1)): Path(fn).stem
+        for fn in filenames if re.search(pattern, fn)
+    }
+    return dict_mbank_exp_id_fn
+
+def extract_experiment_chunk(session, exp_id, chrom_method, csl_version, pycsl_version, dict_mbank_exp_id_fn):
     """
     Extracts data for a specific experiment id and formats data to meet MassBank requirements.
 
     Args:
-        session (obj)       : SQLAlchemy session object connected to the CSL database.
-        exp_id (int)        : Experiment ID used to query the database.
-        chrom_method (str)  : Chromatographic method identifier.
-        csl_version (str)   : Current version of the CSL database.
-        pycsl_version (str) : Current version of the python package.
+        session (obj)               : SQLAlchemy session object connected to the CSL database.
+        exp_id (int)                : Experiment ID used to query the database.
+        chrom_method (str)          : Chromatographic method identifier.
+        csl_version (str)           : Current version of the CSL database.
+        pycsl_version (str)         : Current version of the python package.
+        dict_mbank_exp_id_fn (dict) : Pairs of existing of accession strings and experiment IDs.
 
     Returns:
         export_chunk (str) : Text chunk formatted to fit MassBank requirements for a single txt file.
@@ -31,7 +58,7 @@ def extract_experiment_chunk(session, exp_id, chrom_method, csl_version, pycsl_v
         return None
 
     # Format data to meet MassBank format requirements
-    FormattedData = extract_and_format_mbank_data(exp_id, chrom_method, SqlQueryResult)
+    FormattedData = extract_and_format_mbank_data(exp_id, chrom_method, SqlQueryResult, dict_mbank_exp_id_fn)
 
     # Assemble text chunk for the MassBank document
     export_chunk = build_export_chunk(FormattedData, csl_version, pycsl_version)
@@ -121,14 +148,15 @@ def sql_queries_export(session, exp_id, chrom_method):
     return SqlQueryResult(experiment, compound, parameter, fragments, exp_groups, compound_groups, retention_time)
 
 
-def extract_and_format_mbank_data(exp_id, chrom_method, sql_data: SqlQueryResult):
+def extract_and_format_mbank_data(exp_id, chrom_method, sql_data: SqlQueryResult, dict_mbank_exp_id_fn):
     """
     Extracts, processes, and formats experimental data into a structured format for MassBank.
 
     Args:
-        exp_id (int)         : Experiment ID used to query the database.
-        chrom_method (str)   : Chromatographic method identifier.
-        sql_data (dataclass) : Dataclass containing experiment data and metadata.
+        exp_id (int)                : Experiment ID used to query the database.
+        chrom_method (str)          : Chromatographic method identifier.
+        sql_data (dataclass)        : Dataclass containing experiment data and metadata.
+        dict_mbank_exp_id_fn (dict) : Pairs of existing of accession strings and experiment IDs.
 
     Returns:
           FormattedData (dataclass) : Dataclass containing the formatted data required for constructing the MassBank
@@ -187,14 +215,15 @@ def extract_and_format_mbank_data(exp_id, chrom_method, sql_data: SqlQueryResult
     if not authors:
         raise ValueError(f"Unknown contributor for experiment ID {exp_id}")
 
-    # Construct title and accession
+    # Construct title
     def_mslevel = 'MS2'
-    entry_prefix = 'CSL'
-    massbank_prefix = 'MSBNK'
     title = f"{sql_data.compound.name}; {sql_data.parameter.instrument.split()[0]}; {def_mslevel}; {int(sql_data.parameter.CE)} {sql_data.parameter.ce_unit}"
+
+    # Get accession string
+    accession = get_accession(exp_id, contrib_prefix, dict_mbank_exp_id_fn)
+
+    # Current date
     date = datetime.now().strftime('%Y.%m.%d')
-    date_prefix = datetime.now().strftime('%y%m%d')
-    accession = f"{massbank_prefix}-{contrib_prefix}-{entry_prefix}{date_prefix}{exp_id}"
 
     # Comments
     inst_notation_pairs = inst_code_csl_mapping()
@@ -210,7 +239,7 @@ def extract_and_format_mbank_data(exp_id, chrom_method, sql_data: SqlQueryResult
     if chrom_method == all_methods['bfg']:
         chrom_chunk = \
             (f"AC$CHROMATOGRAPHY: COLUMN_NAME Zorbax Eclipse Plus C18 2.1 mm x 150 mm, 3.5 um, Agilent\n"
-             f"AC$CHROMATOGRAPHY: COLUMN_TEMPERATURE 40 deg C\n"
+             f"AC$CHROMATOGRAPHY: COLUMN_TEMPERATURE 40 °C\n"
              f"AC$CHROMATOGRAPHY: FLOW_GRADIENT 0 min min 98% A, 1 min 98% A, 2 min 80% A, 16.5 min 2% A, 22 min 2% A, 22.1 min 98% A, 27 min 98% A\n"
              f"AC$CHROMATOGRAPHY: FLOW_RATE 0.3 mL/min\n"
              f"AC$CHROMATOGRAPHY: RETENTION_TIME {rt} min\n"
@@ -287,7 +316,7 @@ def build_export_chunk(f_data: FormattedData, csl_version, pycsl_version):
         export_chunk += f"  {mz} {intensity} {rel_int}\n"
 
     # Last line of a MassBank Record
-    export_chunk += f"//"
+    export_chunk += f"//\n"
 
     return export_chunk
 
@@ -426,7 +455,7 @@ def get_contributors_copyright(exp_group):
 
     current_year = datetime.now().strftime('%Y')
     if inst_notation_pairs['bfg'] == exp_group or 'bfg' == exp_group:
-        authors = 'Ole Lessmann; Kevin S. Jewell; Bjoern Ehlig; Arne Wick'
+        authors = 'Ole Lessmann; Kevin S. Jewell; Björn Ehlig; Arne Wick'
         inst_copyright = f'Copyright {current_year} Federal Institute of Hydrology, Koblenz, Germany'
         contrib_prefix = 'BAFG'  # Todo: change?
         inst_license = 'dl-de/by-2-0'
@@ -443,3 +472,30 @@ def get_contributors_copyright(exp_group):
     else:
         authors = None; inst_copyright = None; contrib_prefix = None; inst_license = None
     return authors, inst_copyright, contrib_prefix, inst_license
+
+
+def get_accession(exp_id, contrib_prefix , dict_mbank_exp_id_fn):
+    """
+    Determines accession string for an experiment ID.
+    If accession already exists for the experiment ID, the accession remains unchanged.
+    Otherwise, a new accession string is created.
+
+    Args:
+        exp_id (int)                : Experiment ID
+        contrib_prefix (str)        : Contributor prefix in MassBank format.
+        dict_mbank_exp_id_fn (dict) : Pairs of existing of accession strings and experiment IDs.
+
+    Return:
+        accession (str) : Unique MassBank-specific identifier for each txt file.
+    """
+    from datetime import datetime
+
+    if exp_id in dict_mbank_exp_id_fn.keys():
+        accession = dict_mbank_exp_id_fn[exp_id]
+    else:
+        massbank_prefix = 'MSBNK'
+        entry_prefix = 'CSL'
+        date_prefix = datetime.now().strftime('%y%m%d')
+        accession = f"{massbank_prefix}-{contrib_prefix}-{entry_prefix}{date_prefix}{exp_id}"
+
+    return accession

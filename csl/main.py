@@ -56,7 +56,10 @@ export_parser.add_argument('format', type=str, choices=['thermo', 'envi', 'mbank
                            help='Specify export format',)
 export_parser.add_argument('institution', type=str, choices=['lfuby', 'bfg', 'uba', 'lanuv', 'lubw'],
                             help='Specify institution type for filtering data')
-export_parser.add_argument('out_path', type=str, help='Path to the directory where the exported file will be saved')
+export_parser.add_argument('out_path', type=str, help='Path to the directory where the exported file will be saved. '
+                                                      'For mbank format: Use path of local clone of '
+                                                      'https://github.com/MassBank/MassBank-data/tree/dev/BAFG '
+                                                      'to check the existing MassBank ACCESSION strings from file names.')
 export_parser.add_argument('csl_path', type=str, default=DEFAULT_CSL_PATH,
                            nargs='?', help='(Optional) Path to CSL file (Default: Specified in config.py)')
 
