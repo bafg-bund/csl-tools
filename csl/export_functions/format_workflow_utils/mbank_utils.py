@@ -169,9 +169,9 @@ def extract_and_format_mbank_data(exp_id, chrom_method, sql_data: SqlQueryResult
 
     # Fragmentation data / Spectrum
     spectrum = get_spectrum(sql_data.fragments)  # Includes rel. intensities
-    splash_code = get_splash_code(spectrum)
     spectrum = format_spectrum(spectrum)  # Rounding and removing zeros in intensity (adjusting to MassBank Format)
     nr_peaks = len(spectrum)
+    splash_code = get_splash_code(spectrum)
 
     # Experiment related
     precursor_mz = sql_data.experiment.mz
@@ -364,8 +364,7 @@ def get_splash_code(spectrum):
     # Multiply intensities by 1000 to avoid splash code issues
     temp_spectrum = []
     for entry in spectrum:
-        temp_int = entry[1] * 1000
-        temp_spectrum.append((entry[0], temp_int))
+        temp_spectrum.append((entry[0], entry[1] * 1000))
 
     # Generate a spectral hash code
     spec = Spectrum(temp_spectrum, SpectrumType.MS)
