@@ -20,15 +20,43 @@ class ThermoWorkflow(FormatWorkflow):
         # Connect to the CSL database
         session = create_session(self.path_csl)
 
-        # Retrieve all experiment IDs
-        experiment_ids = session.query(Experiment.experiment_id).all()
-        experiment_ids = [exp_id[0] for exp_id in experiment_ids]  # Convert to a flat list
+        # Get experiment IDs
+        if self.subset == 'all':
+            # Get all experiment IDs
+            experiment_ids = session.query(Experiment.experiment_id).all()
+            experiment_ids = [exp_id[0] for exp_id in experiment_ids]  # Convert to a flat list
+        else:
+            # Get experiment IDs based on subset (query at specific ExperimentGroup name)
+            inst_notation_pairs = inst_code_csl_mapping()
+            stmt = (
+                select(Experiment.experiment_id)
+                .join(expGroupExp, Experiment.experiment_id == expGroupExp.c.experiment_id)
+                .join(ExperimentGroup, expGroupExp.c.experimentGroup_id == ExperimentGroup.experimentGroup_id)
+                .where(ExperimentGroup.name == inst_notation_pairs[self.subset])
+            )
+            # Execute the query
+            experiment_ids = session.execute(stmt).scalars().all()
+
+        logger.info(f"Found {len(experiment_ids)} experiment ID's for subset: {self.subset}")
+
+        # Start CSL data extraction
+        logger.info("Starting CSL data export")
+
+        # Temporary settings
+        chrom_method = "dx.doi.org/10.1016/j.chroma.2015.11.014"  # Todo: needs to be a command
+
+        # Generate the output file name based on the CSL version and the current date
+        data_source = self.subset
+        csl_version = get_csl_version(self.path_csl)
+        date_code = datetime.now().strftime("%y%m%d")
+        fname = f"THERMO-{data_source}-CSLv{csl_version}-{date_code}.msp"
+        fpath_out = os.path.join(self.path_out, fname)
 
         # Initialize a list to accumulate data for batch writing
         export_data_list = []
 
         # Extract text chunks from the CSL data and append them to the export file
-        with open(fname_out, 'a') as f:
+        with open(fpath_out, 'a', encoding='utf-8') as f:
             # Process each experiment IDs
             for i, exp_id in tqdm(enumerate(experiment_ids), total=len(experiment_ids), ncols=77):
                 try:

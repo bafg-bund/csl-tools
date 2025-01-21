@@ -54,14 +54,16 @@ process_parser.add_argument('--csl_path', type=str, default=DEFAULT_CSL_PATH,
 export_parser = subparsers.add_parser('export', help='Exports the CSL to various formats')
 export_parser.add_argument('format', type=str, choices=['thermo', 'envi', 'mbank'],
                            help='Specify export format',)
-export_parser.add_argument('institution', type=str, choices=['lfuby', 'bfg', 'uba', 'lanuv', 'lubw'],
-                            help='Specify institution type for filtering data')
 export_parser.add_argument('out_path', type=str, help='Path to the directory where the exported file will be saved. '
                                                       'For mbank format: Use path of local clone of '
                                                       'https://github.com/MassBank/MassBank-data/tree/dev/BAFG '
                                                       'to check the existing MassBank ACCESSION strings from file names.')
-export_parser.add_argument('csl_path', type=str, default=DEFAULT_CSL_PATH,
+export_parser.add_argument('--csl_path', type=str, default=DEFAULT_CSL_PATH,
                            nargs='?', help='(Optional) Path to CSL file (Default: Specified in config.py)')
+export_parser.add_argument('--subset', type=str, choices=['lfuby', 'bfg', 'uba', 'lanuv', 'lubw', 'all'],
+                            default= 'all', help='(Optional) Data source (institution) for subsetting the CSL data '
+                                                 'before exporting (choices: lfuby, bfg, uba, lanuv, lubw, all; '
+                                                 'Default: all).')
 
 # Define 'rtscan' command and its arguments
 rtscan_parser = subparsers.add_parser('rtscan', help='Operates on retention time data saved in the CSL')  # todo descr
@@ -83,6 +85,6 @@ if args.command == 'process':
         args.data_path = file_paths
     run_process_workflow(args.institution, args.data_path, args.csl_path)
 elif args.command == 'export':
-    run_export_workflow(args.format, args.institution, args.out_path, args.csl_path)
+    run_export_workflow(args.format, args.out_path, args.csl_path, args.subset)
 elif args.command == 'rtscan':
     run_rtscan_workflow(args.operation, args.csl_path)

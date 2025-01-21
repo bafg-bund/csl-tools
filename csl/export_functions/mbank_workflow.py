@@ -20,18 +20,24 @@ class MbankWorkflow(FormatWorkflow):
         # Connect to the CSL database
         session = create_session(self.path_csl)
 
-        # Query to get experiment IDs with specific ExperimentGroup name
-        inst_notation_pairs = inst_code_csl_mapping()
-        stmt = (
-            select(Experiment.experiment_id)
-            .join(expGroupExp, Experiment.experiment_id == expGroupExp.c.experiment_id)
-            .join(ExperimentGroup, expGroupExp.c.experimentGroup_id == ExperimentGroup.experimentGroup_id)
-            .where(ExperimentGroup.name == inst_notation_pairs[self.inst])
-        )
+        # Get experiment IDs
+        if self.subset == 'all':
+            # Get all experiment IDs
+            experiment_ids = session.query(Experiment.experiment_id).all()
+            experiment_ids = [exp_id[0] for exp_id in experiment_ids]  # Convert to a flat list
+        else:
+            # Get experiment IDs based on subset (query at specific ExperimentGroup name)
+            inst_notation_pairs = inst_code_csl_mapping()
+            stmt = (
+                select(Experiment.experiment_id)
+                .join(expGroupExp, Experiment.experiment_id == expGroupExp.c.experiment_id)
+                .join(ExperimentGroup, expGroupExp.c.experimentGroup_id == ExperimentGroup.experimentGroup_id)
+                .where(ExperimentGroup.name == inst_notation_pairs[self.subset])
+            )
+            # Execute the query
+            experiment_ids = session.execute(stmt).scalars().all()
 
-        # Execute the query
-        experiment_ids = session.execute(stmt).scalars().all()
-        logger.info(f"Found {len(experiment_ids)} experiment ID's for {inst_notation_pairs[self.inst]}")
+        logger.info(f"Found {len(experiment_ids)} experiment ID's for subset: {self.subset}")
 
         # Start CSL data extraction
         logger.info("Starting CSL data export")
