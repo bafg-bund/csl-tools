@@ -1,31 +1,21 @@
-from .format_workflow import FormatWorkflow
-from utils.sql_utils import create_session, Experiment
-from .format_workflow_utils import *
-
+from export_functions.format_workflow import FormatWorkflow
+from utils.sql_utils import inst_code_csl_mapping, create_session, Experiment, ExperimentGroup, expGroupExp
+from export_functions.format_workflow_utils import *
+from utils.file_utils import get_csl_version
+from config import pycsl_version
 
 class ThermoWorkflow(FormatWorkflow):
     def export(self):
         """Workflow to export CSL data to a text file."""
 
-        from datetime import datetime
+        from sqlalchemy import select
         import os.path
+        from datetime import datetime
         from tqdm import tqdm
         import logging
 
         logger = logging.getLogger(__name__)
-        logger.info('Executing thermo export workflow')
-
-        # Temporary settings
-        chrom_method = "dx.doi.org/10.1016/j.chroma.2015.11.014"  # Todo: needs to be a command later
-
-        # Generate the output file name based on the CSL version and the current date
-        export_method = f"thermo"
-        csl_version = os.path.splitext(os.path.basename(self.path_csl))[0]
-        date_code = datetime.now().strftime("%y%m%d")
-        fname_out = os.path.join(self.path_out, f'{date_code}_{csl_version}_{export_method}.txt')
-
-        # Start CSL connection and data extraction
-        logger.info("Starting CSL data extraction")
+        logger.info('Executing export workflow for MSP/NIST documents (thermo workflow)')
 
         # Connect to the CSL database
         session = create_session(self.path_csl)
@@ -43,7 +33,10 @@ class ThermoWorkflow(FormatWorkflow):
             for i, exp_id in tqdm(enumerate(experiment_ids), total=len(experiment_ids), ncols=77):
                 try:
                     # Extract the text chunk for the current experiment
-                    export_data = extract_experiment_text_chunk(session, exp_id, chrom_method)
+                    export_data = extract_experiment_chunk_thermo(session, exp_id, chrom_method, csl_version, pycsl_version)
+                    if not export_data:
+                        logger.info(f'Skipping {exp_id}')
+                        continue
                     export_data_list.append(export_data + "\n\n")  # Append new line after each chunk
 
                     # Every 100 iterations, write to the file and clear the list
@@ -61,4 +54,4 @@ class ThermoWorkflow(FormatWorkflow):
         # Close the session after processing all experiments
         session.close()
 
-        logger.info('End of thermo export workflow')
+        logger.info('End of Thermo export workflow')
