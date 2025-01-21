@@ -8,7 +8,7 @@ from datetime import datetime
 def test_export_mbank_bfg():
     """Tests correct export of BfG experiments as MassBank documents."""
     # Prepare paths
-    csl_path = os.path.join(ROOT_DIR,'tests/integration/fixtures/CSL_v0_export_mbank.db')
+    csl_path = os.path.join(ROOT_DIR,'tests/integration/fixtures/CSL_v0_export_1bfg_1bfgIS_1lfuby_1uba.db')
     out_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 
     # Make sure temp directory is clean
@@ -18,11 +18,9 @@ def test_export_mbank_bfg():
             os.remove(f)
 
     # Export mbank workflow
-    run_export_workflow(format='mbank', inst='bfg',
-                        path_out=out_path,
-                        path_csl=csl_path)
+    run_export_workflow(format='mbank', path_out=out_path, path_csl=csl_path, subset='bfg')
 
-    # Assert that only one file was produced
+    # Assert that only one file was produced (CSL subset contains only one bfg experiment, that is not an internal standard)
     files = glob.glob(os.path.join(out_path, '*'))  # List all files in the output folder
     assert len(files) == 1, f"Expected 1 file, but found {len(files)}: {files}"
 
