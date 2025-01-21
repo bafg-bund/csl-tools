@@ -42,15 +42,15 @@ class MbankWorkflow(FormatWorkflow):
         # Get CSL version number
         csl_version = get_csl_version(self.path_csl)
 
-        # Get list of current MassBank experiment IDs (=accession numbers)
+        # Get list of current MassBank experiment IDs
         logger.info(f"Checking for existing MassBank files at {self.path_out}")
-        dict_mbank_exp_id_fn = get_mbank_exp_ids(self.path_out)
+        dict_mbank_exp_id_fn = get_exp_ids_mbank(self.path_out)
 
         # Process experiment IDs and generate txt files
         for i, exp_id in tqdm(enumerate(experiment_ids), total=len(experiment_ids), ncols=77):
             try:
                 # Extracts data for a specific experiment id and formats data to meet MassBank requirements.
-                export_data = extract_experiment_chunk(session, exp_id, chrom_method, csl_version, pycsl_version,
+                export_data = extract_experiment_chunk_mbank(session, exp_id, chrom_method, csl_version, pycsl_version,
                                                        dict_mbank_exp_id_fn)
 
                 # Skip experiment ID if compound is an internal standard (export_data is None)
