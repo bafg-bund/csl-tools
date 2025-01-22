@@ -129,11 +129,9 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, pycsl_vers
 
     # Current date
     date = datetime.now().strftime('%Y.%m.%d')
-    date_prefix = datetime.now().strftime("%y%m%d")
 
-    # Construct unique identifier for data entry
-    entry_prefix = 'CSL'
-    accession = f"{contrib_prefix}-{entry_prefix}{date_prefix}{exp_id}"
+    # Unique experiment identifier
+    accession = f"{exp_id}"
 
     # Comments
     inst_notation_pairs = inst_code_csl_mapping()
