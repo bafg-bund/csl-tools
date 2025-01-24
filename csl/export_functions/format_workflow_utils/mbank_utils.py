@@ -48,7 +48,7 @@ def extract_experiment_chunk_mbank(session, exp_id, chrom_method, csl_version, p
     """
 
     # SQL queries based on experiment ID and chromatographic method
-    SqlQueryResult = sql_queries_export(session, exp_id, chrom_method)
+    SqlQueryResult = sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method)
 
     # Skip internal standards
     skip_comp = skip_compounds_mbank()

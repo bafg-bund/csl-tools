@@ -15,7 +15,7 @@ class SqlQueryResult:
     retention_time: RetentionTime
 
 
-def sql_queries_export(session, exp_id, chrom_method):
+def sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method):
     """
     Queries the CSL database for experiment data and related metadata based on the experiment ID and method.
 

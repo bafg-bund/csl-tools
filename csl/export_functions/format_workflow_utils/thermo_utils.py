@@ -8,7 +8,7 @@ def extract_experiment_chunk_thermo(session, exp_id, chrom_method, csl_version, 
     """."""
 
     # SQL queries based on experiment ID and chromatographic method
-    SqlQueryResult = sql_queries_export(session, exp_id, chrom_method)
+    SqlQueryResult = sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method)
 
     # Format data to meet MSP/NIST format requirements
     FormattedDataThermo = extract_and_format_thermo_data(exp_id, chrom_method, csl_version, pycsl_version, SqlQueryResult)
