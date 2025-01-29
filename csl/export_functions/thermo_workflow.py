@@ -82,4 +82,4 @@ class ThermoWorkflow(FormatWorkflow):
         # Close the session after processing all experiments
         session.close()
 
-        logger.info('End of Thermo export workflow')
+        logger.info('End of thermo export workflow')

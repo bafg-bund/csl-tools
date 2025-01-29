@@ -1,7 +1,5 @@
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Float
-from sqlalchemy.orm import relationship
-from sqlalchemy import create_engine
+from sqlalchemy.orm import DeclarativeBase, sessionmaker, relationship
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Float, create_engine
 from sqlalchemy.schema import Table
 
 
