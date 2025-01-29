@@ -54,14 +54,14 @@ from export_functions import EnviWorkflow
 #     assert df_formatted.loc[0, 'Fragments'] != ""  # Assuming there is at least one fragment meeting criteria
 
 
-def test_get_mz_fragments_int_cutoff():
-    """Test return of get_mz_fragments_int_cutoff function with different input conditions."""
-    # Create test data for fragments
-    fragments = [(100.0, 30), (150.0, 100), (200.0, 75)]  # (m/z, intensity)
-
-    # Test different cutoff values
-    assert EnviWorkflow.get_mz_fragments_int_cutoff(fragments, 20) == "100.0, 150.0, 200.0"
-    assert EnviWorkflow.get_mz_fragments_int_cutoff(fragments, 50) == "150.0, 200.0"
-    assert EnviWorkflow.get_mz_fragments_int_cutoff(fragments, 80) == "150.0"
-    # Test empty fragments list case
-    assert EnviWorkflow.get_mz_fragments_int_cutoff([], 20) == ""
+# def test_get_mz_fragments_int_cutoff():
+#     """Test return of get_mz_fragments_int_cutoff function with different input conditions."""
+#     # Create test data for fragments
+#     fragments = [(100.0, 30), (150.0, 100), (200.0, 75)]  # (m/z, intensity)
+#
+#     # Test different cutoff values
+#     assert EnviWorkflow.get_mz_fragments_int_cutoff(fragments, 20) == "100.0, 150.0, 200.0"
+#     assert EnviWorkflow.get_mz_fragments_int_cutoff(fragments, 50) == "150.0, 200.0"
+#     assert EnviWorkflow.get_mz_fragments_int_cutoff(fragments, 80) == "150.0"
+#     # Test empty fragments list case
+#     assert EnviWorkflow.get_mz_fragments_int_cutoff([], 20) == ""

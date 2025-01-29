@@ -1,194 +1,92 @@
-from .format_workflow import FormatWorkflow
-from utils.sql_utils import create_session, Experiment, Fragment, Parameter, Compound, RetentionTime
-from .format_workflow_utils import *
+from export_functions.format_workflow import FormatWorkflow
+from export_functions.format_workflow_utils.envi_utils import *
+from export_functions.format_workflow_utils.envi_config import *
+from utils.sql_utils import inst_code_csl_mapping, create_session, Experiment, ExperimentGroup, expGroupExp
+from utils.file_utils import get_csl_version
 
 
 class EnviWorkflow(FormatWorkflow):
     def export(self):
         """
-        Workflow to export CSL data as a target list usable for envimass.
+        Workflow to export CSL data as a target list usable for enviMass.
 
         This function loads the default configuration, conducts a CSL query to collect relevant data, processes the CSL
-        data, formats it according to the EnviMass target list, and then exports the formatted data to a text file.
+        data, formats it according to the enviMass target list, and then exports the formatted data to a text file.
+        Todo: Make function to get experiment ids in all 3 workflows
+        Todo: Write tests (unit and integration)
+        Todo: clean up __init__ and imports
         """
 
-        import os
+        from sqlalchemy import select
+        import os.path
         from datetime import datetime
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.info('Executing envimass export workflow')
-
-        # Load default configuration
-        envi_def = default_config_envi()
-        fragment_cutoff_percent = envi_def['fragment_cutoff_percent_def']  # todo: default 20; argument input needed?
-        ce_filter = envi_def['ce_def']
-        ces_filter = envi_def['ces_def']
-        instrument_filter = envi_def['instrument_def']
-        chrom_method_filter = envi_def['chrom_method_def']  # todo: default bfg; input chrom method?
-
-        # Generate the output file name based on the CSL version and the current date
-        export_method = f"envi_target_cutoff{fragment_cutoff_percent}perc"
-        csl_version = os.path.splitext(os.path.basename(self.path_csl))[0]
-        date_code = datetime.now().strftime("%y%m%d")
-        fname_out = os.path.join(self.path_out, f'{date_code}_{csl_version}_{export_method}.txt')
-
-        # Read files
-        logger.info('Querying CSL data')
-        df, fragment_data = self.csl_query_envi(ce_filter, ces_filter, instrument_filter, chrom_method_filter)
-
-        # Process and format the DataFrame based on standard configuration
-        logger.info('Processing and formatting data')
-        df = self.process_data_envi(df, fragment_data, fragment_cutoff_percent)
-
-        # Export the DataFrame as text file
-        logger.info('Writing data to file')
-        df.to_csv(fname_out, sep='\t', index=False, quoting=3)
-
-        logger.info('End of envimass export workflow')
-
-    def csl_query_envi(self, ce_filter, ces_filter, instrument_filter, chrom_method_filter):
-        """
-        Queries CSL data based on the specified filters and returns the results.
-
-        Args:
-            ce_filter (list of int)         : Collision energy filter range.
-            ces_filter (int)                : Collision energy spread lower threshold.
-            instrument_filter (list of str) : List of instrument types to filter by.
-            chrom_method_filter (str)       : Chromatographic method filter.
-
-        Returns:
-            df (DataFrame)       : Pandas DataFrame containing the queried data.
-            fragment_data (list) : List of fragments data for all experiments.
-        """
-        from sqlalchemy import and_
+        from tqdm import tqdm
         import pandas as pd
+        import logging
 
-        # Connect to the database
+        logger = logging.getLogger(__name__)
+        logger.info('Executing export workflow for enviMass documents')
+
+        # Connect to the CSL database
         session = create_session(self.path_csl)
 
-        # SQLAlchemy query to fetch the required data
-        query = session.query(
-            Compound.name,
-            Compound.formula,
-            RetentionTime.rt,
-            Experiment.adduct,
-            Parameter.polarity,
-            Experiment.experiment_id,
-            Compound.CAS,
-            Compound.inchi,
-            Compound.SMILES
-        ).join(
-            Experiment, Experiment.compound_id == Compound.compound_id
-        ).join(
-            Parameter, Experiment.parameter_id == Parameter.parameter_id
-        ).join(
-            RetentionTime, RetentionTime.compound_id == Compound.compound_id
-        ).filter(
-            and_(
-                Parameter.CE.between(ce_filter[0], ce_filter[1]),
-                Parameter.CES > ces_filter,
-                Parameter.instrument.in_(
-                    instrument_filter
-                ),
-                RetentionTime.chrom_method == chrom_method_filter
+        # Get experiment IDs  Todo: make function in all 3 workflows in format_utils or sql utils?-> get_exp_ids(self.subset)
+        if self.subset == 'all':
+            # Get all experiment IDs
+            experiment_ids = session.query(Experiment.experiment_id).all()
+            experiment_ids = [exp_id[0] for exp_id in experiment_ids]  # Convert to a flat list
+        else:
+            # Get experiment IDs based on subset (query at specific ExperimentGroup name)
+            inst_notation_pairs = inst_code_csl_mapping()
+            stmt = (
+                select(Experiment.experiment_id)
+                .join(expGroupExp, Experiment.experiment_id == expGroupExp.c.experiment_id)
+                .join(ExperimentGroup, expGroupExp.c.experimentGroup_id == ExperimentGroup.experimentGroup_id)
+                .where(ExperimentGroup.name == inst_notation_pairs[self.subset])
             )
-        ).order_by(
-            Compound.name
-        )
+            # Execute the query
+            experiment_ids = session.execute(stmt).scalars().all()
 
-        # Convert query result to a DataFrame
-        df = pd.read_sql(query.statement, session.bind)
+        logger.info(f"Found {len(experiment_ids)} experiment ID's for subset: {self.subset}")
 
-        # Fragment extraction for all experiments
-        fragment_data = session.query(
-            Fragment.experiment_id, Fragment.mz, Fragment.int
-        ).filter(Fragment.experiment_id.in_(df['experiment_id'])).all()
+        # Start CSL data extraction
+        logger.info("Starting CSL data export")
 
-        # Close the session
+        # Generate the output file name based on the CSL version and the current date
+        data_source = self.subset
+        csl_version = get_csl_version(self.path_csl)
+        date_code = datetime.now().strftime("%y%m%d")
+        fname = f"ENVI-{data_source}-CSLv{csl_version}-{date_code}.txt"
+        fpath_out = os.path.join(self.path_out, fname)
+
+        # Get csl data based on query filters
+        csl_query_data = sql_query_with_filters_envi(session)
+
+        # Filter result by list of allowed experiment ids
+        csl_data_filtered = [data_entry for data_entry in csl_query_data if data_entry.experiment_id in experiment_ids]
+
+        # Process csl data entries to match required format
+        export_list = []
+        for csl_data in tqdm(csl_data_filtered, total=len(export_list), ncols=77):
+            try:
+                processed_entry = process_data_entry_envi(csl_data)
+                if not processed_entry:
+                    logger.info(f"Skipping compound {csl_data.compound.name} with experiment ID: {csl_data.experiment_id}")
+                    continue
+                export_list.append(processed_entry)
+
+            except Exception as e:
+                logger.error(f"There was an error processing experiment ID {csl_data.experiment_id}: {str(e)}")
+
+        # Create DataFrame
+        column_names = column_names_order_envi()  # Column structure target list
+        df = pd.DataFrame(export_list, columns=column_names[1:], index=range(1,len(export_list)+1))
+        df.rename_axis(column_names[0], inplace=True)
+
+        # Export the DataFrame as text file
+        df.to_csv(fpath_out, sep='\t', index=True, quoting=3)
+
+        # Close the session after processing all experiments
         session.close()
 
-        return df, fragment_data
-
-    # noinspection PyMethodMayBeStatic
-    def process_data_envi(self, df, fragment_data, fragment_cutoff_percent):
-        """
-        Processes the queried CSL data and formats it according to the EnviMass target list format.
-
-        Args:
-            df (DataFrame)                  : Queried CSL data in a pandas DataFrame.
-            fragment_data (list)            : List of fragment data for each experiment.
-            fragment_cutoff_percent (float) : The cutoff percentage for fragment intensity.
-
-        Returns:
-            df (DataFrame) : Pandas DataFrame formatted for the EnviMass target list.
-        """
-
-        # Organize fragment data into a dictionary by experiment_id
-        fragments_by_experiment = {}
-        for fragment in fragment_data:
-            expid = fragment.experiment_id
-            if expid not in fragments_by_experiment:
-                fragments_by_experiment[expid] = []
-            fragments_by_experiment[expid].append((fragment.mz, fragment.int))
-
-        # Apply the get_fragments_int_cut_batch function in a loop
-        df['Fragments'] = df['experiment_id'].apply(
-            lambda exp_id: self.get_mz_fragments_int_cutoff(fragments_by_experiment.get(expid, []), fragment_cutoff_percent)
-        )
-
-        # Processing and formatting based on standard configuration (envi_config.py)
-        df['adduct'] = df['adduct'].replace(adduct_name_pairs_envi())
-        df['polarity'] = df['polarity'].replace(polarity_pairs_envi())
-        df.rename(columns=column_name_pairs_envi(), inplace=True)
-
-        # Add additional columns
-        for key, value in additional_columns_with_def_values_envi().items():
-            if key == 'ID':
-                df[key] = range(1, len(df) + 1)
-            else:
-                df[key] = value
-
-        # Set 'restrict_adduct' to TRUE if main_adduct is 'M+'
-        df.loc[df['main_adduct'] == 'M+', 'restrict_adduct'] = 'TRUE'
-
-        # Check if 'CAS' column contains 'NA', an empty string, or is NaN and replace with 'FALSE'
-        id_na = (df['CAS'] == 'NA') | (df['CAS'] == '') | (df['CAS'].isna())
-        df.loc[id_na, 'CAS'] = 'FALSE'
-
-        # Remove specific rows
-        df = df[~df['Name'].isin(remove_name_rows_envi())]
-
-        # Replace occurrences of single quote with "prime" in the 'Name' column
-        df.loc[:, 'Name'] = df['Name'].str.replace("'", "prime")
-
-        # Remove SMILES codes with '#'
-        df.loc[df['SMILES'].str.contains('#'), 'SMILES'] = 'FALSE'
-
-        # Reorder the DataFrame columns based on defined order
-        df = df.reindex(columns=column_order_envi())
-
-        return df
-
-    @staticmethod
-    def get_mz_fragments_int_cutoff(fragments, cutoff_percent):
-        """
-        Filters and returns fragment mass-to-charge (m/z) ratios that have an intensity above a specified cutoff
-        percentage of the maximum intensity.
-
-        Args:
-            fragments (list of tuple) : List of tuples where each tuple contains two elements:
-                                        - mz (float): The mass-to-charge ratio of the fragment.
-                                        - intensity (float): The intensity of the fragment.
-            cutoff_percent (float)    : The intensity cutoff as a percentage of the maximum intensity.
-                                        Only fragments with an intensity above this percentage of the maximum
-                                        intensity will be included in the result.
-
-        Returns:
-            str: Comma-separated string of m/z ratios that meet or exceed the intensity cutoff.
-                 Returns an empty string if no fragments meet the criteria or if the input fragments list is empty.
-        """
-        if not fragments:
-            return ""
-        max_int = max(intensity for _, intensity in fragments)
-        selected_fragments = [mz for mz, intensity in fragments if intensity / max_int >= cutoff_percent / 100]
-        return ", ".join(map(str, selected_fragments))
+        logger.info('End of envim export workflow')
