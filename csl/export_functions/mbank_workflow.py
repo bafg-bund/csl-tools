@@ -1,6 +1,7 @@
 from export_functions.format_workflow import FormatWorkflow
-from utils.sql_utils import inst_code_csl_mapping, create_session, Experiment, ExperimentGroup, expGroupExp
 from export_functions.format_workflow_utils import *
+from export_functions.format_workflow_utils.format_utils import get_experiment_ids
+from utils.sql_utils import create_session
 from utils.file_utils import get_csl_version
 from config import pycsl_version
 
@@ -21,22 +22,7 @@ class MbankWorkflow(FormatWorkflow):
         session = create_session(self.path_csl)
 
         # Get experiment IDs
-        if self.subset == 'all':
-            # Get all experiment IDs
-            experiment_ids = session.query(Experiment.experiment_id).all()
-            experiment_ids = [exp_id[0] for exp_id in experiment_ids]  # Convert to a flat list
-        else:
-            # Get experiment IDs based on subset (query at specific ExperimentGroup name)
-            inst_notation_pairs = inst_code_csl_mapping()
-            stmt = (
-                select(Experiment.experiment_id)
-                .join(expGroupExp, Experiment.experiment_id == expGroupExp.c.experiment_id)
-                .join(ExperimentGroup, expGroupExp.c.experimentGroup_id == ExperimentGroup.experimentGroup_id)
-                .where(ExperimentGroup.name == inst_notation_pairs[self.subset])
-            )
-            # Execute the query
-            experiment_ids = session.execute(stmt).scalars().all()
-
+        experiment_ids = get_experiment_ids(session, self.subset)
         logger.info(f"Found {len(experiment_ids)} experiment ID's for subset: {self.subset}")
 
         # Start CSL data extraction

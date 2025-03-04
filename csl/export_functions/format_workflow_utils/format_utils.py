@@ -1,8 +1,7 @@
 from dataclasses import dataclass
-from utils.sql_utils import Experiment, Compound, Parameter, Fragment, expGroupExp, CompoundGroup, RetentionTime
+from utils.sql_utils import (inst_code_csl_mapping, Experiment, Compound, Parameter, Fragment, expGroupExp,
+                             ExperimentGroup, CompoundGroup, RetentionTime)
 from splash import Spectrum, SpectrumType, Splash
-from utils.sql_utils import inst_code_csl_mapping
-
 
 @dataclass
 class SqlQueryResult:
@@ -13,6 +12,28 @@ class SqlQueryResult:
     exp_groups: expGroupExp
     compound_groups: CompoundGroup
     retention_time: RetentionTime
+
+
+def get_experiment_ids(session, data_source):
+    """ ."""
+    from sqlalchemy import select
+
+    if data_source == 'all':
+        # Get all experiment IDs
+        experiment_ids = session.query(Experiment.experiment_id).all()
+        experiment_ids = [exp_id[0] for exp_id in experiment_ids]  # Convert to a flat list
+    else:
+        # Get experiment IDs based on subset (query at specific ExperimentGroup name)
+        inst_notation_pairs = inst_code_csl_mapping()
+        stmt = (
+            select(Experiment.experiment_id)
+            .join(expGroupExp, Experiment.experiment_id == expGroupExp.c.experiment_id)
+            .join(ExperimentGroup, expGroupExp.c.experimentGroup_id == ExperimentGroup.experimentGroup_id)
+            .where(ExperimentGroup.name == inst_notation_pairs[data_source])
+        )
+        # Execute the query
+        experiment_ids = session.execute(stmt).scalars().all()
+    return experiment_ids
 
 
 def sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method):

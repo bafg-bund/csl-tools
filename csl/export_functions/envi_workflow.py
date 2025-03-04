@@ -1,7 +1,8 @@
 from export_functions.format_workflow import FormatWorkflow
 from export_functions.format_workflow_utils.envi_utils import *
 from export_functions.format_workflow_utils.envi_config import *
-from utils.sql_utils import inst_code_csl_mapping, create_session, Experiment, ExperimentGroup, expGroupExp
+from export_functions.format_workflow_utils.format_utils import get_experiment_ids
+from utils.sql_utils import create_session
 from utils.file_utils import get_csl_version
 
 
@@ -12,12 +13,17 @@ class EnviWorkflow(FormatWorkflow):
 
         This function loads the default configuration, conducts a CSL query to collect relevant data, processes the CSL
         data, formats it according to the enviMass target list, and then exports the formatted data to a text file.
-        Todo: Make function to get experiment ids in all 3 workflows
-        Todo: Write tests (unit and integration)
-        Todo: clean up __init__ and imports
+
+        Todo: Filtering by other data sources beside 'bfg' (e.g. lfuby, lubw) currently does not work, as it filtering
+             is done always for the bfg method (dx.doi.org/10.1016/j.chroma.2015.11.014) which is imported from
+             the default settings (envi_config). Therefore, using the data source 'lfuby' will return an empty file.
+             Options: a) Filtering only by methods; b) Filtering by data sources for all methods;
+                    What is needed?
+
+        Todo: Unit and integration tests
         """
 
-        from sqlalchemy import select
+
         import os.path
         from datetime import datetime
         from tqdm import tqdm
@@ -30,23 +36,8 @@ class EnviWorkflow(FormatWorkflow):
         # Connect to the CSL database
         session = create_session(self.path_csl)
 
-        # Get experiment IDs  Todo: make function in all 3 workflows in format_utils or sql utils?-> get_exp_ids(self.subset)
-        if self.subset == 'all':
-            # Get all experiment IDs
-            experiment_ids = session.query(Experiment.experiment_id).all()
-            experiment_ids = [exp_id[0] for exp_id in experiment_ids]  # Convert to a flat list
-        else:
-            # Get experiment IDs based on subset (query at specific ExperimentGroup name)
-            inst_notation_pairs = inst_code_csl_mapping()
-            stmt = (
-                select(Experiment.experiment_id)
-                .join(expGroupExp, Experiment.experiment_id == expGroupExp.c.experiment_id)
-                .join(ExperimentGroup, expGroupExp.c.experimentGroup_id == ExperimentGroup.experimentGroup_id)
-                .where(ExperimentGroup.name == inst_notation_pairs[self.subset])
-            )
-            # Execute the query
-            experiment_ids = session.execute(stmt).scalars().all()
-
+        # Get experiment IDs
+        experiment_ids = get_experiment_ids(session, self.subset)
         logger.info(f"Found {len(experiment_ids)} experiment ID's for subset: {self.subset}")
 
         # Start CSL data extraction
