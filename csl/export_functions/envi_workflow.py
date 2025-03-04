@@ -56,7 +56,10 @@ class EnviWorkflow(FormatWorkflow):
         data_source = self.subset
         csl_version = get_csl_version(self.path_csl)
         date_code = datetime.now().strftime("%y%m%d")
-        fname = f"ENVI-{data_source}-CSLv{csl_version}-{date_code}.txt"
+
+        envi_filter_def = default_sql_query_filter_envi()
+        fragment_cutoff_percent = envi_filter_def['fragment_cutoff_percent_def']
+        fname = f"ENVI-{data_source}-CSLv{csl_version}-cutoff{str(fragment_cutoff_percent)}perc-{date_code}.txt"
         fpath_out = os.path.join(self.path_out, fname)
 
         # Get csl data based on query filters
@@ -80,7 +83,8 @@ class EnviWorkflow(FormatWorkflow):
 
         # Create DataFrame
         column_names = column_names_order_envi()  # Column structure target list
-        df = pd.DataFrame(export_list, columns=column_names[1:], index=range(1,len(export_list)+1))
+        df =  pd.DataFrame(export_list, columns=column_names[1:])
+        df = df.sort_values(by="Name").reset_index(drop=True)
         df.rename_axis(column_names[0], inplace=True)
 
         # Export the DataFrame as text file
