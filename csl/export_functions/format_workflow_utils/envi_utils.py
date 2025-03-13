@@ -57,7 +57,7 @@ def process_data_entry_envi(csl_data):
     """
     # Default configuration
     envi_filter_def = default_sql_query_filter_envi()
-    chrom_method_filter = envi_filter_def['chrom_method_def']  # Todo: currently only allows this method. Any interest in allowing other methods?
+    chrom_method_filter = envi_filter_def['chrom_method_def']  # Todo: currently only allows this method. Allow other methods?
     fragment_cutoff_percent = envi_filter_def['fragment_cutoff_percent_def']
 
     # Extract an format data to meet enviMass-specific requirements
@@ -106,8 +106,7 @@ def get_adduct_info_envi(csl_adduct):
     if csl_adduct in envi_adduct_name_pairs:
         adduct = envi_adduct_name_pairs[csl_adduct]
     else:
-        raise ValueError(
-            f"Adduct {csl_adduct} not in adduct dictionary. Check envi_config and ensure correct adduct format.")
+        adduct = 'FALSE'
 
     # Set 'restrict_adduct' to TRUE if adduct is 'M+'
     if adduct == 'M+':

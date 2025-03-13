@@ -26,22 +26,16 @@ def default_sql_query_filter_envi():
 
 def adduct_name_pairs_envi():
     """
-    Provides pairs of adduct notations for conversion from CSL format to enviMass target list format.
+    Provides pairs of adduct notations for conversion from CSL format to enviMass target list format (Adduct notations
+    not listed will be set to FALSE).
 
     Returns:
         envi_adduct_pairs (dict) : Dictionary mapping CSL adduct notations (keys) to enviMass target list notations (values).
-    Todo: See issue: nts/collective-spectral-library#30
     """
     envi_adduct_pairs = {
         '[M+H]+': 'M+H',
         '[M]+': 'M+',
-        '[M+Na]+': 'FALSE',
-        '[M+NH4]+': 'FALSE',
         '[M-H]-': 'M-H',
-        '[M+H2CO2-H]-': 'FALSE',
-        '[M+HCOO-]-': 'FALSE',
-        '[M-H2O+H]-': 'FALSE',
-        '[M-H2O+H]+': 'FALSE'
     }
     return envi_adduct_pairs
 
