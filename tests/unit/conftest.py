@@ -55,6 +55,7 @@ def mock_extract_data():
         "var_cas": 'mock_cas',
         "var_smiles": 'mock_smiles',
         "var_peak": ['9.9 99.9', '7.7 77.7'],
+        "var_compgroup": 'mock_cg1;mock_cg2',
         "file_path": 'mock_file_path',
         "var_chrom_method": 'mock_chrom_method',
         "var_instrument": 'mock_instrument',
@@ -129,6 +130,7 @@ def mock_entry_df():
         "mz_i": 900,
         "rt_i": 22,
         "spec_i": pd.DataFrame({'mz': [9.9, 7.7], 'int': [99.9, 77.7]}),
+        "compgroup_i": ['Pesticide','Herbicide'],
         "form_err_flag": False,
         "form_warn_flag": False
     }

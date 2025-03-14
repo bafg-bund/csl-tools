@@ -317,3 +317,21 @@ def get_peaks(data_peak):
     else:
         spec_i = pd.DataFrame()
     return spec_i
+
+
+def get_compound_group(data_compgroup):
+    """
+        Extracts the compound groups. Assumes separation of multiple compound groups with ';'.
+
+        Args:
+            data_compgroup (str) : Compound group(s) separated by ';'.
+
+        Returns:
+            compgroup_i (str)    : Formatted compound group name(s). Returns None, if the input is invalid or empty.
+        """
+    if data_compgroup:
+        compgroup_i = data_compgroup.split(';')
+    else:
+        compgroup_i = None
+    return compgroup_i
+

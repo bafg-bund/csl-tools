@@ -24,17 +24,18 @@ def var_regex_lfuby():
     common regular expression (not case-sensitive).
     """
     lfuby_var_regex = {
-        'var_comp': 'Name',              # Compound Name
-        'var_mz': 'PrecursorMz',         # Precursor m/z
-        'var_ce': 'Collision_energy',    # Collision energy
-        'var_ionization': 'Ionization',  # Ionization type
-        'var_ion_mode': 'IonMode',       # Type of operation mode
-        'var_rt': 'RetentionTime',       # Retention time
-        'var_inchikey': 'InChiKey',      # InChIKey
-        'var_formula': 'Formula',        # Molecular formula
-        'var_cas': 'CASNo',              # CAS registry number
-        'var_smiles': 'Smiles',          # Simplified Molecular Line Entry Specification (SMILES)
-        'var_peak': 'Peak',              # Mass spectral peaks
+        'var_comp': 'Name',               # Compound name
+        'var_mz': 'PrecursorMz',          # Precursor m/z
+        'var_ce': 'Collision_energy',     # Collision energy
+        'var_ionization': 'Ionization',   # Ionization type
+        'var_ion_mode': 'IonMode',        # Type of operation mode
+        'var_rt': 'RetentionTime',        # Retention time
+        'var_inchikey': 'InChiKey',       # InChIKey
+        'var_formula': 'Formula',         # Molecular formula
+        'var_cas': 'CASNo',               # CAS registry number
+        'var_smiles': 'Smiles',           # Simplified Molecular Line Entry Specification (SMILES)
+        'var_peak': 'Peak',               # Mass spectral peaks
+        'var_compgroup': 'CompoundClass', # Compound group
     }
     return lfuby_var_regex
 
@@ -49,7 +50,7 @@ def var_fix_lfuby():
 
     lfuby_var_fix = {
         'var_chrom_method': all_methods['lfuby'],       # Chromatographic method
-                                                        # Todo: chrom_method needs to be changed to lfuby in raw data
+                                                        # Todo: chrom_method should be changed to lfuby in raw data
         'var_instrument': 'LC-ESI-Orbitrap QExactive',  # Instrument type
         'var_isotope': 'monoisotopic',                  # Type of molecular mass
         'var_col_type': 'HCD',                          # Collision type
