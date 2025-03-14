@@ -215,6 +215,9 @@ class LubwWorkflow(InstitutionWorkflow):
                 logger.warning('No spectra detected.')
                 entry_err = True
 
+            # Compound group
+            compgroup_i = get_compound_group(entry['var_compgroup'])
+
             # Temporary save formatted data from one entry in dictionary
             form_data_entry = {
                 'pol_i': pol_i,
@@ -231,6 +234,7 @@ class LubwWorkflow(InstitutionWorkflow):
                 'mz_i': mz_i,
                 'rt_i': rt_i,
                 'spec_i': spec_i,
+                'compgroup_i': compgroup_i,
                 'form_err_flag': entry_err,
                 'form_warn_flag': entry_warn
             }

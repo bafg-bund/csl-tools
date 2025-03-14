@@ -123,18 +123,26 @@ def add_exp_to_session(session, entry, inst_def):
     # Check if the experiment group exists (e.g. 'LfU', 'UBA', 'BfG') in CSL and add if necessary.
     exp_group = session.query(ExperimentGroup).filter_by(name=expg_def).one_or_none()
     if not exp_group:
-        logger.info(f'Missing "experimentGroup.name" in the CSL. Adding default value: "{expg_def}"')
+        logger.info(f'Adding missing default experiment group: "{expg_def}"')
         exp_group = ExperimentGroup(name=expg_def)
         session.add(exp_group)
 
-    # Only keep compound groups if they already exist in the CSL
+    # Check if compound groups exist in the CSL database. Collect the ones that match.
     comp_group = []
     for cg in compgroup_i:
-        if session.query(CompoundGroup).filter_by(name=cg).one_or_none():
-            comp_group.append(cg)
-    # Add default compound group if compound group is not valid or empty
+        cg_db = session.query(CompoundGroup).filter(func.lower(CompoundGroup.name) == cg.lower()).one_or_none()
+        if cg_db:
+            comp_group.append(cg_db)
+    # If no matches were found use the default compound group. Create the default compound group if necessary.
     if not comp_group:
-        comp_group = compg_def
+        existing_cg = session.query(CompoundGroup).filter_by(name=compg_def).one_or_none()
+        if not existing_cg:
+            logger.info(f'Adding missing default compound group: "{compg_def}"')
+            new_cg = CompoundGroup(name=compg_def)
+            session.add(new_cg)
+        comp_group = session.query(CompoundGroup).filter_by(name=compg_def).one_or_none()
+        if not isinstance(comp_group, list):
+            comp_group = [comp_group]
 
     # Check if the compound (and a link to each compound group) exists in the CSL and adds an entry if necessary.
     inchikey_main_i = entry['inchikey_main_i']
@@ -151,15 +159,15 @@ def add_exp_to_session(session, entry, inst_def):
     if comp_res:  # If the compound exists in the CSL
         # Add compound groups that don't exist yet for this compound
         for cg in comp_group:
-            if cg not in [group.name for group in comp_res.groups]:
-                logger.info(f'Associating compound group "{cg}" to the compound "{comp_i}"')
-                existing_cg = session.query(CompoundGroup).filter_by(name=cg).one_or_none()
-                comp_res.groups.append(existing_cg)
+            if cg.name not in [group.name for group in comp_res.groups]:
+                logger.info(f'Adding compound group "{cg.name}" to the compound "{comp_i}"')
+                # existing_cg = session.query(CompoundGroup).filter_by(name=cg).one_or_none()
+                comp_res.groups.append(cg)
     else:  # If the compound was not found in the CSL
-        existing_cg = session.query(CompoundGroup).filter(CompoundGroup.name.in_(comp_group)).all()
+        # existing_cg = session.query(CompoundGroup).filter(CompoundGroup.name.in_(comp_group)).all()
         logger.info(f'Compound "{comp_i}" not found in CSL. Adding entry.')
         comp_res = Compound(formula=formula_i, CAS=cas_i, SMILES=smiles_i, name=comp_i,
-                            groups=existing_cg, inchikey=inchikey_i)
+                            groups=comp_group, inchikey=inchikey_i)
         # Add compound entry to session
         session.add(comp_res)
 

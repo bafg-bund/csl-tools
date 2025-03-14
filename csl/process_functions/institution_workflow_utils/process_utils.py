@@ -330,7 +330,10 @@ def get_compound_group(data_compgroup):
             compgroup_i (str)    : Formatted compound group name(s). Returns None, if the input is invalid or empty.
         """
     if data_compgroup:
-        compgroup_i = data_compgroup.split(';')
+        parts = data_compgroup.split(';')
+        compgroup_i = []
+        for part in parts:
+            compgroup_i.append(part.strip())
     else:
         compgroup_i = None
     return compgroup_i

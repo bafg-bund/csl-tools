@@ -22,16 +22,17 @@ def var_regex_lubw():
     Variables are not case-sensitive. Set to shortest (but unique) common variable across all lubw file types.
     """
     lubw_var_regex = {
-        'var_comp': 'Name',            # Compound Name
-        'var_mz': 'Selected Ion m/z',  # Precursor m/z
-        'var_ce': 'Collision_energy',  # Collision energy
-        'var_ion_mode': 'MS:1000130',  # Type of operation mode
-        'var_rt': 'RetentionTime',     # Retention time
-        'var_inchikey': 'InChiKey',    # InChIKey
-        'var_formula': 'Formula',      # Molecular formula
-        'var_cas': 'CASNo',            # CAS registry number
-        'var_smiles': 'Smiles',        # Simplified Molecular Line Entry Specification (SMILES)
-        'var_peak': 'MS:1009006',      # Mass spectral peaks
+        'var_comp': 'Name',                # Compound Name
+        'var_mz': 'Selected Ion m/z',      # Precursor m/z
+        'var_ce': 'Collision_energy',      # Collision energy
+        'var_ion_mode': 'MS:1000130',      # Type of operation mode
+        'var_rt': 'RetentionTime',         # Retention time
+        'var_inchikey': 'InChiKey',        # InChIKey
+        'var_formula': 'Formula',          # Molecular formula
+        'var_cas': 'CASNo',                # CAS registry number
+        'var_smiles': 'Smiles',            # Simplified Molecular Line Entry Specification (SMILES)
+        'var_peak': 'MS:1009006',          # Mass spectral peaks
+        'var_compgroup': 'CompoundClass',  # Compound group
     }
     return lubw_var_regex
 
