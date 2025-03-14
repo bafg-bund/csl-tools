@@ -1,11 +1,11 @@
 # """
 # Main entry point for the CSL Operations Program.
 #
-# This script provides command-line interface (CLI) options for processing MS2 data files from various institutions
-# and exporting the Collective Spectral Library (CSL) in different formats.
+# This script provides command-line interface options for processing and importing MS2 data files from various
+# institutions and exporting the Collective Spectral Library (CSL) in different formats.
 #
 # Commands:
-#     process : Processes MS2 data files based on the institution type.
+#     process : Processes MS2 data files based on the institution type and imports the data into the CSL database.
 #     export  : Exports the CSL to the specified formats.
 #     rtscan  : Operates on retention time data saved in the CSL.
 #
@@ -41,7 +41,7 @@ parser = ArgumentParser(
 subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
 # Define 'process' command and its arguments
-process_parser = subparsers.add_parser('process', help='Processes MS2 data files from a specified institution')
+process_parser = subparsers.add_parser('process', help='Processes MS2 data files from a specified institution and imports the data into the CSL')
 
 process_parser.add_argument('institution', type=str, choices=['lfuby', 'bfg', 'uba', 'lanuv', 'lubw'],
                             help='Specify institution type')
