@@ -136,7 +136,7 @@ class LfubyWorkflow(InstitutionWorkflow):
             # Adduct format conversion
             adduct_i = format_adduct(adduct_name, spec_adduct, inst_def['def_qf'], pol_i)
             if not adduct_i:
-                logger.warning(f'Adduct name not detected. Check fields for compound name and ion mode')
+                logger.warning(f'Adduct name not detected. Check fields for compound name and ion mode.')
                 entry_err = True
             else:
                 logger.info(f'Adduct name: {adduct_name}; Formatted adduct name: {adduct_i}')
@@ -146,11 +146,11 @@ class LfubyWorkflow(InstitutionWorkflow):
             if not ce_i or not ce_i and not ces_i:
                 logger.warning(
                     f'No collision energy (CE) or unexpected number of CE or non-equal difference in CE spread. '
-                    f'Check field for collision energy')
+                    f'Check field for collision energy.')
                 entry_err = True
             elif ces_warn:
                 logger.warning(f'Unexpected collision energy spread. Verify field for collision energy. '
-                               f'\n''Will NOT automatically skip file due to this warning')
+                               f'\n''Will NOT automatically skip file due to this warning.')
                 entry_warn = True
 
             # Ionization type
@@ -174,7 +174,7 @@ class LfubyWorkflow(InstitutionWorkflow):
             # CAS registry number
             cas_i = get_cas(entry['var_cas'])
             if not cas_i:
-                logger.warning('CAS registry number not detected or malformed')
+                logger.warning('CAS registry number not detected or malformed.')
                 entry_warn = True
 
             # Set error flag to True if no InChIKey and no CAS registry number found
@@ -184,25 +184,25 @@ class LfubyWorkflow(InstitutionWorkflow):
             # SMILES
             smiles_i = get_smiles(entry['var_smiles'])
             if not smiles_i:
-                logger.warning('Smiles not detected')
+                logger.warning('Smiles not detected.')
                 entry_err = True
 
             # Precursor mass
             mz_i = get_precursor_mz(entry['var_mz'])
             if not mz_i:
-                logger.warning('Precursor mass not detected')
+                logger.warning('Precursor mass not detected.')
                 entry_err = True
 
             # Retention time
             rt_i = get_retention_time(entry['var_rt'])
             if not rt_i:
-                logger.warning('Retention time not detected')
+                logger.warning('Retention time not detected.')
                 entry_err = True
 
             # Spectra / Peaks
             spec_i = get_peaks(entry['var_peak'])
             if spec_i.empty:
-                logger.warning('No spectra detected')
+                logger.warning('No spectra detected.')
                 entry_err = True
 
             # Compound group
