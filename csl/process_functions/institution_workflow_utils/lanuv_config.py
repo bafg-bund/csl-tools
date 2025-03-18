@@ -52,6 +52,7 @@ def var_fix_lanuv():
         'var_smiles': 'smiles_placeholder',         # Simplified Molecular Line Entry Specification (SMILES) todo: Placeholder.
         'var_col_type': 'Q',                        # Collision type  # todo: Assumed 'Q' based on existing CSL entries
         'var_ce_unit': 'V',                         # Unit for collision energy
+        'var_compgroup': 'compgroup_placeholder'    # Compound group # todo: Placeholder.
     }
     return lanuv_var_fix
 
