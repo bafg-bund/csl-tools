@@ -311,6 +311,8 @@ def get_peaks(data_peak):
     """
     import pandas as pd
 
+    if not isinstance(data_peak, list):
+        data_peak = [data_peak]
     if data_peak:
         split_strings = [s.split() for s in data_peak]
         spec_i = pd.DataFrame(split_strings, columns=['mz', 'int'])
