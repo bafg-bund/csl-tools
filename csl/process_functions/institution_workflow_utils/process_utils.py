@@ -312,7 +312,7 @@ def get_peaks(data_peak):
 
     if not isinstance(data_peak, list):
         data_peak = [data_peak]
-    if data_peak:
+    if data_peak and not all(item == '' for item in data_peak):
         split_strings = [s.split() for s in data_peak]
         spec_i = pd.DataFrame(split_strings, columns=['mz', 'int'])
     else:
