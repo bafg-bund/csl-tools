@@ -191,8 +191,8 @@ def test_match_with_csl(mock_dependencies_match_with_csl, mock_session, mock_for
                          [
                              # Case 1: All data entries eligible for CSL commit; User confirms;
                              (pd.DataFrame({
-                                            'var_comp': ['compound1', 'compound2'],
-                                            'var_ce': ['40', '30'],
+                                            'comp_i': ['compound1', 'compound2'],
+                                            'ce_i': ['40', '30'],
                                             'file_path': ['file1', 'file2'],
                                             'form_err_flag': [False, False],
                                             'form_warn_flag': [False, False],
@@ -201,8 +201,8 @@ def test_match_with_csl(mock_dependencies_match_with_csl, mock_session, mock_for
                                             'csl_add_flag': [True, True]}),
                               'yes'),
                              # Case 2: One error flag; One data entry eligible for CSL commit; User confirms
-                             (pd.DataFrame({'var_comp': ['compound1', 'compound2'],
-                                            'var_ce': ['40', '30'],
+                             (pd.DataFrame({'comp_i': ['compound1', 'compound2'],
+                                            'ce_i': ['40', '30'],
                                             'file_path': ['file1', 'file2'],
                                             'form_err_flag': [False, False],
                                             'form_warn_flag': [False, False],
@@ -211,8 +211,8 @@ def test_match_with_csl(mock_dependencies_match_with_csl, mock_session, mock_for
                                             'csl_add_flag': [True, False]}),
                               'yes'),
                              # Case 3: All data entries eligible for CSL commit; User cancels;
-                             (pd.DataFrame({'var_comp': ['compound1', 'compound2'],
-                                            'var_ce': ['40', '30'],
+                             (pd.DataFrame({'comp_i': ['compound1', 'compound2'],
+                                            'ce_i': ['40', '30'],
                                             'file_path': ['file1', 'file2'],
                                             'form_err_flag': [False, False],
                                             'form_warn_flag': [False, False],
@@ -221,8 +221,8 @@ def test_match_with_csl(mock_dependencies_match_with_csl, mock_session, mock_for
                                             'csl_add_flag': [True, True]}),
                               'any_other_input'),
                              # Case 4: No data entries are eligible for CSL commit;
-                             (pd.DataFrame({'var_comp': ['compound1', 'compound2'],
-                                            'var_ce': ['40', '30'],
+                             (pd.DataFrame({'comp_i': ['compound1', 'compound2'],
+                                            'ce_i': ['40', '30'],
                                             'file_path': ['file1', 'file2'],
                                             'form_err_flag': [False, False],
                                             'form_warn_flag': [False, False],
