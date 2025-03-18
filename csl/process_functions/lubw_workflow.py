@@ -54,7 +54,7 @@ class LubwWorkflow(InstitutionWorkflow):
         Collects and processes files and extracts data using specific regular expressions.
 
         1. If self.path_files is a directory path then all files in that directory (including sub-directories) are
-        retrieved. Todo: Option to filter files based on identifier string still exists, but likely will be removed.
+        retrieved.
         2. Extracts data from the files using a list of regular expressions specific to the lfuby context.
         3. Adds file path information and append extracted data of each file.
 
@@ -71,9 +71,7 @@ class LubwWorkflow(InstitutionWorkflow):
             if os.path.isfile(self.path_data):
                 file_paths = [self.path_data]
             else:  # If a directory is provided
-                # Filter files based on identifier string
-                # Todo: Identifier string (fstr_id) for files is not an option for user input (needed?).
-                #  Set to None (= retrieves all files).
+                # Find all files in directory (also subdirectories)
                 file_paths = match_file_paths(self.path_data, fstr_id=None)
 
         # Data extraction based on lfuby specific regular expressions
@@ -338,27 +336,27 @@ class LubwWorkflow(InstitutionWorkflow):
         if len(form_err_data) > 0:
             logger.error('The following data will not be added to the CSL due to format errors:')
             for index, entry in form_err_data.iterrows():
-                logger.error(f'Compound: {entry['var_comp']}; CE: {entry['var_ce']}; File path: {entry['file_path']}')
+                logger.error(f'Compound: {entry['comp_i']}; CE: {entry['ce_i']}; File path: {entry['file_path']}')
 
         if len(form_warn_data) > 0:
             logger.warning('The following data will be added to the CSL with warnings:')
             for index, entry in form_warn_data.iterrows():
-                logger.warning(f'Compound: {entry['var_comp']}; CE: {entry['var_ce']}; File path: {entry['file_path']}')
+                logger.warning(f'Compound: {entry['comp_i']}; CE: {entry['ce_i']}; File path: {entry['file_path']}')
 
         if len(csl_err_data) > 0:
             logger.error('The following data will not be added to the CSL due to errors caused during CSL-matching:')
             for index, entry in csl_err_data.iterrows():
-                logger.error(f'Compound: {entry['var_comp']}; CE: {entry['var_ce']}; File path: {entry['file_path']}')
+                logger.error(f'Compound: {entry['comp_i']}; CE: {entry['ce_i']}; File path: {entry['file_path']}')
 
         if len(csl_dupl_data) > 0:
             logger.warning('The following data already exists in the CSL and will not be added:')
             for index, entry in csl_dupl_data.iterrows():
-                logger.warning(f'Compound: {entry['var_comp']}; CE: {entry['var_ce']}; File path: {entry['file_path']}')
+                logger.warning(f'Compound: {entry['comp_i']}; CE: {entry['ce_i']}; File path: {entry['file_path']}')
 
         if len(csl_add_data) > 0:
             logger.info('The following data will be added to the CSL:')
             for index, entry in csl_add_data.iterrows():
-                logger.info(f'Compound: {entry['var_comp']}; CE: {entry['var_ce']}; File path: {entry['file_path']}')
+                logger.info(f'Compound: {entry['comp_i']}; CE: {entry['ce_i']}; File path: {entry['file_path']}')
 
         # Collect data eligible for addition
         add_data_all = form_data_match[form_data_match.csl_add_flag]

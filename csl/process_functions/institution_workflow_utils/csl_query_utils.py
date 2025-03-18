@@ -69,8 +69,6 @@ def add_exp_to_session(session, entry, inst_def):
     - Checks if the experiment group exists in the CSL and adds it if necessary.
     Compound group
     - Checks if the compound group exists in the CSL and adds it if necessary.
-        Todo: Under which conditions would the compound group be "Biocide" or "Pharma" (which workflow)?
-    Compound
     - Checks if the compound (and a link to compound group) exists in the CSL and adds an entry if necessary.
     Retention time
     - Checks for an existing retention time and uses the retention time from the file if it doesn't exist.

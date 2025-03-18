@@ -52,9 +52,8 @@ def get_compound_and_adduct_name(data_comp):
     """
     Extracts and formats compound name and adduct name from the provided character string according to CSL requirements.
     - The expected input format is `CompoundName` or `CompoundName_AdductName`.
-    - If `CompoundName` is provided, the default adduct name `H` is assigned.
+    - If only `CompoundName` is provided, the default adduct name `H` is assigned.
     - If the input format is invalid or unexpected, both the compound name and adduct name will return None.
-    Todo: Lfuby format (CompoundName_AdductName) compatible with other workflows? -> TBD
 
     Args:
         data_comp (str) : Compound name and optionally the adduct name from data. The expected format is `CompoundName`
