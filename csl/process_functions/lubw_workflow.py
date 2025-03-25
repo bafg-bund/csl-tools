@@ -222,7 +222,7 @@ class LubwWorkflow(InstitutionWorkflow):
             # Compound group
             compgroup_i = get_compound_group(entry['var_compgroup'])
 
-            # Temporary save formatted data from one entry in dictionary
+            # Organize formatted data from one entry in dictionary
             form_data_entry = {
                 'pol_i': pol_i,
                 'comp_i': comp_i,
@@ -339,7 +339,7 @@ class LubwWorkflow(InstitutionWorkflow):
 
         # Log information about entry states
         logger.info('Summary of information before CSL commit '
-                    '\n (Check more details on individual errors and warnings in the log)')
+                    '\n (Check more details on individual errors and warnings in the log).')
         if len(form_err_data) > 0:
             logger.error('The following data will not be added to the CSL due to format errors:')
             for index, entry in form_err_data.iterrows():
@@ -370,16 +370,16 @@ class LubwWorkflow(InstitutionWorkflow):
 
         # User choice for committing changes to CSL
         if len(add_data_all) == 0:
-            logger.info('No data to add to the CSL')
+            logger.info('No data to add to the CSL.')
         else:
             print(
-                'Do you want to proceed committing these changes? \n  - Confirm by typing "yes" and pressing enter \n'
-                '  - Cancel with any other input')
+                'Do you want to proceed committing these changes? \n  - Confirm by typing "yes" and pressing enter. \n'
+                '  - Cancel with any other input.')
             choice = input()
             if choice == 'yes':
                 # Commit all changes to the CSL
                 session.commit()
-                logger.info(f'Changes committed to CSL at {self.path_csl}')
+                logger.info(f'Changes committed to CSL at {self.path_csl}.')
             else:
                 logger.info('Operation canceled by user. No data added to CSL.')
 

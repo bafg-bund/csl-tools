@@ -146,7 +146,7 @@ class LanuvWorkflow(InstitutionWorkflow):
             # Adduct format conversion
             adduct_i = format_adduct(adduct_name, spec_adduct, inst_def['def_qf'], pol_i)
             if not adduct_i:
-                logger.warning(f'Adduct name not detected. Check fields for compound name and ion mode')
+                logger.warning(f'Adduct name not detected. Check fields for compound name and ion mode.')
                 entry_err = True
             else:
                 logger.info(f'Adduct name: {adduct_name}; Formatted adduct name: {adduct_i}')
@@ -156,11 +156,11 @@ class LanuvWorkflow(InstitutionWorkflow):
             if not ce_i or not ce_i and not ces_i:
                 logger.warning(
                     f'No collision energy (CE) or unexpected number of CE or non-equal difference in CE spread. '
-                    f'Check field for collision energy')
+                    f'Check field for collision energy.')
                 entry_err = True
             elif ces_warn:
                 logger.warning(f'Unexpected collision energy spread. Verify field for collision energy. '
-                               f'\n''Will NOT automatically skip file due to this warning')
+                               f'\n''Will NOT automatically skip file due to this warning.')
                 entry_warn = True
 
             # Ionization type
@@ -184,7 +184,7 @@ class LanuvWorkflow(InstitutionWorkflow):
             # CAS registry number
             cas_i = get_cas(entry['var_cas'])
             if not cas_i:
-                logger.warning('CAS registry number not detected or malformed')
+                logger.warning('CAS registry number not detected or malformed.')
                 entry_warn = True
 
             # Set error flag to True if no InChIKey and no CAS registry number found
@@ -194,7 +194,7 @@ class LanuvWorkflow(InstitutionWorkflow):
             # SMILES
             smiles_i = get_smiles(entry['var_smiles'])
             if not smiles_i:
-                logger.warning('Smiles not detected')
+                logger.warning('Smiles not detected.')
                 entry_err = True
 
             # InChI
@@ -206,25 +206,25 @@ class LanuvWorkflow(InstitutionWorkflow):
             # Precursor mass
             mz_i = get_precursor_mz(entry['var_mz'])
             if not mz_i:
-                logger.warning('Precursor mass not detected')
+                logger.warning('Precursor mass not detected.')
                 entry_err = True
 
             # Retention time
             rt_i = get_retention_time(entry['var_rt'])
             if not rt_i:
-                logger.warning('Retention time not detected')
+                logger.warning('Retention time not detected.')
                 entry_err = True
 
             # Spectra / Peaks
             spec_i = get_peaks(entry['var_peak'])
             if spec_i.empty:
-                logger.warning('No spectra detected')
+                logger.warning('No spectra detected.')
                 entry_err = True
 
             # Compound group
             compgroup_i = get_compound_group(entry['var_compgroup'])
 
-            # Temporary save formatted data from one entry in dictionary
+            # Organize formatted data from one entry in dictionary
             form_data_entry = {
                 'pol_i': pol_i,
                 'comp_i': comp_i,
@@ -341,7 +341,7 @@ class LanuvWorkflow(InstitutionWorkflow):
 
         # Log information about entry states
         logger.info('Summary of information before CSL commit '
-                    '\n (Check more details on individual errors and warnings in the log)')
+                    '\n (Check more details on individual errors and warnings in the log).')
         if len(form_err_data) > 0:
             logger.error('The following data will not be added to the CSL due to format errors:')
             for index, entry in form_err_data.iterrows():
@@ -372,16 +372,16 @@ class LanuvWorkflow(InstitutionWorkflow):
 
         # User choice for committing changes to CSL
         if len(add_data_all) == 0:
-            logger.info('No data to add to the CSL')
+            logger.info('No data to add to the CSL.')
         else:
             print(
-                'Do you want to proceed committing these changes? \n  - Confirm by typing "yes" and pressing enter \n'
-                '  - Cancel with any other input')
+                'Do you want to proceed committing these changes? \n  - Confirm by typing "yes" and pressing enter. \n'
+                '  - Cancel with any other input.')
             choice = input()
             if choice == 'yes':
                 # Commit all changes to the CSL
                 session.commit()
-                logger.info(f'Changes committed to CSL at {self.path_csl}')
+                logger.info(f'Changes committed to CSL at {self.path_csl}.')
             else:
                 logger.info('Operation canceled by user. No data added to CSL.')
 
