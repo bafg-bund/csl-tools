@@ -80,14 +80,16 @@ def test_read_files_mult_files(mock_extract_data_regex, mock_match_file_paths, m
 @patch('process_functions.lfuby_workflow.get_inchikey', return_value=('inchikey', 'inchikey_main'))
 @patch('process_functions.lfuby_workflow.get_cas', return_value='cas')
 @patch('process_functions.lfuby_workflow.get_smiles', return_value='smiles')
+@patch('process_functions.lfuby_workflow.get_inchi_from_smiles', return_value='inchi')
 @patch('process_functions.lfuby_workflow.get_precursor_mz', return_value=99)
 @patch('process_functions.lfuby_workflow.get_retention_time', return_value=99)
 @patch('process_functions.lfuby_workflow.get_peaks', return_value=pd.DataFrame({'peak': [9.9, 9.9, 9.9]}))
 @patch('process_functions.lfuby_workflow.get_compound_group', return_value=['Pesticide','Herbicide'])
 def test_process_data(mock_get_compound_group, mock_get_peaks, mock_get_retention_time, mock_get_precursor_mz,
-                      mock_get_smiles, mock_get_cas, mock_get_inchikey, mock_get_formula, mock_get_ionization_type,
-                      mock_get_collision_energy, mock_format_adduct, mock_get_compound_and_adduct_name, mock_get_polarity,
-                      mock_extract_data, mock_inst_def, mock_spec_adduct):
+                      mock_get_inchi_from_smiles, mock_get_smiles, mock_get_cas, mock_get_inchikey, mock_get_formula,
+                      mock_get_ionization_type, mock_get_collision_energy, mock_format_adduct,
+                      mock_get_compound_and_adduct_name, mock_get_polarity, mock_extract_data, mock_inst_def,
+                      mock_spec_adduct):
     """Test processing of sample data without creating warning or error flags."""
 
     # Instantiate the LfubyWorkflow class
@@ -112,15 +114,16 @@ def test_process_data(mock_get_compound_group, mock_get_peaks, mock_get_retentio
 @patch('process_functions.lfuby_workflow.get_inchikey', return_value=(None, None))
 @patch('process_functions.lfuby_workflow.get_cas', return_value=None)
 @patch('process_functions.lfuby_workflow.get_smiles', return_value='smiles')
+@patch('process_functions.lfuby_workflow.get_inchi_from_smiles', return_value='inchi')
 @patch('process_functions.lfuby_workflow.get_precursor_mz', return_value=99)
 @patch('process_functions.lfuby_workflow.get_retention_time', return_value=99)
 @patch('process_functions.lfuby_workflow.get_peaks', return_value=pd.DataFrame({'peak': [9.9, 9.9, 9.9]}))
 @patch('process_functions.lfuby_workflow.get_compound_group', return_value=['Pesticide','Herbicide'])
 def test_process_data_inchi_cas_none(mock_get_compound_group, mock_get_peaks, mock_get_retention_time,
-                                     mock_get_precursor_mz, mock_get_smiles, mock_get_cas, mock_get_inchikey,
-                                     mock_get_formula, mock_get_ionization_type, mock_get_collision_energy,
-                                     mock_format_adduct, mock_get_compound_and_adduct_name, mock_get_polarity,
-                                     mock_extract_data, mock_inst_def, mock_spec_adduct):
+                                     mock_get_precursor_mz, mock_get_inchi_from_smiles, mock_get_smiles, mock_get_cas,
+                                     mock_get_inchikey, mock_get_formula, mock_get_ionization_type,
+                                     mock_get_collision_energy, mock_format_adduct, mock_get_compound_and_adduct_name,
+                                     mock_get_polarity, mock_extract_data, mock_inst_def, mock_spec_adduct):
     """Test processing of sample data without creating warning or error flags."""
 
     # Instantiate the LfubyWorkflow class

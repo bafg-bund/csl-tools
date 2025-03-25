@@ -1,7 +1,7 @@
 from .process_utils import match_file_paths
 from .process_utils import (get_polarity, get_compound_and_adduct_name, format_adduct, get_collision_energy,
-                            get_ionization_type, get_formula, get_inchikey, get_cas, get_smiles, get_precursor_mz,
-                            get_retention_time, get_peaks, get_compound_group)
+                            get_ionization_type, get_formula, get_inchikey, get_cas, get_smiles, get_inchi_from_smiles,
+                            get_precursor_mz, get_retention_time, get_peaks, get_compound_group)
 from .lfuby_utils import extract_data_regex_lfuby
 from .lfuby_config import var_regex_lfuby, var_fix_lfuby, defaults_lfuby, adduct_notation_lfuby
 from .lanuv_utils import extract_data_regex_lanuv
@@ -21,6 +21,7 @@ __all__ = [
     "get_inchikey",
     "get_cas",
     "get_smiles",
+    "get_inchi_from_smiles",
     "get_precursor_mz",
     "get_retention_time",
     "get_peaks",

@@ -106,6 +106,7 @@ def add_exp_to_session(session, entry, inst_def):
     formula_i = entry['formula_i']
     smiles_i = entry['smiles_i']
     inchikey_i = entry['inchikey_i']
+    inchi_i = entry['inchi_i']
     chrom_method = entry['var_chrom_method']
     rt_i = entry['rt_i']
     instrument = entry['var_instrument']
@@ -166,7 +167,7 @@ def add_exp_to_session(session, entry, inst_def):
     else:  # If the compound was not found in the CSL
         logger.info(f'Compound "{comp_i}" not found in CSL. Adding entry.')
         comp_res = Compound(formula=formula_i, CAS=cas_i, SMILES=smiles_i, name=comp_i,
-                            groups=comp_group, inchikey=inchikey_i)
+                            groups=comp_group, inchikey=inchikey_i, inchi=inchi_i)
         # Add compound entry to session
         session.add(comp_res)
 

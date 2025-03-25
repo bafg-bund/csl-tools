@@ -263,6 +263,29 @@ def get_smiles(data_smiles):
     return smiles_i
 
 
+def get_inchi_from_smiles(smiles_i):
+    """
+    Get the InChi from the SMILES code.
+
+    Args:
+        smiles_i (str) : SMILES-string
+
+    Returns:
+        inchi_i (str) : InChI-string. Returns None, if the input is invalid.
+    """
+    from rdkit import Chem
+
+    if smiles_i:
+        mol = Chem.MolFromSmiles(smiles_i)  # Convert SMILES to RDKit molecule object
+        if mol:
+            inchi_i = Chem.MolToInchi(mol)  # Convert to InChI
+        else:
+            inchi_i = None
+    else:
+        inchi_i = None
+    return inchi_i
+
+
 def get_precursor_mz(data_mz):
     """
     Retrieves and returns the precursor mass-to-charge ratio (m/z) as a float.

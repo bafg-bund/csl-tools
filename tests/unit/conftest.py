@@ -127,6 +127,7 @@ def mock_entry_df():
         "inchikey_main_i": 'mock_pol_inchikey_main',
         "cas_i": 'mock_pol_cas',
         "smiles_i": 'mock_pol_smiles',
+        "inchi_i": 'mock_inchi',
         "mz_i": 900,
         "rt_i": 22,
         "spec_i": pd.DataFrame({'mz': [9.9, 7.7], 'int': [99.9, 77.7]}),

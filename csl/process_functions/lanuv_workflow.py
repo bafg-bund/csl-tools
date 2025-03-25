@@ -197,6 +197,12 @@ class LanuvWorkflow(InstitutionWorkflow):
                 logger.warning('Smiles not detected')
                 entry_err = True
 
+            # InChI
+            inchi_i = get_inchi_from_smiles(smiles_i)
+            if not inchi_i:
+                logger.warning('InChI not generated.')
+                entry_err = True
+
             # Precursor mass
             mz_i = get_precursor_mz(entry['var_mz'])
             if not mz_i:
@@ -231,6 +237,7 @@ class LanuvWorkflow(InstitutionWorkflow):
                 'inchikey_main_i': inchikey_main_i,
                 'cas_i': cas_i,
                 'smiles_i': smiles_i,
+                'inchi_i': inchi_i,
                 'mz_i': mz_i,
                 'rt_i': rt_i,
                 'spec_i': spec_i,
