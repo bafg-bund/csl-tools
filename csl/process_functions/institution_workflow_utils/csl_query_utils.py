@@ -67,20 +67,23 @@ def add_exp_to_session(session, entry, inst_def):
     Adds the new experimental information to the following tables in the CSL:
     Experiment group
     - Checks if the experiment group exists in the CSL and adds it if necessary.
-    Compound group
-    - Checks if the compound group exists in the CSL and adds it if necessary.
-    - Checks if the compound (and a link to compound group) exists in the CSL and adds an entry if necessary.
+    Compound group(s)
+    - Matches compound groups with existing ones in the CSL. Collects the matches.
+    - If no matches are found, uses the default compound group.
+    Compound
+    - Checks if the compound, and a link to the matched compound group(s), exists in the CSL.
+    - Missing compounds and links to compound group(s) are added.
     Retention time
     - Checks for an existing retention time and uses the retention time from the file if it doesn't exist.
-        Todo: RT from file and from query can be different. What is better to use?
+        Todo: RT from file and from query can be different. What should be preferred?
     Experimental parameters
-    - Searches for experimental parameters and add them from the file if they don't exist.
+    - Searches for experimental parameters and add them from the file if they do not exist.
         Todo: How do you know that this is the experiment of the same compound without filtering for InChIKey or CAS RN?
         Todo: Or does it only matters, that these parameters exist (for any experiment)?
     Experiment
-    - Creates a new experiment entry in the CSL (also adding the current time)
+    - Creates a new experiment entry in the CSL at the current time.
     Fragments
-    - Adding all fragment information from the file
+    - Adds all fragment information from the file.
 
     Args:
         session (obj)         : SQLAlchemy session object (sqlalchemy.orm.session.Session)
@@ -118,22 +121,22 @@ def add_exp_to_session(session, entry, inst_def):
     spec_i = entry['spec_i']
     compgroup_i = entry['compgroup_i']
 
-    # Check if the experiment group exists (e.g. 'LfU', 'UBA', 'BfG') in CSL and add if necessary.
+    # Check if the experiment group exists (e.g., 'UBA', 'BfG') in the CSL and add it if necessary.
     exp_group = session.query(ExperimentGroup).filter_by(name=expg_def).one_or_none()
     if not exp_group:
         logger.info(f'Adding missing default experiment group: "{expg_def}"')
         exp_group = ExperimentGroup(name=expg_def)
         session.add(exp_group)
 
-    # Check if compound groups exist in the CSL database. Collect the ones that match.
+    # Match compound groups with existing ones in the CSL. Collect the matches. If no matches are found, use the default.
     comp_group = []
     for cg in compgroup_i:
         cg_db = session.query(CompoundGroup).filter(func.lower(CompoundGroup.name) == cg.lower()).one_or_none()
         if cg_db:
             comp_group.append(cg_db)
-    # If no matches were found use the default compound group. Create the default compound group if necessary.
     if not comp_group:
         existing_cg = session.query(CompoundGroup).filter_by(name=compg_def).one_or_none()
+        # Create the default compound group if necessary.
         if not existing_cg:
             logger.info(f'Adding missing default compound group: "{compg_def}"')
             new_cg = CompoundGroup(name=compg_def)
@@ -142,7 +145,7 @@ def add_exp_to_session(session, entry, inst_def):
         if not isinstance(comp_group, list):
             comp_group = [comp_group]
 
-    # Check if the compound (and a link to each compound group) exists in the CSL and adds an entry if necessary.
+    # Check if the compound, and a link to the matched compound group(s), exists in the CSL. Missing entries are added.
     inchikey_main_i = entry['inchikey_main_i']
     cas_i = entry['cas_i']
     if inchikey_main_i:  # InChIKey is preferred
@@ -155,22 +158,20 @@ def add_exp_to_session(session, entry, inst_def):
     else:
         comp_res = []
     if comp_res:  # If the compound exists in the CSL
-        # Add compound groups that don't exist yet for this compound
+        # Add compound groups that do not exist yet for this compound
         for cg in comp_group:
             if cg.name not in [group.name for group in comp_res.groups]:
                 logger.info(f'Adding compound group "{cg.name}" to the compound "{comp_i}"')
-                # existing_cg = session.query(CompoundGroup).filter_by(name=cg).one_or_none()
                 comp_res.groups.append(cg)
     else:  # If the compound was not found in the CSL
-        # existing_cg = session.query(CompoundGroup).filter(CompoundGroup.name.in_(comp_group)).all()
         logger.info(f'Compound "{comp_i}" not found in CSL. Adding entry.')
         comp_res = Compound(formula=formula_i, CAS=cas_i, SMILES=smiles_i, name=comp_i,
                             groups=comp_group, inchikey=inchikey_i)
         # Add compound entry to session
         session.add(comp_res)
 
-    # Check for existing retention time (filter by compound_id and chrom. method). Use RT from file if it doesn't exist.
-    # Todo: RT from file and from query can be different. What is better to use?
+    # Check for existing retention time (filter by compound_id and chrom. method). Use RT from file if it does not exist.
+    # Todo: RT from file and from query can be different. What should be preferred?
     rt_res = session.query(RetentionTime).filter_by(compound_id=comp_res.compound_id, chrom_method=chrom_method
                                                      ).one_or_none()
     if not rt_res:
@@ -179,7 +180,7 @@ def add_exp_to_session(session, entry, inst_def):
         rt_res = RetentionTime(chrom_method=chrom_method, rt=rt_i, compound=comp_res, predicted='FALSE')
         session.add(rt_res)
 
-    # Search experimental parameters and add then from the file if they don't exist
+    # Search experimental parameters and add them from the file if they don't exist
     para_res = session.query(Parameter).filter_by(instrument=instrument, polarity=pol_i, CE=ce_i, CES=ces_i,
                                                   ce_unit=ce_unit, col_type=col_type, ionisation=ionization_i
                                                   ).one_or_none()
@@ -191,12 +192,12 @@ def add_exp_to_session(session, entry, inst_def):
                              col_type=col_type, ionisation=ionization_i)
         session.add(para_res)
 
-    # Create a new experiment entry in the CSL (also adding the current time)
+    # Create a new experiment entry in the CSL at the current time
     exp = Experiment(mz=mz_i, compound=comp_res, parameter=para_res, adduct=adduct_i, groups=[exp_group],
                      time_added=datetime.today(), isotope=isotope)
     session.add(exp)
 
-    # Add spectrum to the experiment
+    # Add the spectrum to the experiment
     for frag in spec_i.itertuples():
         frag_i = Fragment(mz=frag.mz, int=frag.int, experiment=exp)
         session.add(frag_i)
