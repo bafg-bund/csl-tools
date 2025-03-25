@@ -146,6 +146,14 @@ def test_get_smiles(data_smiles, expected_smiles_i):
     assert smiles_i == expected_smiles_i
 
 
+@pytest.mark.parametrize("smiles_i, expected_inchi_i",
+                         [('CCO', 'InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3'), ('', None), (None, None)])
+def test_get_inchi_from_smiles(smiles_i, expected_inchi_i):
+    """Test the function `get_inchi_from_smiles` with parametrized inputs."""
+    inchi_i = get_inchi_from_smiles(smiles_i)
+    assert inchi_i == expected_inchi_i
+
+
 @pytest.mark.parametrize("data_mz, expected_mz_i",
                          [('318.45672', 318.45672), ('319', 319.0), ('', None)])
 def test_get_precursor_mz(data_mz, expected_mz_i):
