@@ -2,8 +2,11 @@ from main_functions.export import run_export_workflow
 from config import ROOT_DIR
 import os
 import re
+import shutil
 import glob
 from datetime import datetime
+from pathlib import Path
+
 
 def test_export_mbank_bfg():
     """Tests correct export of BfG experiments as MassBank documents."""
@@ -11,11 +14,18 @@ def test_export_mbank_bfg():
     csl_path = os.path.join(ROOT_DIR,'tests/integration/fixtures/CSL_v0_export_1bfg_1bfgIS_1lfuby_1uba.db')
     out_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 
+    # Create out_path folder if necessary
+    Path(out_path).mkdir(parents=False, exist_ok=True)
+
     # Make sure temp directory is clean
-    files = glob.glob(os.path.join(out_path, '*'))
-    if files:
-        for f in files:
-            os.remove(f)
+    for f in Path(out_path).iterdir():
+        try:
+            if f.is_file() or f.is_symlink():
+                f.unlink()  # Delete file or symlink
+            elif f.is_dir():
+                shutil.rmtree(f)  # Delete directory and contents
+        except PermissionError as e:
+            print(f"Could not delete {f}: {e}")
 
     # Export mbank workflow
     run_export_workflow(format='mbank', path_out=out_path, path_csl=csl_path, subset='bfg')
