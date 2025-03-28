@@ -148,7 +148,10 @@ Todo: Add SOPs for formats of spectral data files
 ## Authors and acknowledgments
 Ole Lessmann, BfG, lessmann@bafg.de  
 Björn Ehlig, BfG, ehlig@bafg.de  
-Kevin Jewell, BfG, jewell@bafg.de  
+Kevin S. Jewell, BfG, jewell@bafg.de  
+
+Todo: Add acknowledgements for data contributions
+
 
 ## License
 Todo

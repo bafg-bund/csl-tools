@@ -189,8 +189,4 @@ def test_commit_to_csl(mock_session, mock_logger, monkeypatch, mock_form_data_ma
         if not any(mock_form_data_match.csl_add_flag):
             mock_input.assert_not_called()
 
-
-        # session_change = mock_session.new or session.dirty  # todo test if session.dirty is none if no changes were made
-        # print(f'session change is {session_change}')
-
         mock_session.close.assert_called_once()  # Session should always be closed

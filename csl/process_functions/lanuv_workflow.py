@@ -54,7 +54,7 @@ class LanuvWorkflow(InstitutionWorkflow):
         """
         Collects and processes files and extracts data using specific regular expressions.
 
-        1. If self.path_files is a directory path then all files in that directory (including sub-directories) are
+        1. If self.path_files is a directory path then all files in that directory (including subdirectories) are
         retrieved.
         2. Extracts data from the files using a list of regular expressions specific to the lfuby context.
         3. Adds file path information and append extracted data of each file.
