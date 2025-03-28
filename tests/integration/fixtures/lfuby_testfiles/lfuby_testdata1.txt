@@ -1,0 +1,38 @@
+﻿Name: Desmedipham_NH4
+PrecursorMz: 318.14482
+Precursor_type: 
+Collision_energy: 10.00
+Ionization: ESI
+IonMode: positive
+RetentionTime: 11.24195
+InChiKey: WZJZMXBKUWKXTQ-UHFFFAOYSA-N
+Formula: C16H16N2O4
+CASNo: 13684-56-5
+Smiles: CCOC(=O)Nc1cccc(c1)OC(=O)Nc2ccccc2
+CompoundClass: Herbicide;Pesticide
+Comment: 
+Num peaks: 4
+136.0397 13393.02
+182.0816 349997.91
+301.1186 60422.74
+318.2636 31287.43
+
+Name: Desmedipham_NH4
+PrecursorMz: 318.14482
+Precursor_type: 
+Collision_energy: 20.00
+Ionization: ESI
+IonMode: positive
+RetentionTime: 11.24335
+InChiKey: WZJZMXBKUWKXTQ-UHFFFAOYSA-N
+Formula: C16H16N2O4
+CASNo: 13684-56-5
+Smiles: CCOC(=O)Nc1cccc(c1)OC(=O)Nc2ccccc2
+CompoundClass: Herbicide;Pesticide
+Comment: 
+Num peaks: 5
+73.0287 14813.86
+136.0397 154862.31
+154.0503 72739.36
+164.0714 5852.84
+182.0816 187456.61

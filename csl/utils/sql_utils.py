@@ -1,7 +1,7 @@
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, relationship
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Float, create_engine
 from sqlalchemy.schema import Table
-
+from sqlalchemy.pool import NullPool
 
 def inst_code_csl_mapping():
     """
@@ -17,7 +17,7 @@ def inst_code_csl_mapping():
 
 def create_session(path_csl):
     # Create engine using path of CSL and bind it to session
-    engine = create_engine(f"sqlite:///{path_csl}")
+    engine = create_engine(f"sqlite:///{path_csl}", poolclass=NullPool)
     Base.metadata.bind = engine
     db_session = sessionmaker(bind=engine)
     session = db_session()
