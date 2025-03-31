@@ -3,15 +3,26 @@ from unittest.mock import patch
 import os
 import tempfile
 import pandas as pd
-
 from process_functions.institution_workflow_utils.process_utils import *
-from process_functions.institution_workflow_utils.lfuby_utils import extract_data_regex_lfuby
+
+
+@pytest.mark.parametrize("mock_data_paths, mock_isfile, expected_file_paths",
+                         [('one_file.txt', True, ['one_file.txt']),  # Expect conversion to list for single file str
+                          (['file1.txt', 'file2.txt'], None, ['file1.txt', 'file2.txt']),  # Expect no changes
+                          ('dir', False, ['dir/file.txt']),  # Expect use of mock function `mock_match_file_paths`
+                          ])  # List of file str should be unchanged.
+@patch('process_functions.institution_workflow_utils.process_utils.match_file_paths')
+def test_get_file_paths(mock_match_file_paths, mock_data_paths, mock_isfile, expected_file_paths):
+    """Test if file paths are correctly returned."""
+    with patch('os.path.isfile', return_value=mock_isfile):
+        mock_match_file_paths.return_value = expected_file_paths
+        file_paths = get_file_paths(mock_data_paths)
+
+    assert file_paths == expected_file_paths
 
 
 def test_match_file_paths():
-    """
-    Test that match_file_paths correctly identifies files (also in a subdirectory) containing the identifier string.
-    """
+    """Test if files are found and correctly identified."""
     # Create a temporary directory
     with tempfile.TemporaryDirectory() as temp_dir:
         # Create temporary subdirectory
@@ -21,7 +32,7 @@ def test_match_file_paths():
             os.path.join(temp_dir, "file1_test.txt"),
             os.path.join(temp_dir, "file2_testX.txt"),
             os.path.join(temp_dir, "other_file.txt"),  # This one should not be detected
-            os.path.join(temp_dir, "subdir", "file4_test.txt")  # Create file in subdirectory
+            os.path.join(temp_dir, "subdir", "file4_test.txt")  # File should be found in subdirectory
         ]
 
         for file_path in file_paths:

@@ -1,12 +1,12 @@
 import pytest
 from unittest.mock import MagicMock, patch
+import pandas as pd
 
 
 @pytest.fixture
 def mock_session():
     """Mock the session object."""
     session = MagicMock()
-    print('test mock session')
     return session
 
 
@@ -41,8 +41,6 @@ def mock_spec_adduct():
 @pytest.fixture
 def mock_extract_data():
     """Mock the extracted data (DataFrame)."""
-    import pandas as pd
-
     data = [{
         "var_comp": 'mock_compound',
         "var_mz": '900',
@@ -69,7 +67,6 @@ def mock_extract_data():
 @pytest.fixture
 def mock_format_data():
     """Mock the formatted data (DataFrame)."""
-    import pandas as pd
     data = {
         "dummy_i": ['mock_dummy'],
         "form_err_flag": [False],
@@ -81,7 +78,6 @@ def mock_format_data():
 @pytest.fixture
 def mock_format_data_match():
     """Mock the formatted and matched data (DataFrame)."""
-    import pandas as pd
     data = {
         'dummy_i': ['mock_dummy'],
         'form_err_flag': [False],
@@ -96,8 +92,6 @@ def mock_format_data_match():
 @pytest.fixture
 def mock_entry_df():
     """Mock the data entry (that includes the formatted data) used in process workflows."""
-    import pandas as pd
-
     data = {
         "var_comp": 'mock_compound',
         "var_mz": '900',
@@ -141,8 +135,6 @@ def mock_entry_df():
 @pytest.fixture
 def mock_df_envi():
     """Mock a DataFrame returned by the CSL query used in the envimass export workflow."""
-    import pandas as pd
-
     return pd.DataFrame({
         'name': ['compound1', 'compound2'],
         'formula': ['H2O', 'CO2'],
