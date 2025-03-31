@@ -1,14 +1,49 @@
 from process_functions.institution_workflow_utils import *
 from utils.sql_utils import create_session
+from abc import ABC, abstractmethod
 
-
-class InstitutionWorkflow:
+class InstitutionWorkflow(ABC):
     def __init__(self, path_data, path_csl):
         self.path_data = path_data
         self.path_csl = path_csl
 
     def process(self):
         raise NotImplementedError("Subclasses should implement this!")
+
+
+    def read_files(self, var_regex):
+        """
+        Collects file paths and extracts data using format-specific regular expressions.
+
+        Args:
+            var_regex (dict) : Mapping of parameters (keys) to format-specific identifiers (values) for data extraction.
+
+        Returns:
+            data_extract_all (DataFrame) : Extracted data from all files based on regular expressions.
+        """
+        import pandas as pd
+
+        # Collect valid file paths
+        file_paths = get_file_paths(self.path_data)
+
+        # Data extraction based on the subclass-specific method and regular expressions
+        data_extract_all = []
+        for file in file_paths:
+            data_extract_file = self.extract_data_regex(file, var_regex)
+            data_extract_file['file_path'] = file  # Add current file path for every entry
+            data_extract_all.append(data_extract_file)
+
+        # Merge into one pandas DataFrame and reset index
+        if len(data_extract_all) > 0 and isinstance(data_extract_all, list):
+            data_extract_all = pd.concat(data_extract_all, ignore_index=True)
+
+        return data_extract_all
+
+    @abstractmethod
+    def extract_data_regex(self, file, var_regex):
+        """Subclasses should implement this method to extract data."""
+        pass
+
 
     # noinspection PyMethodMayBeStatic
     def add_fixed_variables(self, extract_data, var_fix):
@@ -17,6 +52,7 @@ class InstitutionWorkflow:
         for var in var_fix.items():
             extract_data_add[var[0]] = var[1]
         return extract_data_add
+
 
     # noinspection PyMethodMayBeStatic
     def process_data(self, extract_data, inst_def, spec_adduct):
@@ -309,3 +345,5 @@ class InstitutionWorkflow:
 
         # End session
         session.close()
+
+

@@ -1,4 +1,4 @@
-from .process_utils import match_file_paths
+from .process_utils import get_file_paths, match_file_paths
 from .process_utils import (get_polarity, get_compound_and_adduct_name, format_adduct, get_collision_energy,
                             get_ionization_type, get_formula, get_inchikey, get_cas, get_smiles, get_inchi_from_smiles,
                             get_precursor_mz, get_retention_time, get_peaks, get_compound_group)
@@ -11,6 +11,7 @@ from .lubw_config import var_regex_lubw, var_fix_lubw, defaults_lubw, adduct_not
 from .csl_query_utils import check_duplicate, add_exp_to_session
 
 __all__ = [
+    "get_file_paths",
     "match_file_paths",
     "get_polarity",
     "get_compound_and_adduct_name",

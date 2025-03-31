@@ -38,8 +38,10 @@ def var_regex_lanuv():
 
 def var_fix_lanuv():
     """
-    Mapping of CSL-relevant variables (keys) to lanuv-specific default/fixed information (values).
-    The information is currently fixed for this institution or does not appear in the data files (can't be extracted).
+    Mapping of CSL-relevant parameters (keys) to lanuv-specific identifiers (values) for data extraction.
+
+    The identifiers should appear in every experiment of the data files. Define them as the shortest (but unique)
+    common regular expression (not case-sensitive).
     """
     from config import DEFAULT_PAIRS_INST_CHROM
     all_methods = DEFAULT_PAIRS_INST_CHROM

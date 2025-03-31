@@ -50,41 +50,38 @@ class LanuvWorkflow(InstitutionWorkflow):
 
         logger.info('End of lfuby workflow')
 
-    def read_files(self, var_regex):
-        """
-        Collects and processes files and extracts data using specific regular expressions.
+    def extract_data_regex(self, file, var_regex):
+        """lanuv-specific data extraction."""
+        return extract_data_regex_lanuv(file, var_regex)
 
-        1. If self.path_files is a directory path then all files in that directory (including subdirectories) are
-        retrieved.
-        2. Extracts data from the files using a list of regular expressions specific to the lfuby context.
-        3. Adds file path information and append extracted data of each file.
-
-        Returns:
-                data_extract_all (DataFrame) : Extracted data from all files based on regular expressions.
-        """
-        import os
-        import pandas as pd
-
-        # Get file paths
-        if isinstance(self.path_data, list):  # User selected file(s) are provided as list of str
-            file_paths = self.path_data
-        else:  # Otherwise check if provided path is a directory or a single file
-            if os.path.isfile(self.path_data):
-                file_paths = [self.path_data]
-            else:  # If a directory is provided
-                # Find all files in directory (also subdirectories)
-                file_paths = match_file_paths(self.path_data, fstr_id=None)
-
-        # Data extraction based on lfuby specific regular expressions
-        data_extract_all = []
-        for file in file_paths:
-            data_extract_file = extract_data_regex_lanuv(file, var_regex)
-            data_extract_file['file_path'] = file  # Add current file path for every entry
-            data_extract_all.append(data_extract_file)
-
-        # Merge into one pandas DataFrame and reset index
-        if len(data_extract_all) > 0 and isinstance(data_extract_all, list):
-            data_extract_all = pd.concat(data_extract_all, ignore_index=True)
-
-        return data_extract_all
+    #
+    # def read_files(self, var_regex):
+    #     """
+    #     Collects and processes files and extracts data using specific regular expressions.
+    #
+    #     1. If self.path_files is a directory path then all files in that directory (including subdirectories) are
+    #     retrieved.
+    #     2. Extracts data from the files using a list of regular expressions specific to the lfuby context.
+    #     3. Adds file path information and append extracted data of each file.
+    #
+    #     Returns:
+    #             data_extract_all (DataFrame) : Extracted data from all files based on regular expressions.
+    #     """
+    #     import pandas as pd
+    #
+    #     # Collect valid file paths
+    #     file_paths = get_file_paths(self.path_data)
+    #
+    #     # Data extraction based on lanuv-specific regular expressions
+    #     data_extract_all = []
+    #     for file in file_paths:
+    #         data_extract_file = extract_data_regex_lanuv(file, var_regex)
+    #         data_extract_file['file_path'] = file  # Add current file path for every entry
+    #         data_extract_all.append(data_extract_file)
+    #
+    #     # Merge into one pandas DataFrame and reset index
+    #     if len(data_extract_all) > 0 and isinstance(data_extract_all, list):
+    #         data_extract_all = pd.concat(data_extract_all, ignore_index=True)
+    #
+    #     return data_extract_all
 

@@ -18,9 +18,9 @@
 
 def var_regex_lfuby():
     """
-    Mapping of CSL-relevant variables (keys) to lfuby-specific identifiers (values) for data extraction.
+    Mapping of CSL-relevant parameters (keys) to lfuby-specific identifiers (values) for data extraction.
 
-    The identifiers should appear in every "chunk" of the data files! Define them as the shortest (but unique)
+    The identifiers should appear in every experiment of the data files. Define them as the shortest (but unique)
     common regular expression (not case-sensitive).
     """
     lfuby_var_regex = {

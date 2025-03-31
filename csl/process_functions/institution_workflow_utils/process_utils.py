@@ -1,3 +1,32 @@
+def get_file_paths(data_path):
+    """
+    Returns file paths in correct format.
+    Handles different inputs:
+        - Single file path (str) : Converted to a list.
+        - Multiple file paths (list of str): No change.
+        - Path to directory (str) : Returns all valid file paths in the directory and subdirectories.
+
+    Args:
+        data_path (str or list of str) : Path of data. Can be a directory or a list of file paths.
+
+    Returns:
+        file_paths (list of str) : List of file paths.
+
+    """
+    import os
+
+    # Get file paths
+    if isinstance(data_path, list):  # User selected file(s) are provided as list of str
+        file_paths = data_path
+    else:  # Otherwise check if provided path is a directory or a single file
+        if os.path.isfile(data_path):
+            file_paths = [data_path]
+        else:  # If a directory is provided
+            # Find all files in directory (also subdirectories)
+            file_paths = match_file_paths(data_path, fstr_id=None)
+    return file_paths
+
+
 def match_file_paths(path_dir, fstr_id=None):
     """
     Collects files in a specified dictionary (including subfolders). Can filter filenames based on an identifier string.

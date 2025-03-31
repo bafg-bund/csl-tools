@@ -18,8 +18,10 @@
 
 def var_regex_lubw():
     """
-    Define variables for data extraction.
-    Variables are not case-sensitive. Set to shortest (but unique) common variable across all lubw file types.
+    Mapping of CSL-relevant parameters (keys) to lubw-specific identifiers (values) for data extraction.
+
+    The identifiers should appear in every experiment of the data files. Define them as the shortest (but unique)
+    common regular expression (not case-sensitive).
     """
     lubw_var_regex = {
         'var_comp': 'Name',                # Compound Name
