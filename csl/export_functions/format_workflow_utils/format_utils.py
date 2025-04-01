@@ -15,7 +15,16 @@ class SqlQueryResult:
 
 
 def get_experiment_ids(session, data_source):
-    """ ."""
+    """
+    Get experiment IDs from the CSL. Can be subset by data source.
+
+    Args:
+        session (obj)     : SQLAlchemy session object connected to the CSL database.
+        data_source (str) : Corresponds to ExperimentGroup in CSL (e.g., 'bfg'), or 'all' for all experiment IDs.
+
+    Returns:
+        experiment_ids (list of int) :  Experiment IDs of the data entries (experiments) in the CSL.
+    """
     from sqlalchemy import select
 
     if data_source == 'all':

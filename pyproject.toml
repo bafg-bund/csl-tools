@@ -21,7 +21,7 @@ dependencies = [
     "joblib<1.4.2",
     "pygam<0.9.1",
     "splash @ git+https://github.com/berlinguyinca/spectra-hash.git@174fbf289a0357535f9bacda282b9a2dbb7807cc#egg=splash&subdirectory=python",
-#    "pubchempy<1.0.4",  # Todo: uncomment, if used.
+    "pubchempy<1.0.4",
 ]
 
 [tool.setuptools.packages.find]

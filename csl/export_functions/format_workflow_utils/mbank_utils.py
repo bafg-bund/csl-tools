@@ -4,6 +4,7 @@ from config import DEFAULT_PAIRS_INST_CHROM
 from dataclasses import dataclass
 from typing import Optional, Union, List
 
+
 def get_exp_ids_mbank(path_mbank_files):
     """
     Retrieve current MassBank experiment IDs (=accession numbers).
@@ -33,7 +34,7 @@ def get_exp_ids_mbank(path_mbank_files):
 
 def extract_experiment_chunk_mbank(session, exp_id, chrom_method, csl_version, pycsl_version, dict_mbank_exp_id_fn):
     """
-    Extracts data for a specific experiment id and formats data to meet MassBank requirements.
+    Extracts data for a specific experiment id and formats data for MassBank requirements.
 
     Args:
         session (obj)               : SQLAlchemy session object connected to the CSL database.
@@ -44,7 +45,7 @@ def extract_experiment_chunk_mbank(session, exp_id, chrom_method, csl_version, p
         dict_mbank_exp_id_fn (dict) : Pairs of existing of accession strings and experiment IDs.
 
     Returns:
-        export_chunk (str) : Text chunk formatted to fit MassBank requirements for a single txt file.
+        export_chunk (str) : Text chunk formatted to MassBank requirements for a single txt file.
     """
 
     # SQL queries based on experiment ID and chromatographic method
@@ -113,7 +114,6 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, pycsl_versi
           FormattedData (dataclass) : Dataclass containing the formatted data required for constructing the MassBank
                                       document.
     """
-
     from datetime import datetime
     from rdkit import Chem
     from rdkit.Chem import Descriptors
@@ -266,7 +266,7 @@ def format_spectrum_mbank(spectrum):
     # Remove zeros in intensity
     spectrum_nozero = [entry for entry in spectrum if entry[1] != 0]
 
-    intensities = [spec[1] for spec in spectrum_nozero]  # Todo: check
+    intensities = [spec[1] for spec in spectrum_nozero]
     # Calculate relative intensities
     max_intensity = max(intensities)
     relative_intensities = [int((intensity / max_intensity) * 999) for intensity in intensities]

@@ -9,7 +9,6 @@ class ThermoWorkflow(FormatWorkflow):
     def export(self):
         """Workflow to export CSL data to a text file."""
 
-        from sqlalchemy import select
         import os.path
         from datetime import datetime
         from tqdm import tqdm

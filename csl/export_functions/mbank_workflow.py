@@ -9,7 +9,6 @@ class MbankWorkflow(FormatWorkflow):
     def export(self):
         """Workflow to export CSL data for MassBank."""
 
-        from sqlalchemy import select
         import os.path
         import re
         from tqdm import tqdm

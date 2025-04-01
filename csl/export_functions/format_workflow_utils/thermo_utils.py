@@ -1,11 +1,22 @@
 from .format_utils import *
-# from utils.sql_utils import inst_code_csl_mapping
 from dataclasses import dataclass
 from typing import Optional, Union, List
 
 
 def extract_experiment_chunk_thermo(session, exp_id, chrom_method, csl_version, pycsl_version):
-    """."""
+    """
+    Extracts data for a specific experiment id and formats data for MSP/NIST documents (mzVault/ThermoFisher).
+
+    Args:
+        session (obj)               : SQLAlchemy session object connected to the CSL database.
+        exp_id (int)                : Experiment ID used to query the database.
+        chrom_method (str)          : Chromatographic method identifier.
+        csl_version (str)           : Current version of the CSL database.
+        pycsl_version (str)         : Current version of the python package.
+
+    Returns:
+        export_chunk (str) : Text chunk formatted for a single MSP/NIST document.
+    """
 
     # SQL queries based on experiment ID and chromatographic method
     SqlQueryResult = sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method)
@@ -68,7 +79,6 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, pycsl_vers
           FormattedData (dataclass) : Dataclass containing the formatted data required for constructing the MassBank
                                       document.
     """
-
     from datetime import datetime
     from rdkit import Chem
     from rdkit.Chem import Descriptors
@@ -160,37 +170,37 @@ def build_export_chunk_thermo(f_data: FormattedDataThermo):
     """
 
     # Creating export text chunk
-    export_chunk = "".join(filter(None, [                   # Imported to mzVault (v2.3.64.0)?
-         f"NAME: {f_data.compound_name}\n",                     # YES
-         f"ACCESSION: {f_data.accession}\n",                            # NO
-         f"RECORD_TITLE: {f_data.title}\n",                             # NO
-         f"DATE: {f_data.date}\n",                                      # NO
-         f"AUTHORS: {f_data.authors}\n",                                # NO
-         f"LICENSE: {f_data.inst_license}\n",                           # NO
-         f"COPYRIGHT: {f_data.inst_copyright}\n",                       # NO
-         f"{f_data.comment_chunk}" if f_data.comment_chunk else None,   # NO
-         f"COMPOUNDCLASS: {f_data.compound_classes}\n"          # YES
+    export_chunk = "".join(filter(None, [
+         f"NAME: {f_data.compound_name}\n",
+         f"ACCESSION: {f_data.accession}\n",
+         f"RECORD_TITLE: {f_data.title}\n",
+         f"DATE: {f_data.date}\n",
+         f"AUTHORS: {f_data.authors}\n",
+         f"LICENSE: {f_data.inst_license}\n",
+         f"COPYRIGHT: {f_data.inst_copyright}\n",
+         f"{f_data.comment_chunk}" if f_data.comment_chunk else None,
+         f"COMPOUNDCLASS: {f_data.compound_classes}\n"
          if f_data.compound_classes else None,
-         f"FORMULA: {f_data.formula}\n",                        # YES
-         f"EXACT_MASS: {f_data.exact_mass}\n",                          # NO
-         f"CENTROIDED: {f_data.def_centroided}\n",                      # NO
-         f"SMILES: {f_data.smiles}\n",                          # YES
-         f"INCHI: {f_data.inchi}\n",                                    # NO
-         f"CASNO: {f_data.cas}\n",                              # YES
-         f"INCHIKEY: {f_data.inchikey}\n",                      # YES
-         f"INSTRUMENT: {f_data.instrument_name}\n",                     # NO
-         f"INSTRUMENTTYPE: {f_data.instrument_type}\n",                 # NO
-         f"MS_TYPE: {f_data.def_mslevel}\n",                            # NO
-         f"ION_MODE: {f_data.ion_mode}\n",                      # YES
-         f"COLLISION_ENERGY: {f_data.ce}\n",                    # YES
-         f"FRAGMENTATION_MODE: {f_data.frag_mode}\n",                   # NO
-         f"IONIZATION: {f_data.ionization}\n",                  # YES
-         f"RETENTIONTIME: {f_data.rt}\n",                       # YES
-         f"PRECURSORMZ: {f_data.precursor_mz}\n",               # YES
-         f"PRECURSORTYPE: {f_data.adduct}\n",                   # YES
-         f"PRECURSOR_CHARGE: {f_data.precursor_charge}\n",              # NO
-         f"SPLASH: {f_data.splash_code}\n",                             # NO
-         f"Num Peaks: {f_data.nr_peaks}\n",                     # YES (Spectrum data)
+         f"FORMULA: {f_data.formula}\n",
+         f"EXACT_MASS: {f_data.exact_mass}\n",
+         f"CENTROIDED: {f_data.def_centroided}\n",
+         f"SMILES: {f_data.smiles}\n",
+         f"INCHI: {f_data.inchi}\n",
+         f"CASNO: {f_data.cas}\n",
+         f"INCHIKEY: {f_data.inchikey}\n",
+         f"INSTRUMENT: {f_data.instrument_name}\n",
+         f"INSTRUMENTTYPE: {f_data.instrument_type}\n",
+         f"MS_TYPE: {f_data.def_mslevel}\n",
+         f"ION_MODE: {f_data.ion_mode}\n",
+         f"COLLISION_ENERGY: {f_data.ce}\n",
+         f"FRAGMENTATION_MODE: {f_data.frag_mode}\n",
+         f"IONIZATION: {f_data.ionization}\n",
+         f"RETENTIONTIME: {f_data.rt}\n",
+         f"PRECURSORMZ: {f_data.precursor_mz}\n",
+         f"PRECURSORTYPE: {f_data.adduct}\n",
+         f"PRECURSOR_CHARGE: {f_data.precursor_charge}\n",
+         f"SPLASH: {f_data.splash_code}\n",
+         f"Num Peaks: {f_data.nr_peaks}\n",
          ]))
 
     # Add the spectrum data
