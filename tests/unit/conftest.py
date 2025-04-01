@@ -200,7 +200,7 @@ def mock_formatted_data_mbank():
     mock_f_data.inst_copyright = 'Copyright 2025 Institution'
     mock_f_data.comment_chunk = (f"COMMENT: Information\n"
          f"COMMENT: Additional information\n")
-    mock_f_data.compound_name = 'Compound X'
+    mock_f_data.compound_name = 'Compound'
     mock_f_data.compound_classes = 'Industrial_process; Biocide'
     mock_f_data.formula = '[C10H15N]+'
     mock_f_data.exact_mass = 248.23
@@ -225,7 +225,45 @@ def mock_formatted_data_mbank():
         (100.0, 150.0, 10.0),
         (200.0, 250.0, 20.0),
     ]
-
     return mock_f_data
 
 
+@pytest.fixture
+def mock_formatted_data_thermo():
+    """Mock a FormattedData dataclass required for building final text chunks in the thermo export workflow."""
+    mock_f_data = MagicMock()
+    mock_f_data.compound_name = 'Compound'
+    mock_f_data.accession = 'BAFG-CSL2501225'
+    mock_f_data.title = 'Compound; Instr; MS2; 140 V'
+    mock_f_data.date = '2025.01.09'
+    mock_f_data.authors = 'Person A; Person B; Person C'
+    mock_f_data.inst_license = 'dl-de/by-2-0'
+    mock_f_data.inst_copyright = 'Copyright 2025 Institution'
+    mock_f_data.comment_chunk = (f"COMMENT: Information\n"
+         f"COMMENT: Additional information\n")
+    mock_f_data.compound_classes = 'Industrial_process; Biocide'
+    mock_f_data.formula = 'C10H15N'
+    mock_f_data.exact_mass = 248.23
+    mock_f_data.def_centroided = 'TRUE'
+    mock_f_data.smiles = 'CC(C)CC'
+    mock_f_data.inchi = 'InChI=1S/C17H30N'
+    mock_f_data.cas = '469-1-1'
+    mock_f_data.inchikey = 'SHF-USA-N'
+    mock_f_data.instrument_name = 'TripleTOF 5600 SCIEX'
+    mock_f_data.instrument_type = 'LC-ESI-QTOF'
+    mock_f_data.def_mslevel = 'MS2'
+    mock_f_data.ion_mode = 'Positive'
+    mock_f_data.ce = 140
+    mock_f_data.frag_mode = 'Q'
+    mock_f_data.ionization = 'ESI'
+    mock_f_data.precursor_mz = 123.23
+    mock_f_data.adduct = '[M]+'
+    mock_f_data.rt = 12.11
+    mock_f_data.precursor_charge = 1
+    mock_f_data.splash_code = 'splash10-0i-900-755'
+    mock_f_data.nr_peaks = 2
+    mock_f_data.spectrum = [
+        (100.0, 150.0),
+        (200.0, 250.0),
+    ]
+    return mock_f_data
