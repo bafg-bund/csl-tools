@@ -1,5 +1,5 @@
 import pytest
-from rtscan_functions.rtscan_workflow_utils.rtscan_utils import *
+from rtscan_functions.utils.rtscan_utils import *
 from unittest.mock import patch, MagicMock
 
 

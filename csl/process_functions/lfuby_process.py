@@ -1,8 +1,8 @@
-from process_functions import InstitutionWorkflow
-from process_functions.institution_workflow_utils import *
+from process_functions import FormatProcess
+from process_functions.utils import *
 
 
-class LfubyWorkflow(InstitutionWorkflow):
+class LfubyProcess(FormatProcess):
     def process(self):
         """Workflow to process MS2 data files from the institution lfuby (Bayerisches Landesamt für Umwelt)."""
 
@@ -41,32 +41,3 @@ class LfubyWorkflow(InstitutionWorkflow):
     def extract_data_regex(self, file, var_regex):
         """lfuby-specific data extraction."""
         return extract_data_regex_lfuby(file, var_regex)
-
-    # def read_files(self, var_regex):
-    #     """
-    #     Collects file paths and extracts data using format-specific regular expressions.
-    #
-    #     Args:
-    #         var_regex (dict) : Mapping of parameters (keys) to format-specific identifiers (values) for data extraction.
-    #
-    #     Returns:
-    #         data_extract_all (DataFrame) : Extracted data from all files based on regular expressions.
-    #     """
-    #     import pandas as pd
-    #
-    #     # Collect valid file paths
-    #     file_paths = get_file_paths(self.path_data)
-    #
-    #     # Data extraction based on lfuby-specific regular expressions
-    #     data_extract_all = []
-    #     for file in file_paths:
-    #         data_extract_file = extract_data_regex_lfuby(file, var_regex)
-    #         data_extract_file['file_path'] = file  # Add current file path for every entry
-    #         data_extract_all.append(data_extract_file)
-    #
-    #     # Merge into one pandas DataFrame and reset index
-    #     if len(data_extract_all) > 0 and isinstance(data_extract_all, list):
-    #         data_extract_all = pd.concat(data_extract_all, ignore_index=True)
-    #
-    #     return data_extract_all
-

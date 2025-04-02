@@ -3,7 +3,7 @@ from unittest.mock import patch
 import os
 import tempfile
 import pandas as pd
-from process_functions.institution_workflow_utils.process_utils import *
+from process_functions.utils.process_utils import *
 
 
 @pytest.mark.parametrize("mock_data_paths, mock_isfile, expected_file_paths",
@@ -11,7 +11,7 @@ from process_functions.institution_workflow_utils.process_utils import *
                           (['file1.txt', 'file2.txt'], None, ['file1.txt', 'file2.txt']),  # Expect no changes
                           ('dir', False, ['dir/file.txt']),  # Expect use of mock function `mock_match_file_paths`
                           ])  # List of file str should be unchanged.
-@patch('process_functions.institution_workflow_utils.process_utils.match_file_paths')
+@patch('process_functions.utils.process_utils.match_file_paths')
 def test_get_file_paths(mock_match_file_paths, mock_data_paths, mock_isfile, expected_file_paths):
     """Test if file paths are correctly returned."""
     with patch('os.path.isfile', return_value=mock_isfile):
@@ -60,7 +60,7 @@ def test_match_file_paths():
 @pytest.mark.parametrize("data_ionmode, expected_pol_i",
                          [('positive', 'pos'), ('negative', 'neg'), ('wrong_string', None)])
 def test_get_polarity(data_ionmode, expected_pol_i):
-    """Test the function `get_polarity` with parametrized inputs."""
+    """Test the function with parametrized inputs."""
     pol_i = get_polarity(data_ionmode, 'positive', 'negative')
     assert pol_i == expected_pol_i
 
@@ -74,7 +74,7 @@ def test_get_polarity(data_ionmode, expected_pol_i):
     ('_', None, None)
 ])
 def test_get_compound_and_adduct_name(data_comp, expected_comp_i, expected_adduct_name):
-    """Test the function `get_compound_and_adduct_name` with parametrized inputs."""
+    """Test the function with parametrized inputs."""
     comp_i, adduct_name = get_compound_and_adduct_name(data_comp)
     assert comp_i == expected_comp_i
     assert adduct_name == expected_adduct_name
@@ -90,7 +90,7 @@ def test_get_compound_and_adduct_name(data_comp, expected_comp_i, expected_adduc
     ('QF121', 'neg', '[QF121]-')
 ])
 def test_format_adduct(adduct_name, pol_i, expected_adduct_i):
-    """Test the function `format_adduct` with parametrized inputs."""
+    """Test the function with parametrized inputs."""
     adduct_i = format_adduct(adduct_name, {'special': 'special_format'}, 'QF', pol_i)
     assert adduct_i == expected_adduct_i
 
@@ -107,7 +107,7 @@ def test_format_adduct(adduct_name, pol_i, expected_adduct_i):
     ('', None, None, False)  # No data
 ])
 def test_get_collision_energy(data_ce, expected_ce_i, expected_ces_i, expected_ces_warn):
-    """Test the function `get_collision_energy` with parametrized inputs."""
+    """Test the function with parametrized inputs."""
     ce_i, ces_i, ces_warn = get_collision_energy(data_ce)
     assert ce_i == expected_ce_i
     assert ces_i == expected_ces_i
@@ -117,7 +117,7 @@ def test_get_collision_energy(data_ce, expected_ce_i, expected_ces_i, expected_c
 @pytest.mark.parametrize("data_ionization, expected_ionization_i",
                          [('ESI', 'ESI'), ('', None)])
 def test_get_ionization_type(data_ionization, expected_ionization_i):
-    """Test the function `get_ionization_type` with parametrized inputs."""
+    """Test the function with parametrized inputs."""
     ionization_i = get_ionization_type(data_ionization)
     assert ionization_i == expected_ionization_i
 
@@ -135,7 +135,7 @@ def test_get_formula(data_formula, expected_form_i):
     ('', None, None)
 ])
 def test_get_inchikey(data_inchikey, expected_inchikey_i, expected_inchikey_main_i):
-    """Test the function `get_inchikey` with parametrized inputs."""
+    """Test the function with parametrized inputs."""
     inchikey_i, inchikey_main_i = get_inchikey(data_inchikey)
     assert inchikey_i == expected_inchikey_i
     assert inchikey_main_i == expected_inchikey_main_i
@@ -144,7 +144,7 @@ def test_get_inchikey(data_inchikey, expected_inchikey_i, expected_inchikey_main
 @pytest.mark.parametrize("data_cas, expected_cas_i",
                          [('13684-56-5', '13684-56-5'), ('136BA-56-5', None), ('', None)])
 def test_get_cas(data_cas, expected_cas_i):
-    """Test the function `get_cas` with parametrized inputs."""
+    """Test the function with parametrized inputs."""
     cas_i = get_cas(data_cas)
     assert cas_i == expected_cas_i
 
@@ -152,7 +152,7 @@ def test_get_cas(data_cas, expected_cas_i):
 @pytest.mark.parametrize("data_smiles, expected_smiles_i",
                          [('CCOC(=O)Nc1cccc(c1)OC(=O)Nc2ccccc2', 'CCOC(=O)Nc1cccc(c1)OC(=O)Nc2ccccc2'), ('', None)])
 def test_get_smiles(data_smiles, expected_smiles_i):
-    """Test the function `get_smiles` with parametrized inputs."""
+    """Test the function with parametrized inputs."""
     smiles_i = get_smiles(data_smiles)
     assert smiles_i == expected_smiles_i
 
@@ -160,7 +160,7 @@ def test_get_smiles(data_smiles, expected_smiles_i):
 @pytest.mark.parametrize("smiles_i, expected_inchi_i",
                          [('CCO', 'InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3'), ('', None), (None, None)])
 def test_get_inchi_from_smiles(smiles_i, expected_inchi_i):
-    """Test the function `get_inchi_from_smiles` with parametrized inputs."""
+    """Test the function with parametrized inputs."""
     inchi_i = get_inchi_from_smiles(smiles_i)
     assert inchi_i == expected_inchi_i
 
@@ -168,7 +168,7 @@ def test_get_inchi_from_smiles(smiles_i, expected_inchi_i):
 @pytest.mark.parametrize("data_mz, expected_mz_i",
                          [('318.45672', 318.45672), ('319', 319.0), ('', None)])
 def test_get_precursor_mz(data_mz, expected_mz_i):
-    """Test the function `get_precursor_mz` with parametrized inputs."""
+    """Test the function with parametrized inputs."""
     mz_i = get_precursor_mz(data_mz)
     assert mz_i == expected_mz_i
 
@@ -176,7 +176,7 @@ def test_get_precursor_mz(data_mz, expected_mz_i):
 @pytest.mark.parametrize("data_rt, expected_rt_i",
                          [('11.24195', 11.24195), ('10', 10.0), ('', None)])
 def test_get_retention_time(data_rt, expected_rt_i):
-    """Test the function `get_retention_time` with parametrized inputs."""
+    """Test the function with parametrized inputs."""
     rt_i = get_retention_time(data_rt)
     assert rt_i == expected_rt_i
 
@@ -189,6 +189,6 @@ def test_get_retention_time(data_rt, expected_rt_i):
     ('', pd.DataFrame())
 ])
 def test_get_peaks(data_peak, expected_spec_i):
-    """Test the function `get_peaks` with parametrized inputs"""
+    """Test the function with parametrized inputs"""
     spec_i = get_peaks(data_peak)
     pd.testing.assert_frame_equal(spec_i, expected_spec_i)

@@ -1,4 +1,4 @@
-from export_functions.format_workflow_utils.envi_config import *
+from export_functions.utils.envi_export_config import *
 from utils.sql_utils import Experiment, RetentionTime, Compound, Parameter
 
 def sql_query_with_filters_envi(session):

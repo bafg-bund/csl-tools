@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch
-from export_functions.format_workflow_utils.mbank_utils import *
+from export_functions.utils.mbank_export_utils import *
 
 
 def test_get_exp_ids_mbank():

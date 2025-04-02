@@ -1,13 +1,13 @@
-from .operation_workflow import OperationWorkflow
+from rtscan_functions.operation_rtscan import OperationRtscan
 from utils.file_utils import update_version_filename
 from utils.sql_utils import inst_code_csl_mapping, create_session
-from .rtscan_workflow_utils.rtscan_utils import *
+from rtscan_functions.utils.rtscan_utils import *
 from config import DEFAULT_PAIRS_INST_CHROM
-from .rtscan_config import (DEFAULT_GAM_BFG_TO_LANUV_PATH, DEFAULT_GAM_LANUV_TO_BFG_PATH,
-                            check_order_pred_bfg_rt)  # todo test model results
+from rtscan_functions.utils.rtscan_config import (DEFAULT_GAM_BFG_TO_LANUV_PATH, DEFAULT_GAM_LANUV_TO_BFG_PATH,
+                                                  check_order_pred_bfg_rt)  # todo test model results
 
 
-class UpdateWorkflow(OperationWorkflow):
+class UpdateRtscan(OperationRtscan):
     def rtscan(self):
         """Workflow for updating missing retention time (RT) data in the CSL."""
 

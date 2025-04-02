@@ -1,12 +1,12 @@
 """
-Main function to process MS2 data files from various institutions.
+Main function to process MS2 data files from various formats.
 
-Workflow Classes:
-    LfubyWorkflow : Workflow for 'lfuby' (Bayerisches Landesamt für Umwelt).
-    BfgWorkflow   : Workflow for 'bfg' (Bundesanstalt für Gewässerkunde).
-    LanuvWorkflow : Workflow for 'lanuv' (Landesamt für Natur, Umwelt und Verbraucherschutz Nordrhein-Westfalen).
-    LubwWorkflow  : Workflow for 'lubw' (Landesanstalt für Umwelt Baden-Württemberg).
-    UbaWorkflow   : Workflow for 'uba' (Umweltbundesamt).
+Process Classes:
+    lfuby : Workflow for 'lfuby' (Bayerisches Landesamt für Umwelt).
+    bfg   : Workflow for 'bfg' (Bundesanstalt für Gewässerkunde).
+    lanuv : Workflow for 'lanuv' (Landesamt für Natur, Umwelt und Verbraucherschutz Nordrhein-Westfalen).
+    lubw  : Workflow for 'lubw' (Landesanstalt für Umwelt Baden-Württemberg).
+    uba   : Workflow for 'uba' (Umweltbundesamt).
 """
 
 import os.path
@@ -22,22 +22,20 @@ os.makedirs(log_dir, exist_ok=True)
 log_fpath = os.path.join(log_dir, fname)
 setup_logger(log_fpath)  # Sets basic logger configuration and adds stream handlers
 
-# Define workflow dictionary
+# Define process workflow dictionary
 WORKFLOWS = {
-    "lfuby": LfubyWorkflow,
-    "bfg": BfgWorkflow,
-    "lanuv": LanuvWorkflow,
-    "lubw": LubwWorkflow,
-    "uba": UbaWorkflow
+    "lfuby": LfubyProcess,
+    "lanuv": LanuvProcess,
+    "lubw": LubwProcess,
 }
 
 
-def run_process_workflow(inst, path_data, path_csl):
+def run_process_workflow(format, path_data, path_csl):
     """
     Executes the appropriate workflow for processing MS2 data files based on the institution type.
 
     Args:
-        inst (str)                      : Institution type, used to select the appropriate workflow.
+        format (str)                    : Format of files to be processed. Used to select the appropriate workflow.
         path_data (str or list of str)  : File path(s) or directory path containing the MS2 data files to process.
         path_csl (str)                  : Path to the CSL file.
     """
@@ -51,7 +49,7 @@ def run_process_workflow(inst, path_data, path_csl):
 
     validate_file_path(path_csl)
 
-    # Select and execute the appropriate workflow based on the institution
-    workflow_class = WORKFLOWS[inst]
+    # Select and execute the appropriate process workflow based on the format
+    workflow_class = WORKFLOWS[format]
     workflow = workflow_class(path_data, path_csl)
     workflow.process()

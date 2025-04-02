@@ -1,7 +1,7 @@
-from process_functions import InstitutionWorkflow
+from process_functions import FormatProcess
 
 
-class UbaWorkflow(InstitutionWorkflow):
+class UbaProcess(FormatProcess):
     def process(self):
         # Implement processing logic for uba data
         print('Executed uba workflow')

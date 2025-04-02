@@ -1,43 +1,43 @@
 import pytest
 from unittest.mock import patch
 import pandas as pd
-from process_functions import InstitutionWorkflow
+from process_functions import FormatProcess
 
 
-# Define a fixture for the TestWorkflow class
+# Define a fixture for the TestProcess class
 @pytest.fixture
 def workflow():
-    class TestWorkflow(InstitutionWorkflow):
+    class TestProcess(FormatProcess):
         def extract_data_regex(self, file, var_regex):
             """Mock return for `extract_data_regex`."""
             return pd.DataFrame([{"var_comp": "Test", "var_ce": 10, "file_path": file}])
 
-    return TestWorkflow(path_data='dummy_data_path', path_csl='dummy_csl_path')
+    return TestProcess(path_data='dummy_data_path', path_csl='dummy_csl_path')
 
 
-class TestInstitutionWorkflow:
+class TestFormatProcess:
 
     def test_process_data(self, workflow, mock_extract_data, mock_inst_def, mock_spec_adduct):
         """Test processing of sample data without creating warning or error flags."""
 
-        with patch('process_functions.institution_workflow.get_polarity', return_value='polarity'), \
-             patch('process_functions.institution_workflow.get_compound_and_adduct_name',
+        with patch('process_functions.format_process.get_polarity', return_value='polarity'), \
+             patch('process_functions.format_process.get_compound_and_adduct_name',
                       return_value=('comp', 'adduct')), \
-             patch('process_functions.institution_workflow.format_adduct', return_value='formatted_adduct'), \
-             patch('process_functions.institution_workflow.get_collision_energy',
+             patch('process_functions.format_process.format_adduct', return_value='formatted_adduct'), \
+             patch('process_functions.format_process.get_collision_energy',
                       return_value=('ce', 'ces', False)), \
-             patch('process_functions.institution_workflow.get_ionization_type', return_value='ionization_type'), \
-             patch('process_functions.institution_workflow.get_formula', return_value='formula'), \
-             patch('process_functions.institution_workflow.get_inchikey',
+             patch('process_functions.format_process.get_ionization_type', return_value='ionization_type'), \
+             patch('process_functions.format_process.get_formula', return_value='formula'), \
+             patch('process_functions.format_process.get_inchikey',
                       return_value=('inchikey', 'inchikey_main')), \
-             patch('process_functions.institution_workflow.get_cas', return_value='cas'), \
-             patch('process_functions.institution_workflow.get_smiles', return_value='smiles'), \
-             patch('process_functions.institution_workflow.get_inchi_from_smiles', return_value='inchi'), \
-             patch('process_functions.institution_workflow.get_precursor_mz', return_value=99), \
-             patch('process_functions.institution_workflow.get_retention_time', return_value=99), \
-             patch('process_functions.institution_workflow.get_peaks',
+             patch('process_functions.format_process.get_cas', return_value='cas'), \
+             patch('process_functions.format_process.get_smiles', return_value='smiles'), \
+             patch('process_functions.format_process.get_inchi_from_smiles', return_value='inchi'), \
+             patch('process_functions.format_process.get_precursor_mz', return_value=99), \
+             patch('process_functions.format_process.get_retention_time', return_value=99), \
+             patch('process_functions.format_process.get_peaks',
                       return_value=pd.DataFrame({'peak': [9.9, 9.9, 9.9]})), \
-             patch('process_functions.institution_workflow.get_compound_group',
+             patch('process_functions.format_process.get_compound_group',
                       return_value=['Pesticide', 'Herbicide']):
             # Call the process_data method
             form_data = workflow.process_data(mock_extract_data, mock_inst_def, mock_spec_adduct)
@@ -53,23 +53,23 @@ class TestInstitutionWorkflow:
     def test_process_data_inchi_cas_none(self, workflow, mock_extract_data, mock_inst_def, mock_spec_adduct):
         """Test processing of sample data without creating warning or error flags."""
 
-        with patch('process_functions.institution_workflow.get_polarity', return_value='polarity') as mock_get_polarity, \
-                patch('process_functions.institution_workflow.get_compound_and_adduct_name',
+        with patch('process_functions.format_process.get_polarity', return_value='polarity') as mock_get_polarity, \
+                patch('process_functions.format_process.get_compound_and_adduct_name',
                       return_value=('comp', 'adduct')) as mock_get_compound_and_adduct_name, \
-                patch('process_functions.institution_workflow.format_adduct',
+                patch('process_functions.format_process.format_adduct',
                       return_value='formatted_adduct') as mock_format_adduct, \
-                patch('process_functions.institution_workflow.get_collision_energy', return_value=('ce', 'ces', False)), \
-                patch('process_functions.institution_workflow.get_ionization_type', return_value='ionization_type'), \
-                patch('process_functions.institution_workflow.get_formula', return_value='formula'), \
-                patch('process_functions.institution_workflow.get_inchikey', return_value=(None, None)), \
-                patch('process_functions.institution_workflow.get_cas', return_value=None), \
-                patch('process_functions.institution_workflow.get_smiles', return_value='smiles'), \
-                patch('process_functions.institution_workflow.get_inchi_from_smiles', return_value='inchi'), \
-                patch('process_functions.institution_workflow.get_precursor_mz', return_value=99), \
-                patch('process_functions.institution_workflow.get_retention_time', return_value=99), \
-                patch('process_functions.institution_workflow.get_peaks',
+                patch('process_functions.format_process.get_collision_energy', return_value=('ce', 'ces', False)), \
+                patch('process_functions.format_process.get_ionization_type', return_value='ionization_type'), \
+                patch('process_functions.format_process.get_formula', return_value='formula'), \
+                patch('process_functions.format_process.get_inchikey', return_value=(None, None)), \
+                patch('process_functions.format_process.get_cas', return_value=None), \
+                patch('process_functions.format_process.get_smiles', return_value='smiles'), \
+                patch('process_functions.format_process.get_inchi_from_smiles', return_value='inchi'), \
+                patch('process_functions.format_process.get_precursor_mz', return_value=99), \
+                patch('process_functions.format_process.get_retention_time', return_value=99), \
+                patch('process_functions.format_process.get_peaks',
                       return_value=pd.DataFrame({'peak': [9.9, 9.9, 9.9]})), \
-                patch('process_functions.institution_workflow.get_compound_group',
+                patch('process_functions.format_process.get_compound_group',
                       return_value=['Pesticide', 'Herbicide']):
             # Call the process_data method
             form_data = workflow.process_data(mock_extract_data, mock_inst_def, mock_spec_adduct)
@@ -88,9 +88,9 @@ class TestInstitutionWorkflow:
     @pytest.fixture
     def mock_dependencies_match_with_csl(self):
         """Mock dependencies (sub-function returns) for the function match_with_csl."""
-        with patch('process_functions.institution_workflow.create_session') as mock_create_session, \
-                patch('process_functions.institution_workflow.check_duplicate') as mock_check_duplicate, \
-                patch('process_functions.institution_workflow.add_exp_to_session') as mock_add_exp_to_session:
+        with patch('process_functions.format_process.create_session') as mock_create_session, \
+                patch('process_functions.format_process.check_duplicate') as mock_check_duplicate, \
+                patch('process_functions.format_process.add_exp_to_session') as mock_add_exp_to_session:
             yield mock_create_session, mock_check_duplicate, mock_add_exp_to_session
 
     @pytest.mark.parametrize("mock_res_count, expected_dupl_flag, expected_err_flag, expected_add_flag",

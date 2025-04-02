@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
-from rtscan_functions import UpdateWorkflow
-from rtscan_functions.rtscan_workflow_utils.rtscan_utils import *
+from rtscan_functions import UpdateRtscan
+from rtscan_functions.utils.rtscan_utils import *
 
 
 @pytest.mark.parametrize("mock_inst_rt, mock_inst_exp_rt, mock_inst_pred_rt, mock_predict_bfg_rt_called", [
@@ -24,19 +24,19 @@ from rtscan_functions.rtscan_workflow_utils.rtscan_utils import *
 @patch('tqdm.tqdm', lambda x: x)  # Disable tqdm progress bar
 def test_rtscan(mock_session, mock_inst_method_pairs, mock_inst_notation_pairs, mock_inst_rt, mock_inst_exp_rt,
                 mock_inst_pred_rt, mock_predict_bfg_rt_called):
-    with patch('rtscan_functions.update_workflow.DEFAULT_PAIRS_INST_CHROM', mock_inst_method_pairs), \
-         patch('rtscan_functions.update_workflow.inst_code_csl_mapping') as mock_default_inst_mapping, \
-         patch('rtscan_functions.update_workflow.check_order_pred_bfg_rt') as mock_check_order_pred_bfg_rt, \
-         patch('rtscan_functions.update_workflow.update_version_filename') as mock_update_version_filename, \
+    with patch('rtscan_functions.update_rtscan.DEFAULT_PAIRS_INST_CHROM', mock_inst_method_pairs), \
+         patch('rtscan_functions.update_rtscan.inst_code_csl_mapping') as mock_default_inst_mapping, \
+         patch('rtscan_functions.update_rtscan.check_order_pred_bfg_rt') as mock_check_order_pred_bfg_rt, \
+         patch('rtscan_functions.update_rtscan.update_version_filename') as mock_update_version_filename, \
          patch('shutil.copy'), \
-         patch('rtscan_functions.update_workflow.create_session') as mock_create_session, \
-         patch('rtscan_functions.update_workflow.get_inst_rt_info') as mock_get_inst_rt_info, \
-         patch('rtscan_functions.update_workflow.check_experimental_data') as mock_check_exp_data, \
-         patch('rtscan_functions.update_workflow.check_predicted_flags_pred_data') as mock_check_pred_flags, \
-         patch('rtscan_functions.update_workflow.predict_bfg_rt') as mock_predict_bfg_rt, \
-         patch('rtscan_functions.update_workflow.predict_rt') as mock_predict_rt, \
-         patch('rtscan_functions.update_workflow.summarize_corrections_and_errors'), \
-         patch('rtscan_functions.update_workflow.commit_changes_choice'):
+         patch('rtscan_functions.update_rtscan.create_session') as mock_create_session, \
+         patch('rtscan_functions.update_rtscan.get_inst_rt_info') as mock_get_inst_rt_info, \
+         patch('rtscan_functions.update_rtscan.check_experimental_data') as mock_check_exp_data, \
+         patch('rtscan_functions.update_rtscan.check_predicted_flags_pred_data') as mock_check_pred_flags, \
+         patch('rtscan_functions.update_rtscan.predict_bfg_rt') as mock_predict_bfg_rt, \
+         patch('rtscan_functions.update_rtscan.predict_rt') as mock_predict_rt, \
+         patch('rtscan_functions.update_rtscan.summarize_corrections_and_errors'), \
+         patch('rtscan_functions.update_rtscan.commit_changes_choice'):
 
         # Mock function returns
         mock_default_inst_mapping.return_value = mock_inst_notation_pairs
@@ -51,7 +51,7 @@ def test_rtscan(mock_session, mock_inst_method_pairs, mock_inst_notation_pairs, 
         mock_predict_rt.return_value = True
 
         # Instantiate workflow with dummy path
-        mock_update_workflow = UpdateWorkflow(path_csl='path/to/csl')
+        mock_update_workflow = UpdateRtscan(path_csl='path/to/csl')
 
         # Execute the rtscan method
         mock_update_workflow.rtscan()

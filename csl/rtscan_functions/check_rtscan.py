@@ -1,7 +1,7 @@
-from .operation_workflow import OperationWorkflow
+from .operation_rtscan import OperationRtscan
 
 
-class CheckWorkflow(OperationWorkflow):
+class CheckRtscan(OperationRtscan):
     def rtscan(self):
         """Workflow for checking the status of the retention time data in the CSL, without making any changes."""
 

@@ -1,4 +1,4 @@
-class OperationWorkflow:
+class OperationRtscan:
     def __init__(self, path_csl):
         self.path_csl = path_csl
 

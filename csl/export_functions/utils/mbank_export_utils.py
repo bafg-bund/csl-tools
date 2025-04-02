@@ -1,4 +1,4 @@
-from export_functions.format_workflow_utils import *
+from export_functions.utils import *
 from utils.sql_utils import inst_code_csl_mapping
 from config import DEFAULT_PAIRS_INST_CHROM
 from dataclasses import dataclass

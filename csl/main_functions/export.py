@@ -20,11 +20,11 @@ os.makedirs(log_dir, exist_ok=True)
 log_fpath = os.path.join(log_dir, fname)
 setup_logger(log_fpath)  # Sets basic logger configuration and adds stream handlers
 
-# Define workflow dictionary
+# Define export workflow dictionary
 WORKFLOWS = {
-    "thermo": ThermoWorkflow,
-    "envi": EnviWorkflow,
-    "mbank": MbankWorkflow
+    "thermo": ThermoExport,
+    "envi": EnviExport,
+    "mbank": MbankExport
 }
 
 

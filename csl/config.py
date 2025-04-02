@@ -15,7 +15,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Dictionary with pairs of institution and chromatographic method
 # If institutions are added or modified, the respective mappings need to be changed here and in the following sections:
-# + Mapping for RT models in rtscan_functions.update_workflow.py
+# + Mapping for RT models in rtscan_functions.update_rtscan.py
 # + Mapping of institution code to institution notation in utils.sql_utils.py (inst_code_csl_mapping)
 DEFAULT_PAIRS_INST_CHROM = {
     'bfg': 'dx.doi.org/10.1016/j.chroma.2015.11.014',

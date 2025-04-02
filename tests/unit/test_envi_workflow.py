@@ -1,5 +1,5 @@
 from unittest.mock import patch, MagicMock
-from export_functions import EnviWorkflow
+from export_functions import EnviExport
 
 
 # def test_csl_query_envi(mock_session, mock_df_envi):
@@ -7,8 +7,8 @@ from export_functions import EnviWorkflow
 #     with patch('export_functions.envi_workflow.create_session') as mock_create_session, \
 #          patch('pandas.read_sql') as mock_read_sql:
 #
-#         # Instantiate EnviWorkflow with dummy paths for testing
-#         workflow = EnviWorkflow(inst='dummy_inst', path_out='dummy_path_out', path_csl='dummy_csl_path')
+#         # Instantiate workflow with dummy paths for testing
+#         workflow = EnviExport(inst='dummy_inst', path_out='dummy_path_out', path_csl='dummy_csl_path')
 #
 #         # Mock session query returns
 #         mock_create_session.return_value = mock_session
@@ -40,8 +40,8 @@ from export_functions import EnviWorkflow
 #
 #     fragment_cutoff_percent = 20
 #
-#     # Instantiate EnviWorkflow with dummy paths for testing
-#     workflow = EnviWorkflow(inst='dummy_inst', path_out='dummy_path_out', path_csl='dummy_csl_path')
+#     # Instantiate workflow with dummy paths for testing
+#     workflow = EnviExport(inst='dummy_inst', path_out='dummy_path_out', path_csl='dummy_csl_path')
 #
 #     # Call the function
 #     df_formatted = workflow.process_data_envi(mock_df_envi, mock_fragment_data, fragment_cutoff_percent)
@@ -60,8 +60,8 @@ from export_functions import EnviWorkflow
 #     fragments = [(100.0, 30), (150.0, 100), (200.0, 75)]  # (m/z, intensity)
 #
 #     # Test different cutoff values
-#     assert EnviWorkflow.get_mz_fragments_int_cutoff(fragments, 20) == "100.0, 150.0, 200.0"
-#     assert EnviWorkflow.get_mz_fragments_int_cutoff(fragments, 50) == "150.0, 200.0"
-#     assert EnviWorkflow.get_mz_fragments_int_cutoff(fragments, 80) == "150.0"
+#     assert EnviExport.get_mz_fragments_int_cutoff(fragments, 20) == "100.0, 150.0, 200.0"
+#     assert EnviExport.get_mz_fragments_int_cutoff(fragments, 50) == "150.0, 200.0"
+#     assert EnviExport.get_mz_fragments_int_cutoff(fragments, 80) == "150.0"
 #     # Test empty fragments list case
-#     assert EnviWorkflow.get_mz_fragments_int_cutoff([], 20) == ""
+#     assert EnviExport.get_mz_fragments_int_cutoff([], 20) == ""

@@ -1,8 +1,8 @@
-from process_functions.institution_workflow_utils import *
+from process_functions.utils import *
 from utils.sql_utils import create_session
 from abc import ABC, abstractmethod
 
-class InstitutionWorkflow(ABC):
+class FormatProcess(ABC):
     def __init__(self, path_data, path_csl):
         self.path_data = path_data
         self.path_csl = path_csl
@@ -345,5 +345,3 @@ class InstitutionWorkflow(ABC):
 
         # End session
         session.close()
-
-

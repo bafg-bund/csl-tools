@@ -1,7 +1,7 @@
-from .operation_workflow import OperationWorkflow
+from .operation_rtscan import OperationRtscan
 
 
-class RecalcWorkflow(OperationWorkflow):
+class RecalcRtscan(OperationRtscan):
     def rtscan(self):
         """Workflow for recalculating all retention time data in the CSL."""
 

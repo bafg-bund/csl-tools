@@ -1,7 +1,7 @@
-from process_functions import InstitutionWorkflow
+from process_functions import FormatProcess
 
 
-class BfgWorkflow(InstitutionWorkflow):
+class BfgProcess(FormatProcess):
     def process(self):
         # Implement processing logic for bfg data
         print('Executed bfg workflow')

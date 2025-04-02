@@ -1,16 +1,16 @@
-from .institution_workflow import InstitutionWorkflow
-from .lfuby_workflow import LfubyWorkflow
-from .bfg_workflow import BfgWorkflow
-from .lanuv_workflow import LanuvWorkflow
-from .lubw_workflow import LubwWorkflow
-from .uba_workflow import UbaWorkflow
+from .format_process import FormatProcess
+from .lfuby_process import LfubyProcess
+from .bfg_process import BfgProcess
+from .lanuv_process import LanuvProcess
+from .lubw_process import LubwProcess
+from .uba_process import UbaProcess
 
 
 __all__ = [
-    "InstitutionWorkflow",
-    "LfubyWorkflow",
-    "BfgWorkflow",
-    "LanuvWorkflow",
-    "LubwWorkflow",
-    "UbaWorkflow"
+    "FormatProcess",
+    "LfubyProcess",
+    "BfgProcess",
+    "LanuvProcess",
+    "LubwProcess",
+    "UbaProcess"
 ]

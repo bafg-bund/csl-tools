@@ -1,5 +1,5 @@
 import pytest
-from export_functions.format_workflow_utils.thermo_utils import *
+from export_functions.utils.thermo_export_utils import *
 
 
 def test_build_export_chunk_thermo(mock_formatted_data_thermo):

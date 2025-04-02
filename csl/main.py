@@ -2,10 +2,10 @@
 # Main entry point for the CSL Operations Program.
 #
 # This script provides command-line interface options for processing and importing MS2 data files from various
-# institutions and exporting the Collective Spectral Library (CSL) in different formats.
+# formats and exporting the Collective Spectral Library (CSL) in different formats.
 #
 # Commands:
-#     process : Processes MS2 data files based on the institution type and imports the data into the CSL database.
+#     process : Processes MS2 data files based on the format and imports the data into the CSL database.
 #     export  : Exports the CSL to the specified formats.
 #     rtscan  : Operates on retention time data saved in the CSL.
 #
@@ -41,10 +41,10 @@ parser = ArgumentParser(
 subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
 # Define 'process' command and its arguments
-process_parser = subparsers.add_parser('process', help='Processes MS2 data files from a specified institution and imports the data into the CSL')
+process_parser = subparsers.add_parser('process', help='Processes MS2 data files from a specified format and imports the data into the CSL')
 
-process_parser.add_argument('institution', type=str, choices=['lfuby', 'bfg', 'uba', 'lanuv', 'lubw'],
-                            help='Specify institution type')
+process_parser.add_argument('format', type=str, choices=['mbank', 'lfuby', 'lanuv', 'lubw'],  # Todo: change format to thermo and sciex
+                            help='Specify format')
 process_parser.add_argument('data_path', type=str, default=None, nargs='?',
                             help='(Optional) Path to data file or directory (Default: Opens dialog to select files)')
 process_parser.add_argument('--csl_path', type=str, default=DEFAULT_CSL_PATH,
@@ -83,7 +83,7 @@ if args.command == 'process':
             print("No files selected. Exiting.")
             exit(1)
         args.data_path = file_paths
-    run_process_workflow(args.institution, args.data_path, args.csl_path)
+    run_process_workflow(args.format, args.data_path, args.csl_path)
 elif args.command == 'export':
     run_export_workflow(args.format, args.out_path, args.csl_path, args.subset)
 elif args.command == 'rtscan':

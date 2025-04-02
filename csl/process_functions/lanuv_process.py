@@ -1,8 +1,8 @@
-from process_functions import InstitutionWorkflow
-from process_functions.institution_workflow_utils import *
+from process_functions import FormatProcess
+from process_functions.utils import *
 
 
-class LanuvWorkflow(InstitutionWorkflow):
+class LanuvProcess(FormatProcess):
     def process(self):
         """Workflow to process MS2 data files from the institution lanuv
         (Landesamt für Natur, Umwelt und Verbraucherschutz Nordrhein-Westfalen)."""
@@ -53,35 +53,3 @@ class LanuvWorkflow(InstitutionWorkflow):
     def extract_data_regex(self, file, var_regex):
         """lanuv-specific data extraction."""
         return extract_data_regex_lanuv(file, var_regex)
-
-    #
-    # def read_files(self, var_regex):
-    #     """
-    #     Collects and processes files and extracts data using specific regular expressions.
-    #
-    #     1. If self.path_files is a directory path then all files in that directory (including subdirectories) are
-    #     retrieved.
-    #     2. Extracts data from the files using a list of regular expressions specific to the lfuby context.
-    #     3. Adds file path information and append extracted data of each file.
-    #
-    #     Returns:
-    #             data_extract_all (DataFrame) : Extracted data from all files based on regular expressions.
-    #     """
-    #     import pandas as pd
-    #
-    #     # Collect valid file paths
-    #     file_paths = get_file_paths(self.path_data)
-    #
-    #     # Data extraction based on lanuv-specific regular expressions
-    #     data_extract_all = []
-    #     for file in file_paths:
-    #         data_extract_file = extract_data_regex_lanuv(file, var_regex)
-    #         data_extract_file['file_path'] = file  # Add current file path for every entry
-    #         data_extract_all.append(data_extract_file)
-    #
-    #     # Merge into one pandas DataFrame and reset index
-    #     if len(data_extract_all) > 0 and isinstance(data_extract_all, list):
-    #         data_extract_all = pd.concat(data_extract_all, ignore_index=True)
-    #
-    #     return data_extract_all
-
