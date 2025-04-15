@@ -79,11 +79,12 @@ class FormatProcess(ABC):
         import logging
         logger = logging.getLogger(__name__)
 
-        entry_err = False
-        entry_warn = False
         form_data_entry_all = []  # List of dictionaries with formatted data
 
         for index, entry in extract_data.iterrows():  # Each entry in the DataFrame
+
+            entry_err = False
+            entry_warn = False
 
             logger.info(f'Compound: {entry['var_comp']}; CE: {entry['var_ce']}; File path: {entry['file_path']}')
 
