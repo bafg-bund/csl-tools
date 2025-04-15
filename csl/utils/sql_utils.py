@@ -76,9 +76,9 @@ class Experiment(Base):
     isotope = Column(String)
 
     def __repr__(self):  # Define output
-        return "\nid={}, mz={}, para={}, comp={}, adduct={}, time={}".format(self.experiment_id, self.mz,
-                                                                             self.parameter_id, self.compound_id,
-                                                                             self.adduct, self.time_added)
+        return (f"experiment_id={self.experiment_id}, compound_id={self.compound_id}, compound={self.compound}, "
+                f"parameter_id={self.parameter_id}, parameter={self.parameter}, mz={self.mz}, time={self.time_added}, "
+                f"adduct={self.adduct}, isotope={self.isotope}")
 
 
 class Fragment(Base):
@@ -93,7 +93,8 @@ class Fragment(Base):
     int = Column(Float, nullable=False)
 
     def __repr__(self):
-        return "\nmz={}, int={}, exp_id={}".format(self.mz, self.int, self.experiment_id)
+        return (f"fragment_id={self.fragment_id}, experiment_id={self.experiment_id}, experiment={self.experiment}, "
+                f"mz={self.mz}, int={self.int}")
 
 
 class Parameter(Base):
@@ -111,10 +112,9 @@ class Parameter(Base):
     col_type = Column(String, nullable=False)  # Collision type
 
     def __repr__(self):
-        return '\ninstrument={}, pol={}, CE={}, CES={}, ce_unit={}, col_type={}'.format(self.instrument,
-                                                                                        self.polarity,
-                                                                                        self.CE, self.CES,
-                                                                                        self.ce_unit, self.col_type)
+        return (f"parameter_id={self.parameter_id}, instrument={self.instrument}, polarity={self.polarity}, "
+                f"ionisation={self.ionisation}, CE={self.CE}, CES={self.CES}, ce_unit={self.ce_unit}, "
+                f"col_type={self.col_type}")
 
 
 class Compound(Base):
@@ -137,7 +137,8 @@ class Compound(Base):
     inchikey = Column(String)
 
     def __repr__(self):
-        return "\nname={}, CAS={}, id={}, smiles={}".format(self.name, self.CAS, self.compound_id, self.SMILES)
+        return (f"compound_id={self.compound_id}, name={self.name}, CAS={self.CAS}, inchikey={self.inchikey}, "
+                f"formula={self.formula}, smiles={self.SMILES}, inchi={self.inchi}, chem_list_id={self.chem_list_id}")
 
 
 class RetentionTime(Base):
@@ -153,7 +154,8 @@ class RetentionTime(Base):
     predicted = Column(String)
 
     def __repr__(self):
-        return '\nrt={}, chromatographic method={}'.format(self.rt, self.chrom_method)
+        return (f"ret_time_id={self.ret_time_id}, compound_id={self.compound_id}, compound={self.compound}, rt={self.rt},"
+                f"chrom_method={self.chrom_method}, predicted={self.predicted}")
 
 
 class CompoundGroup(Base):
@@ -167,7 +169,7 @@ class CompoundGroup(Base):
     name = Column(String, nullable=False)
 
     def __repr__(self):
-        return '\nname={}'.format(self.name)
+        return f"compoundGroup_id={self.compoundGroup_id}, name={self.name}, no. of compounds={len(self.compounds)}"
 
 
 class ExperimentGroup(Base):
@@ -181,4 +183,4 @@ class ExperimentGroup(Base):
     name = Column(String, nullable=False)
 
     def __repr__(self):
-        return '\nname={}'.format(self.name)
+        return f"experimentGroup_id={self.experimentGroup_id}, name={self.name}, no. of experiments={len(self.experiments)}"
