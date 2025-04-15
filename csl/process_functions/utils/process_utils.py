@@ -442,7 +442,7 @@ def get_collision_type(data_col_type):
         col_type_i (str) : Formatted collision type.
     """
     if data_col_type:
-        if data_col_type == 'CID':  # Massbank notation
+        if data_col_type == 'CID':  # MassBank notation
             col_type_i = 'Q'
         else:
             col_type_i = data_col_type
@@ -456,11 +456,11 @@ def get_instrument(data_instrument, data_instrument_type):
     Returns a string representing the instrument identifier.
 
     Args:
-        data_instrument (str) : The instrument name or instrument type + name.
-        data_instrument_type (str or None) : The instrument type.
+        data_instrument (str) : Instrument name or instrument type + name.
+        data_instrument_type (str or None) : Instrument type.
 
     Returns:
-        instrument_i (str) : The formatted instrument identifier.
+        instrument_i (str) : Formatted instrument identifier.
     """
     if data_instrument and data_instrument_type:
         instrument_i = f"{data_instrument_type} {data_instrument}"
@@ -473,8 +473,13 @@ def get_instrument(data_instrument, data_instrument_type):
 
 def get_experiment_id(data_accession):
     """
-    Extract experiment ID from accession string (MassBank Format).
-    Todo
+    Extract experiment ID from accession string (MassBank format).
+
+    Args:
+        data_accession (str) : Accession string (MassBank format).
+
+    Returns:
+        experiment_id_i (str) : Experiment ID
     """
     import re
     if data_accession:
