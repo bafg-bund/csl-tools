@@ -20,6 +20,7 @@ def check_duplicate(session, entry):
     from utils.sql_utils import Experiment, Parameter, Compound
     from sqlalchemy import func
 
+    # Prepare query
     qry = session.query(
         Compound.CAS, Experiment.isotope, Parameter.instrument, Parameter.ionisation,
         Parameter.CE, Parameter.CES, Parameter.col_type, Parameter.ce_unit,

@@ -9,9 +9,9 @@ class LanuvProcess(FormatProcess):
 
         import logging
         logger = logging.getLogger(__name__)
-        logger.info('Executing lfuby workflow to process MS2 data files')
+        logger.info('Executing lanuv workflow to process MS2 data files')
 
-        # Load institution defaults and settings
+        # Load defaults and settings
         var_regex = var_regex_lanuv()
         var_fix = var_fix_lanuv()
         inst_def = defaults_lanuv()
@@ -48,7 +48,7 @@ class LanuvProcess(FormatProcess):
             logger.info('Preparing to commit session changes to CSL')
             self.commit_to_csl(session, form_data_match)
 
-        logger.info('End of lfuby workflow')
+        logger.info('End of lanuv workflow')
 
     def extract_data_regex(self, file, var_regex):
         """lanuv-specific data extraction."""

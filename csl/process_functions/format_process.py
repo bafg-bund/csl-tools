@@ -39,6 +39,7 @@ class FormatProcess(ABC):
 
         return data_extract_all
 
+
     @abstractmethod
     def extract_data_regex(self, file, var_regex):
         """Subclasses should implement this method to extract data."""
@@ -94,7 +95,7 @@ class FormatProcess(ABC):
                 logger.warning(f'Unexpected polarity type: {entry['var_ion_mode']}')
                 entry_err = True
 
-            # Compound and adduct name
+            # Compound and adduct name (adduct name only for <CompoundName_AdductName> notation)
             comp_i, adduct_name = get_compound_and_adduct_name(entry['var_comp'])
             if not comp_i or not adduct_name:
                 logger.warning(
@@ -252,8 +253,8 @@ class FormatProcess(ABC):
                 # Match experimental parameters with the CSL to detect potential duplicate entries
                 res_count = check_duplicate(session, entry)  # Number of duplicate entries
                 if res_count > 0:  # Duplicate found, skip the file
-                    logger.warning(f'Found {res_count} duplicate(s) in CSL \n Compound: {entry['var_comp']}; '
-                                   f'CE: {entry['var_ce']}; File path: {entry['file_path']}')
+                    # logger.warning(f'Found {res_count} duplicate(s) in CSL \n Compound: {entry['var_comp']}; '
+                    #                f'CE: {entry['var_ce']}; File path: {entry['file_path']}')
                     entry_dupl = True
                 elif res_count < 0:  # Missing identifiers, skip the file
                     logger.warning('No InChIKey and no CAS registry number found. Provide at least one. Skipping file.')
@@ -292,15 +293,21 @@ class FormatProcess(ABC):
         import logging
         logger = logging.getLogger(__name__)
 
-        form_err_data = form_data_match[form_data_match.form_err_flag]
-        form_warn_data = form_data_match[form_data_match.form_warn_flag]
-        csl_dupl_data = form_data_match[form_data_match.csl_dupl_flag]
-        csl_err_data = form_data_match[form_data_match.csl_err_flag]
-        csl_add_data = form_data_match[form_data_match.csl_add_flag]
+        form_err_data = form_data_match[form_data_match['form_err_flag']]
+        form_warn_data = form_data_match[(form_data_match['form_warn_flag']) & (~form_data_match['csl_dupl_flag'])]
+        csl_dupl_data = form_data_match[form_data_match['csl_dupl_flag']]
+        csl_err_data = form_data_match[form_data_match['csl_err_flag']]
+        csl_add_data = form_data_match[form_data_match['csl_add_flag']]
 
         # Log information about entry states
         logger.info('Summary of information before CSL commit '
                     '\n (Check more details on individual errors and warnings in the log).')
+        logger.info(f"Experiments eligible to be added: {len(csl_add_data)}")
+        logger.warning(f"Experiments that are eligible to be added, but with warnings: {len(form_warn_data)}")
+        logger.warning(f"Experiments that are already in the CSL (duplicates): {len(csl_dupl_data)}")
+        logger.error(f"Experiments that are not eligible to be added due to matching errors: {len(csl_err_data)}")
+        logger.error(f"Experiments that are not eligible for adding due to format errors: {len(form_err_data)}")
+
         if len(form_err_data) > 0:
             logger.error('The following data will not be added to the CSL due to format errors:')
             for index, entry in form_err_data.iterrows():

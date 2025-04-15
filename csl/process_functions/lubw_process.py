@@ -10,7 +10,7 @@ class LubwProcess(FormatProcess):
         logger = logging.getLogger(__name__)
         logger.info('Executing lubw workflow to process MS2 data files')
 
-        # Load institution defaults and settings
+        # Load defaults and settings
         var_regex = var_regex_lubw()
         var_fix = var_fix_lubw()
         inst_def = defaults_lubw()

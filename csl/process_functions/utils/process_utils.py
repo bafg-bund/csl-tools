@@ -374,14 +374,14 @@ def get_peaks(data_peak):
 
 def get_compound_group(data_compgroup):
     """
-        Extracts the compound groups. Assumes separation of multiple compound groups with ';'.
+    Extracts the compound groups. Assumes separation of multiple compound groups with ';'.
 
-        Args:
-            data_compgroup (str) : Compound group(s) separated by ';'.
+    Args:
+        data_compgroup (str) : Compound group(s) separated by ';'.
 
-        Returns:
-            compgroup_i (str)    : Formatted compound group name(s). Returns None, if the input is invalid or empty.
-        """
+    Returns:
+        compgroup_i (str)    : Formatted compound group name(s). Returns None, if the input is invalid or empty.
+    """
     if data_compgroup:
         parts = data_compgroup.split(';')
         compgroup_i = []

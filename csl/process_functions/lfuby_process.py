@@ -10,7 +10,7 @@ class LfubyProcess(FormatProcess):
         logger = logging.getLogger(__name__)
         logger.info('Executing lfuby workflow to process MS2 data files')
 
-        # Load institution defaults and settings
+        # Load defaults and settings
         var_regex = var_regex_lfuby()
         var_fix = var_fix_lfuby()
         inst_def = defaults_lfuby()

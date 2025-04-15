@@ -43,7 +43,7 @@ def var_regex_lfuby():
 def var_fix_lfuby():
     """
     Mapping of CSL-relevant variables (keys) to lfuby-specific default/fixed information (values).
-    The information is currently fixed for this institution or does not appear in the data files (can't be extracted).
+    The information is currently fixed for this format or does not appear in the data files (can't be extracted).
     """
     from config import DEFAULT_PAIRS_INST_CHROM
     all_methods = DEFAULT_PAIRS_INST_CHROM
@@ -62,7 +62,7 @@ def var_fix_lfuby():
 def defaults_lfuby():
     """
     Mapping of lfuby-specific default settings for data processing.
-    These settings are expected to never have more than one state within each institutional workflow.
+    These settings are expected to never have more than one state within each process workflow.
     """
     from utils.sql_utils import inst_code_csl_mapping
     inst_notation_pairs = inst_code_csl_mapping()
