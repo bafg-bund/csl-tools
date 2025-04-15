@@ -14,7 +14,7 @@ class SqlQueryResult:
     retention_time: RetentionTime
 
 
-def get_experiment_ids(session, data_source):
+def get_experiment_ids_by_exp_group(session, data_source):
     """
     Get experiment IDs from the CSL. Can be subset by data source.
 
