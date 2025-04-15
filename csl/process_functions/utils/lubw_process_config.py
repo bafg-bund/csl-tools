@@ -42,18 +42,27 @@ def var_regex_lubw():
 def var_fix_lubw():
     """
     Mapping of CSL-relevant variables (keys) to lubw-specific default/fixed information (values).
-    The information is currently fixed for this institution or does not appear in the data files (can't be extracted).
+    The information is currently fixed for this format or does not appear in the data files (can't be extracted).
     """
     from config import DEFAULT_PAIRS_INST_CHROM
     all_methods = DEFAULT_PAIRS_INST_CHROM
+    from utils.sql_utils import inst_code_csl_mapping
+    inst_notation_pairs = inst_code_csl_mapping()
+
 
     lubw_var_fix = {
-        'var_chrom_method': all_methods['lubw'],        # Chromatographic method
-        'var_instrument': 'LC-ESI-Orbitrap QExactive',  # Instrument type
-        'var_isotope': 'monoisotopic',                  # Type of molecular mass
-        'var_col_type': 'HCD',                          # Collision type
-        'var_ce_unit': 'V',                             # Unit for collision energy
-        'var_ionization': 'ESI',                        # Ionization type
+        'var_chrom_method': all_methods['lubw'],      # Chromatographic method
+        'var_instrument': 'QExactive',                # Instrument name
+        'var_isotope': 'monoisotopic',                # Type of molecular mass
+        'var_col_type': 'HCD',                        # Collision type
+        'var_ce_unit': 'V',                           # Unit for collision energy
+        'var_ionization': 'ESI',                      # Ionization type
+        'var_adduct': None,                           # Adduct
+        'var_inchi': None,                            # InChI
+        'var_expg_csl': inst_notation_pairs['lubw'],  # Default label for experimentGroup.name in CSL
+        'var_compg_csl': inst_notation_pairs['lubw'], # Default label for compoundGroup.name in CSL
+        'var_instrument_type': 'LC-ESI-Orbitrap',     # Instrument type
+        'var_accession': None,                        # Accession string (used in MassBank)
     }
     return lubw_var_fix
 
@@ -61,17 +70,12 @@ def var_fix_lubw():
 def defaults_lubw():
     """
     Mapping of lubw-specific default settings for data processing.
-    These settings are expected to never have more than one state within each institutional workflow.
+    These settings are expected to never have more than one state within each process workflow.
     """
-    from utils.sql_utils import inst_code_csl_mapping
-    inst_notation_pairs = inst_code_csl_mapping()
-
     lubw_defaults = {
         'def_pol_p': 'Positive scan',                  # Default identifier for positive ion mode
         'def_pol_n': 'Negative scan',                  # Default identifier for positive ion mode
         'def_qf': 'QF',                                # Default identifier for "Quellfragmente" (precursor ions)
-        'def_expg_csl': inst_notation_pairs['lubw'],   # Default label for experimentGroup.name in CSL
-        'def_compg_csl': inst_notation_pairs['lubw'],  # Default label for compoundGroup.name in CSL
     }
     return lubw_defaults
 

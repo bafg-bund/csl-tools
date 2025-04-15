@@ -1,6 +1,9 @@
 from process_functions.utils import *
+from utils import inst_code_csl_mapping
 from utils.sql_utils import create_session
 from abc import ABC, abstractmethod
+from config import DEFAULT_PAIRS_INST_CHROM
+
 
 class FormatProcess(ABC):
     def __init__(self, path_data, path_csl):
@@ -49,9 +52,35 @@ class FormatProcess(ABC):
     # noinspection PyMethodMayBeStatic
     def add_fixed_variables(self, extract_data, var_fix):
         """Adds fixed information (specified in <institution>_config.py) to each entry."""
+        import logging
+        logger = logging.getLogger(__name__)
+
         extract_data_add = extract_data
         for var in var_fix.items():
-            extract_data_add[var[0]] = var[1]
+            # Add value to column of DataFrame. Special case for var_chrom_method if None
+            if var[1]:
+                extract_data_add[var[0]] = var[1]
+            elif not var[1] and var[0] == 'var_chrom_method':
+                options = DEFAULT_PAIRS_INST_CHROM.values()
+                message = 'Select the chromatographic method for the experiments to be added'
+                choice = get_user_choice(list(options), message)
+                extract_data_add[var[0]] = choice
+                logger.info(f"Chromatographic method: {choice}")
+            elif not var[1] and var[0] == 'var_expg_csl':
+                options = inst_code_csl_mapping()
+                message = 'Select the default value for the experiment group for the experiments to be added'
+                choice = get_user_choice(list(options.values()), message)
+                extract_data_add[var[0]] = choice
+                logger.info(f"Default experiment group: {choice}")
+            elif not var[1] and var[0] == 'var_compg_csl':
+                options = inst_code_csl_mapping()
+                message = 'Select the default value for the compound group for the experiments to be added'
+                choice = get_user_choice(list(options.values()), message)
+                extract_data_add[var[0]] = choice
+                logger.info(f"Default compound group: {choice}")
+            else:
+                logger.warning(f"No value for {var[0]}.")
+                extract_data_add[var[0]] = var[1]
         return extract_data_add
 
 
@@ -103,6 +132,8 @@ class FormatProcess(ABC):
                 entry_err = True
 
             # Adduct format conversion
+            if entry['var_adduct']:  # adduct name is replaced if entry exists
+                adduct_name = entry['var_adduct']
             adduct_i = format_adduct(adduct_name, spec_adduct, inst_def['def_qf'], pol_i)
             if not adduct_i:
                 logger.warning(f'Adduct name not detected. Check fields for compound name and ion mode.')
@@ -183,6 +214,18 @@ class FormatProcess(ABC):
             # Compound group
             compgroup_i = get_compound_group(entry['var_compgroup'])
 
+            # Collision type / Fragmentation mode
+            col_type_i = get_collision_type(entry['var_col_type'])
+            if not col_type_i:
+                logger.warning('Collision type / Fragmentation mode not detected.')
+                entry_err = True
+
+            # Instrument
+            instrument_i = get_instrument(entry['var_instrument'], entry['var_instrument_type'])
+
+            # Experiment ID from accession string
+            experiment_id_i = get_experiment_id(entry['var_accession'])
+
             # Organize formatted data from one entry in dictionary
             form_data_entry = {
                 'pol_i': pol_i,
@@ -201,6 +244,9 @@ class FormatProcess(ABC):
                 'rt_i': rt_i,
                 'spec_i': spec_i,
                 'compgroup_i': compgroup_i,
+                'col_type_i': col_type_i,
+                'instrument_i': instrument_i,
+                'experiment_id_i': experiment_id_i,
                 'form_err_flag': entry_err,
                 'form_warn_flag': entry_warn
             }

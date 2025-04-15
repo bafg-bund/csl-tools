@@ -56,6 +56,36 @@ def match_file_paths(path_dir, fstr_id=None):
     return files
 
 
+def get_user_choice(options, message):
+    """
+    Lets user choose between options and returns the choice. User can manually enter string.
+
+    Args:
+        options (list of str) : Options
+        message (str) : Custom message for presenting the options.
+
+    Returns:
+        str : Chosen string
+    """
+
+    print(f"{message}:")
+
+    for idx, key in enumerate(options, 1):
+        print(f"{idx}. {key}")
+    print(f"{len(options) + 1}. Enter string manually")
+
+    while True:
+        choice = input("Enter number: ").strip()
+        if choice.isdigit():
+            choice = int(choice)
+            if 1 <= choice <= len(options):
+                return options[choice - 1]
+            elif choice == len(options) + 1:
+                return input("Enter your string: ").strip()
+
+        print("Invalid choice. Please enter a valid number.")
+
+
 def get_polarity(data_ionmode, pol_p_def, pol_n_def):
     """
     Determines polarity based on default identifier and formats polarity according to CSL requirements.
@@ -128,6 +158,8 @@ def format_adduct(adduct_name, spec_adduct, qf_def, pol_i):
     Returns:
         adduct_i (str) : Formatted adduct notation. Returns None, if the input is invalid.
     """
+    import re
+
     # Adduct name conversion
     adduct_i = None  # Initialize variable
     if not adduct_name or not pol_i:
@@ -136,7 +168,9 @@ def format_adduct(adduct_name, spec_adduct, qf_def, pol_i):
         if adduct_name in spec_adduct:
             # Special cases
             adduct_i = spec_adduct[adduct_name]
-        elif qf_def in adduct_name:
+        elif bool(re.search(r'\[.*]', adduct_name)):  # If adduct name contains brackets
+            adduct_i = adduct_name
+        elif qf_def and qf_def in adduct_name:
             qf_no = ''.join(char for char in adduct_name if char.isdigit())
             if pol_i == 'pos':
                 adduct_i = f"[QF{qf_no}]+"
@@ -229,8 +263,13 @@ def get_formula(data_formula):
     Returns:
         form_i (str) : Formula. Returns None, if the input is invalid.
     """
+    import re
     if data_formula:
-        form_i = data_formula
+        match = re.search(r'\[(.*?)\][+-]?', data_formula)
+        if match:
+            form_i = match.group(1)
+        else:
+            form_i = data_formula
     else:
         form_i = None
     return form_i
@@ -343,7 +382,7 @@ def get_retention_time(data_rt):
         rt_i (float): Retention time as a float. Returns None, if the input is invalid.
     """
     if data_rt:
-        rt_i = float(data_rt)
+        rt_i = float(data_rt.split()[0])
     else:
         rt_i = None
     return rt_i
@@ -365,7 +404,7 @@ def get_peaks(data_peak):
     if not isinstance(data_peak, list):
         data_peak = [data_peak]
     if data_peak and not all(item == '' for item in data_peak):
-        split_strings = [s.split() for s in data_peak]
+        split_strings = [s.split()[0:2] for s in data_peak]
         spec_i = pd.DataFrame(split_strings, columns=['mz', 'int'])
     else:
         spec_i = pd.DataFrame()
@@ -391,3 +430,59 @@ def get_compound_group(data_compgroup):
         compgroup_i = None
     return compgroup_i
 
+
+def get_collision_type(data_col_type):
+    """
+    Checks the collision type format.
+
+    Args:
+        data_col_type (str) : Collision type.
+
+    Returns:
+        col_type_i (str) : Formatted collision type.
+    """
+    if data_col_type:
+        if data_col_type == 'CID':  # Massbank notation
+            col_type_i = 'Q'
+        else:
+            col_type_i = data_col_type
+    else:
+        col_type_i = None
+    return col_type_i
+
+
+def get_instrument(data_instrument, data_instrument_type):
+    """
+    Returns a string representing the instrument identifier.
+
+    Args:
+        data_instrument (str) : The instrument name or instrument type + name.
+        data_instrument_type (str or None) : The instrument type.
+
+    Returns:
+        instrument_i (str) : The formatted instrument identifier.
+    """
+    if data_instrument and data_instrument_type:
+        instrument_i = f"{data_instrument_type} {data_instrument}"
+    elif data_instrument:
+        instrument_i = data_instrument
+    else:
+        instrument_i =  None
+    return instrument_i
+
+
+def get_experiment_id(data_accession):
+    """
+    Extract experiment ID from accession string (MassBank Format).
+    Todo
+    """
+    import re
+    if data_accession:
+        match = re.search(r'(?<=\d{6})\d+', data_accession)
+        if match:
+            experiment_id_i = match.group()
+        else:
+            experiment_id_i = None
+    else:
+        experiment_id_i = None
+    return experiment_id_i

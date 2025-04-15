@@ -31,16 +31,17 @@ def check_duplicate(session, entry):
 
     qry = qry.filter(Experiment.adduct == entry['adduct_i'],
                      Experiment.isotope == entry['var_isotope'],
-                     Parameter.instrument == entry['var_instrument'],
+                     Parameter.instrument == entry['instrument_i'],
                      Parameter.ionisation == entry['ionization_i'],
                      Parameter.polarity == entry['pol_i'],
                      Parameter.CE == entry['ce_i'],
                      Parameter.CES == entry['ces_i'],
-                     Parameter.col_type == entry['var_col_type'],
+                     Parameter.col_type == entry['col_type_i'],
                      Parameter.ce_unit == entry['var_ce_unit'])
 
     inchikey_main_i = entry['inchikey_main_i']
     cas_i = entry['cas_i']
+    exp_id = entry['experiment_id_i']
 
     if inchikey_main_i and not cas_i:
         # Add query filter using the main layer of the InChIkey
@@ -61,7 +62,14 @@ def check_duplicate(session, entry):
         res_count = len(unique_results)
     else:  # If there is no InChIkey (Main Layer) AND no CAS RN
         res_count = -1
+
+    # Additional check by experiment ID if any previous query returned no results
+    if res_count == 0 and exp_id:
+        exp_qry = session.query(Experiment).filter(Experiment.experiment_id == exp_id)
+        res_count = exp_qry.count()
+
     return res_count
+
 
 def add_exp_to_session(session, entry, inst_def):
     """
@@ -79,8 +87,6 @@ def add_exp_to_session(session, entry, inst_def):
         Todo: RT from file and from query can be different. What should be preferred?
     Experimental parameters
     - Searches for experimental parameters and add them from the file if they do not exist.
-        Todo: How do you know that this is the experiment of the same compound without filtering for InChIKey or CAS RN?
-        Todo: Or does it only matters, that these parameters exist (for any experiment)?
     Experiment
     - Creates a new experiment entry in the CSL at the current time.
     Fragments
@@ -101,8 +107,8 @@ def add_exp_to_session(session, entry, inst_def):
     logger = logging.getLogger(__name__)
 
     # Prepare all variables
-    expg_def = inst_def['def_expg_csl']
-    compg_def = inst_def['def_compg_csl']
+    expg_def = entry['var_expg_csl']
+    compg_def = entry['var_compg_csl']
     comp_i = entry['comp_i']
     formula_i = entry['formula_i']
     smiles_i = entry['smiles_i']
@@ -115,13 +121,19 @@ def add_exp_to_session(session, entry, inst_def):
     ce_i = entry['ce_i']
     ces_i = entry['ces_i']
     ce_unit = entry['var_ce_unit']
-    col_type = entry['var_col_type']
+    col_type_i = entry['col_type_i']
     ionization_i = entry['ionization_i']
     mz_i = entry['mz_i']
     adduct_i = entry['adduct_i']
     isotope = entry['var_isotope']
     spec_i = entry['spec_i']
+    inchikey_main_i = entry['inchikey_main_i']
+    cas_i = entry['cas_i']
     compgroup_i = entry['compgroup_i']
+    file_path = entry['file_path']
+
+    # Log compound name, adduct and file path for reference
+    logger.info(f"Compound: {comp_i}; CE: {ce_i}; File path: {file_path}")
 
     # Check if the experiment group exists (e.g., 'UBA', 'BfG') in the CSL and add it if necessary.
     exp_group = session.query(ExperimentGroup).filter_by(name=expg_def).one_or_none()
@@ -132,10 +144,12 @@ def add_exp_to_session(session, entry, inst_def):
 
     # Match compound groups with existing ones in the CSL. Collect the matches. If no matches are found, use the default.
     comp_group = []
-    for cg in compgroup_i:
-        cg_db = session.query(CompoundGroup).filter(func.lower(CompoundGroup.name) == cg.lower()).one_or_none()
-        if cg_db:
-            comp_group.append(cg_db)
+    if compgroup_i:
+        for cg in compgroup_i:
+            cg_db = session.query(CompoundGroup).filter(func.lower(CompoundGroup.name) == cg.lower()).one_or_none()
+            if cg_db:
+                comp_group.append(cg_db)
+
     if not comp_group:
         existing_cg = session.query(CompoundGroup).filter_by(name=compg_def).one_or_none()
         # Create the default compound group if necessary.
@@ -148,8 +162,6 @@ def add_exp_to_session(session, entry, inst_def):
             comp_group = [comp_group]
 
     # Check if the compound, and a link to the matched compound group(s), exists in the CSL. Missing entries are added.
-    inchikey_main_i = entry['inchikey_main_i']
-    cas_i = entry['cas_i']
     if inchikey_main_i:  # InChIKey is preferred
         # Query compound by using the main layer of the InChIKey
         comp_res = session.query(Compound).filter(
@@ -184,14 +196,13 @@ def add_exp_to_session(session, entry, inst_def):
 
     # Search experimental parameters and add them from the file if they don't exist
     para_res = session.query(Parameter).filter_by(instrument=instrument, polarity=pol_i, CE=ce_i, CES=ces_i,
-                                                  ce_unit=ce_unit, col_type=col_type, ionisation=ionization_i
+                                                  ce_unit=ce_unit, col_type=col_type_i, ionisation=ionization_i
                                                   ).one_or_none()
-    # Todo: How do you know this is the experiment of the same compound without filtering for InChIKey or CAS RN?
-    # Todo: Or does it only matters, that these parameters exist (for any experiment)?
+
     if not para_res:
         logger.info('Experimental parameters not found in CSL. Adding parameters from data entry.')
         para_res = Parameter(instrument=instrument, polarity=pol_i, CE=ce_i, CES=ces_i, ce_unit=ce_unit,
-                             col_type=col_type, ionisation=ionization_i)
+                             col_type=col_type_i, ionisation=ionization_i)
         session.add(para_res)
 
     # Create a new experiment entry in the CSL at the current time

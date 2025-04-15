@@ -27,6 +27,7 @@ WORKFLOWS = {
     "lfuby": LfubyProcess,
     "lanuv": LanuvProcess,
     "lubw": LubwProcess,
+    "mbank": MbankProcess,
 }
 
 

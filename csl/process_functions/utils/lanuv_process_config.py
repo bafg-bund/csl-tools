@@ -30,7 +30,7 @@ def var_regex_lanuv():
         'var_mz': 'PRECURSOR M/Z',          # Precursor m/z
         'var_ce': 'COLLISION ENERGY',       # Collision energy
         'var_ion_mode': 'ION MODE',         # Type of operation mode
-        'var_instrument': 'INSTRUMENT',     # Instrument type
+        'var_instrument': 'INSTRUMENT',     # Instrument name
         'var_peak': 'MASS SPECTRAL PEAKS',  # Mass spectral peaks
     }
     return lanuv_var_regex
@@ -43,16 +43,25 @@ def var_fix_lanuv():
     """
     from config import DEFAULT_PAIRS_INST_CHROM
     all_methods = DEFAULT_PAIRS_INST_CHROM
+    from utils.sql_utils import inst_code_csl_mapping
+    inst_notation_pairs = inst_code_csl_mapping()
+
     lanuv_var_fix = {
-        'var_chrom_method': all_methods['lanuv'],   # Chromatographic method
-        'var_isotope': 'monoisotopic',              # Type of molecular mass # todo: Placeholder. Assumed monoisotopic
-        'var_ionization': 'ESI',                    # Ionization type # todo: Placeholder. Assumed 'ESI'
-        'var_rt': '99',                             # Retention time # todo: Placeholder.
-        'var_inchikey': 'inchikey_placeholder',     # InChIKey  # todo: Placeholder.
-        'var_smiles': 'smiles_placeholder',         # Simplified Molecular Line Entry Specification (SMILES) todo: Placeholder.
-        'var_col_type': 'Q',                        # Collision type  # todo: Assumed 'Q' based on existing CSL entries
-        'var_ce_unit': 'V',                         # Unit for collision energy
-        'var_compgroup': 'compgroup_placeholder'    # Compound group # todo: Placeholder.
+        'var_chrom_method': all_methods['lanuv'],      # Chromatographic method
+        'var_isotope': 'monoisotopic',                 # Type of molecular mass # todo: Placeholder. Assumed monoisotopic
+        'var_ionization': 'ESI',                       # Ionization type # todo: Placeholder. Assumed 'ESI'
+        'var_rt': '99',                                # Retention time # todo: Placeholder.
+        'var_inchikey': 'inchikey_placeholder',        # InChIKey  # todo: Placeholder.
+        'var_smiles': 'smiles_placeholder',            # Simplified Molecular Line Entry Specification (SMILES) todo: Placeholder.
+        'var_col_type': 'Q',                           # Collision type  # todo: Assumed 'Q' based on existing CSL entries
+        'var_ce_unit': 'V',                            # Unit for collision energy
+        'var_compgroup': 'compgroup_placeholder',      # Compound group # todo: Placeholder.
+        'var_adduct': None,                            # Adduct
+        'var_inchi': None,                             # InChI
+        'var_instrument_type': None,                   # Instrument type # todo: see below
+        'var_accession': None,                         # Accession string (used in MassBank)
+        'var_expg_csl': inst_notation_pairs['lanuv'],  # Default label for experimentGroup.name in CSL
+        'var_compg_csl': inst_notation_pairs['lanuv'], # Default label for compoundGroup.name in CSL
     }
     return lanuv_var_fix
 
@@ -68,15 +77,10 @@ def defaults_lanuv():
     Mapping of lanuv-specific default settings for data processing.
     These settings are expected to never have more than one state within each process workflow.
     """
-    from utils.sql_utils import inst_code_csl_mapping
-    inst_notation_pairs = inst_code_csl_mapping()
-
     lanuv_defaults = {
         'def_pol_p': 'P',                               # Default identifier for positive ion mode
         'def_pol_n': 'N',                               # Default identifier for positive ion mode
         'def_qf': 'QF',                                 # Default identifier for "Quellfragmente" (precursor ions)
-        'def_expg_csl': inst_notation_pairs['lanuv'],   # Default label for experimentGroup.name in CSL
-        'def_compg_csl': inst_notation_pairs['lanuv'],  # Default label for compoundGroup.name in CSL
     }
     return lanuv_defaults
 
