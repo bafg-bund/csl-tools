@@ -57,6 +57,9 @@ def test_match_file_paths():
         assert matched_file_paths == expected_file_paths, f"Expected {expected_file_paths}, but got {matched_file_paths}"
 
 
+# Todo: add test for get_user_choice
+
+
 @pytest.mark.parametrize("data_ionmode, expected_pol_i",
                          [('positive', 'pos'), ('negative', 'neg'), ('wrong_string', None)])
 def test_get_polarity(data_ionmode, expected_pol_i):
@@ -81,13 +84,14 @@ def test_get_compound_and_adduct_name(data_comp, expected_comp_i, expected_adduc
 
 
 @pytest.mark.parametrize("adduct_name, pol_i, expected_adduct_i", [
-    ('NH4', 'pos', '[M+NH4]+'),
+    ('H', 'pos', '[M+H]+'),
     ('NH4', 'neg', '[M-NH4]-'),
     (None, 'pos', None),
     (None, None, None),
     ('special', 'pos', 'special_format'),  # Test if spec_adduct is overriding the standard conversion
     ('QF121', 'pos', '[QF121]+'),
-    ('QF121', 'neg', '[QF121]-')
+    ('QF121', 'neg', '[QF121]-'),
+    ('[M]+', 'pos', '[M]+'),
 ])
 def test_format_adduct(adduct_name, pol_i, expected_adduct_i):
     """Test the function with parametrized inputs."""
@@ -123,9 +127,9 @@ def test_get_ionization_type(data_ionization, expected_ionization_i):
 
 
 @pytest.mark.parametrize("data_formula, expected_form_i",
-                         [('C16H16N2O4', 'C16H16N2O4'), ('', None)])
+                         [('C16H16N2O4', 'C16H16N2O4'), ('', None), ('[C18H24N]+','C18H24N'), ('[C18H24N]-','C18H24N')])
 def test_get_formula(data_formula, expected_form_i):
-    """Test the function `get_formula` with parametrized inputs."""
+    """Test the function with parametrized inputs."""
     form_i = get_formula(data_formula)
     assert form_i == expected_form_i
 
@@ -174,7 +178,7 @@ def test_get_precursor_mz(data_mz, expected_mz_i):
 
 
 @pytest.mark.parametrize("data_rt, expected_rt_i",
-                         [('11.24195', 11.24195), ('10', 10.0), ('', None)])
+                         [('11.24195', 11.24195), ('10', 10.0), ('', None), ('12 min', 12.0)])
 def test_get_retention_time(data_rt, expected_rt_i):
     """Test the function with parametrized inputs."""
     rt_i = get_retention_time(data_rt)
@@ -182,13 +186,39 @@ def test_get_retention_time(data_rt, expected_rt_i):
 
 
 @pytest.mark.parametrize("data_peak, expected_spec_i", [
-    (['136.0397 13393.02', '182.0816 349997.91'],
+    (['136.0397 13393.02', '182.0816 349997.91'],  # Two entries
      pd.DataFrame([['136.0397', '13393.02'], ['182.0816', '349997.91']], columns=['mz', 'int'])),
-    (['136.0397 13393.02'],
+    (['136.0397 13393.02'],  # Only one entry
      pd.DataFrame([['136.0397', '13393.02']], columns=['mz', 'int'])),
-    ('', pd.DataFrame())
+    ('', pd.DataFrame()),  # Empty DataFrame
+    ('55.0603 2 219',pd.DataFrame([['55.0603', '2']], columns=['mz', 'int'])),  # Only the first two columns
 ])
 def test_get_peaks(data_peak, expected_spec_i):
-    """Test the function with parametrized inputs"""
+    """Test the function with parametrized inputs."""
     spec_i = get_peaks(data_peak)
     pd.testing.assert_frame_equal(spec_i, expected_spec_i)
+
+
+@pytest.mark.parametrize("data_col_type, expected_col_type_i", [('CID', 'Q'),('HCD', 'HCD')])
+def test_get_collision_type(data_col_type, expected_col_type_i):
+    """Test the function with parametrized inputs."""
+    col_type_i = get_collision_type(data_col_type)
+    assert col_type_i == expected_col_type_i
+
+
+@pytest.mark.parametrize("data_instrument, data_instrument_type, expected_instrument_i",
+                         [('TripleTOF 5600 SCIEX', 'LC-ESI-QTOF', 'LC-ESI-QTOF TripleTOF 5600 SCIEX'),
+                          ('LC-ESI-QTOF TripleTOF 5600 SCIEX', None, 'LC-ESI-QTOF TripleTOF 5600 SCIEX'),
+                          ('QExactive','LC-ESI-Orbitrap','LC-ESI-Orbitrap QExactive')])
+def test_get_instrument(data_instrument, data_instrument_type, expected_instrument_i):
+    """Test the function with parametrized inputs."""
+    instrument_i = get_instrument(data_instrument, data_instrument_type)
+    assert instrument_i == expected_instrument_i
+
+
+@pytest.mark.parametrize("data_accession, expected_experiment_id_i",
+                         [('MSBNK-BAFG-CSL23110949', '49'), (None, None), ('MSBNK-BAFG-CSL231109', None)])
+def test_get_experiment_id(data_accession, expected_experiment_id_i):
+    """Test the function with parametrized inputs."""
+    experiment_id_i = get_experiment_id(data_accession)
+    assert experiment_id_i == expected_experiment_id_i

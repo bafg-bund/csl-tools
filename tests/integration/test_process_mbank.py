@@ -7,13 +7,12 @@ from pathlib import Path
 from unittest import mock
 
 
-def test_process_thermo():
+def test_process_mbank():
     """
-    Tests correct processing of ThermoFisher/mzVault-based experiments and import into the CSL.
-        Todo: Currently based on lfuby_workflow. Change later to thermo workflow
+    Tests correct processing of MassBank documents and import into the CSL.
     """
     # Prepare paths
-    data_path = os.path.join(ROOT_DIR, 'tests/integration/fixtures/lfuby_testfiles')  # Todo: lfuby_workflow
+    data_path = os.path.join(ROOT_DIR, 'tests/integration/fixtures/mbank_testfiles')
     csl_template_path = os.path.join(ROOT_DIR,'tests/integration/fixtures/CSL_v0_process_4entries.db')
     csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_process_4entries.db')
     temp_path = os.path.join(ROOT_DIR,'tests/integration/temp')
@@ -34,19 +33,19 @@ def test_process_thermo():
     # Copy the database file
     shutil.copy(csl_template_path, csl_copy_path)
 
-    # Process thermo workflow
-    with mock.patch('builtins.input', return_value='yes'):  # Mocks user input
-        run_process_workflow(format='lfuby', path_data=data_path, path_csl=csl_copy_path)  # Todo: lfuby_workflow
+    # Process mbank workflow
+    with mock.patch('builtins.input', side_effect=['1','1','1','yes']):  # Mocks user input
+        run_process_workflow(format='mbank', path_data=data_path, path_csl=csl_copy_path)
 
     # Connect to CSL database
     session = create_session(path_csl=csl_copy_path)
 
-    # Assert that four experiments were added to the CSL
-    assert len(session.query(Experiment).all()) == 8  # 4 previous + 4 added experiments
+    # Assert that one experiments was added to the CSL
+    assert len(session.query(Experiment).all()) == 5  # 4 previous + 1 added experiment
 
     # Assert that the correct compound was added to the CSL
     compounds = session.query(Compound.name).all()
-    assert any('Desmedipham' in cp for cp in compounds)
+    assert any('Butocarboxim' in cp for cp in compounds)
 
     # Cleanup
     session.close()

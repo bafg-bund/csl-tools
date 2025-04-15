@@ -38,7 +38,9 @@ class TestFormatProcess:
              patch('process_functions.format_process.get_peaks',
                       return_value=pd.DataFrame({'peak': [9.9, 9.9, 9.9]})), \
              patch('process_functions.format_process.get_compound_group',
-                      return_value=['Pesticide', 'Herbicide']):
+                      return_value=['Pesticide', 'Herbicide']), \
+             patch('process_functions.format_process.get_instrument', return_value='instrument'), \
+             patch('process_functions.format_process.get_experiment_id', return_value='experiment_id'):
             # Call the process_data method
             form_data = workflow.process_data(mock_extract_data, mock_inst_def, mock_spec_adduct)
 
@@ -70,7 +72,9 @@ class TestFormatProcess:
                 patch('process_functions.format_process.get_peaks',
                       return_value=pd.DataFrame({'peak': [9.9, 9.9, 9.9]})), \
                 patch('process_functions.format_process.get_compound_group',
-                      return_value=['Pesticide', 'Herbicide']):
+                      return_value=['Pesticide', 'Herbicide']), \
+                patch('process_functions.format_process.get_instrument', return_value='instrument'), \
+                patch('process_functions.format_process.get_experiment_id', return_value='experiment_id'):
             # Call the process_data method
             form_data = workflow.process_data(mock_extract_data, mock_inst_def, mock_spec_adduct)
 
@@ -82,7 +86,7 @@ class TestFormatProcess:
             assert all(form_data['form_warn_flag']) is True
             mock_get_polarity.assert_called_once_with('mock_ion_mode', 'mock_pol_p', 'mock_pol_n')
             mock_get_compound_and_adduct_name.assert_called_once_with('mock_compound')
-            mock_format_adduct.assert_called_once_with('adduct', mock_spec_adduct, 'mock_qf', 'polarity')
+            mock_format_adduct.assert_called_once_with('mock_adduct', mock_spec_adduct, 'mock_qf', 'polarity')
 
 
     @pytest.fixture

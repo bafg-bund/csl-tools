@@ -26,8 +26,6 @@ def mock_inst_def():
         'def_pol_p': 'mock_pol_p',
         'def_pol_n': 'mock_pol_n',
         'def_qf': 'mock_qf',
-        'def_expg_csl': 'mock_expg',
-        'def_compg_csl': 'mock_compg'
     }
 
 
@@ -43,6 +41,7 @@ def mock_extract_data():
     """Mock the extracted data (DataFrame)."""
     data = [{
         "var_comp": 'mock_compound',
+        "var_adduct": 'mock_adduct',
         "var_mz": '900',
         "var_ce": '40',
         "var_ionization": 'mock_ionization',
@@ -54,12 +53,15 @@ def mock_extract_data():
         "var_smiles": 'mock_smiles',
         "var_peak": ['9.9 99.9', '7.7 77.7'],
         "var_compgroup": 'mock_cg1;mock_cg2',
+        "var_inchi": 'mock_inchi',
         "file_path": 'mock_file_path',
         "var_chrom_method": 'mock_chrom_method',
         "var_instrument": 'mock_instrument',
+        "var_instrument_type": 'mock_instrument_type',
         "var_isotope": 'mock_isotope',
         "var_col_type": 'mock_col_type',
-        "var_ce_unit": 'mock_ce_unit'
+        "var_ce_unit": 'mock_ce_unit',
+        "var_accession": 'mock_accession',
     }]
     return pd.DataFrame(data)
 
@@ -107,9 +109,11 @@ def mock_entry_df():
         "file_path": 'mock_file_path',
         "var_chrom_method": 'mock_chrom_method',
         "var_instrument": 'mock_instrument',
+        "var_instrument_type": 'mock_instrument_type',
         "var_isotope": 'mock_isotope',
         "var_col_type": 'mock_col_type',
         "var_ce_unit": 'mock_ce_unit',
+        "var_accession": 'mock_accession',
         "pol_i": 'mock_form_pol',
         "comp_i": 'mock_pol_comp',
         "adduct_i": 'mock_pol_adduct',
@@ -126,6 +130,11 @@ def mock_entry_df():
         "rt_i": 22,
         "spec_i": pd.DataFrame({'mz': [9.9, 7.7], 'int': [99.9, 77.7]}),
         "compgroup_i": ['Pesticide','Herbicide'],
+        "col_type_i": "mock_col_type",
+        "var_expg_csl": 'mock_expg',
+        "var_compg_csl": 'mock_compg',
+        "instrument_i": 'mock_instrument',
+        "experiment_id_i": 'mock_experiment_id',
         "form_err_flag": False,
         "form_warn_flag": False
     }

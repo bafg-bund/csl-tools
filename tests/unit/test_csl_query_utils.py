@@ -94,4 +94,4 @@ def test_add_exp_to_session_exp_group_not_exists(mock_session, mock_entry_df, mo
 
     # Assert if the expected string ('mock_expg') is in any of the calls
     calls = mock_session.add.call_args_list  # List of calls made
-    assert any(call[0][0].name == mock_inst_def['def_expg_csl'] for call in calls)
+    assert any(call[0][0].name == mock_entry_df['var_expg_csl'] for call in calls)
