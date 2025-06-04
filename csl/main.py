@@ -43,7 +43,7 @@ subparsers = parser.add_subparsers(dest='command', help='Available commands')
 # Define 'process' command and its arguments
 process_parser = subparsers.add_parser('process', help='Processes MS2 data files from a specified format and imports the data into the CSL')
 
-process_parser.add_argument('format', type=str, choices=['mbank', 'lfuby', 'lanuv', 'lubw'],  # Todo: change format to thermo and sciex
+process_parser.add_argument('format', type=str, choices=['mbank', 'lfuby', 'lanuk', 'lubw'],  # Todo: change format to thermo and sciex
                             help='Specify format')
 process_parser.add_argument('data_path', type=str, default=None, nargs='?',
                             help='(Optional) Path to data file or directory (Default: Opens dialog to select files)')
@@ -60,9 +60,9 @@ export_parser.add_argument('out_path', type=str, help='Path to the directory whe
                                                       'to check the existing MassBank ACCESSION strings from file names.')
 export_parser.add_argument('--csl_path', type=str, default=DEFAULT_CSL_PATH,
                            nargs='?', help='(Optional) Path to CSL file (Default: Specified in config.py)')
-export_parser.add_argument('--subset', type=str, choices=['lfuby', 'bfg', 'uba', 'lanuv', 'lubw', 'all'],
+export_parser.add_argument('--subset', type=str, choices=['lfuby', 'bfg', 'uba', 'lanuk', 'lubw', 'all'],
                             default= 'all', help='(Optional) Data source (institution) for subsetting the CSL data '
-                                                 'before exporting (choices: lfuby, bfg, uba, lanuv, lubw, all; '
+                                                 'before exporting (choices: lfuby, bfg, uba, lanuk, lubw, all; '
                                                  'Default: all).')
 
 # Define 'rtscan' command and its arguments

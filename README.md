@@ -79,7 +79,7 @@ python main.py process [institution] [data_path] [--csl_path <path>]
   - `lubw`: LUBW import format (ThermoFisher/mzVault).
   - `bfg`: BfG import format (not implemented).
   - `uba`: UBA import format (not implemented).
-  - `lanuv`: LANUV import format (SCIEX/LibraryView) (not implemented).
+  - `lanuk`: LANUK import format (SCIEX/LibraryView) (not implemented).
 - [data_path]: (Optional) Path to data file or directory (Default: Opens dialog to select files)').
 - [--csl_path _path_]: (Optional) Path to CSL file (Default: Specified in `config.py`).
 

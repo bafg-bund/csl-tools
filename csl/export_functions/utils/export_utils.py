@@ -174,7 +174,7 @@ def get_contributors_copyright(exp_group):
         contrib_prefix = 'LFUBY'
         inst_license = None  # Todo licence for lfuby?
     elif inst_notation_pairs['uba'] == exp_group or 'uba' == exp_group:
-        authors = 'Eric Rosenheinrich; Anja Duffeck'
+        authors = 'Eric Rosenheinrich; Anja Duffek'
         inst_copyright = f'Copyright {current_year} Federal Environment Agency, Berlin, Germany'
         contrib_prefix = 'UBA'
         inst_license = 'dl-de/by-2-0'

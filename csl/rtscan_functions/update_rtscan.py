@@ -3,7 +3,7 @@ from utils.file_utils import update_version_filename
 from utils.sql_utils import inst_code_csl_mapping, create_session
 from rtscan_functions.utils.rtscan_utils import *
 from config import DEFAULT_PAIRS_INST_CHROM
-from rtscan_functions.utils.rtscan_config import (DEFAULT_GAM_BFG_TO_LANUV_PATH, DEFAULT_GAM_LANUV_TO_BFG_PATH,
+from rtscan_functions.utils.rtscan_config import (DEFAULT_GAM_BFG_TO_LANUK_PATH, DEFAULT_GAM_LANUK_TO_BFG_PATH,
                                                   check_order_pred_bfg_rt)  # todo test model results
 
 
@@ -27,18 +27,18 @@ class UpdateRtscan(OperationRtscan):
 
         # Functions for predicting RTs between institutions
         # Models need to be updated when institution are added, or when existing notations are modified.
-        gam_bl = joblib.load(DEFAULT_GAM_BFG_TO_LANUV_PATH)  # GAM model for predicting LANUV RTs from BfG RTs
-        gam_lb = joblib.load(DEFAULT_GAM_LANUV_TO_BFG_PATH)  # GAM model for predicting BfG RTs from LANUV RTs
+        gam_bl = joblib.load(DEFAULT_GAM_BFG_TO_LANUK_PATH)  # GAM model for predicting LANUK RTs from BfG RTs
+        gam_lb = joblib.load(DEFAULT_GAM_LANUK_TO_BFG_PATH)  # GAM model for predicting BfG RTs from LANUK RTs
         def pred_rt_bfg_uba(rt_bfg): return round((rt_bfg - 0.75) / 1.12, 3)
         def pred_rt_uba_bfg(rt_uba): return round(1.12 * rt_uba + 0.75, 3)
-        def pred_rt_bfg_lanuv(rt_bfg): return round(gam_bl.predict(rt_bfg)[0], 3)
-        def pred_rt_lanuv_bfg(rt_lanuv): return round(gam_lb.predict(rt_lanuv)[0], 3)
+        def pred_rt_bfg_lanuk(rt_bfg): return round(gam_bl.predict(rt_bfg)[0], 3)
+        def pred_rt_lanuk_bfg(rt_lanuk): return round(gam_lb.predict(rt_lanuk)[0], 3)
         def pred_rt_bfg_lfu(rt_bfg): return rt_bfg
         def pred_rt_lfu_bfg(rt_lfu): return rt_lfu
         models_from_bfg = {inst_notation_pairs['uba']: pred_rt_bfg_uba, inst_notation_pairs['lfuby']: pred_rt_bfg_lfu,
-                           inst_notation_pairs['lanuv']: pred_rt_bfg_lanuv}
+                           inst_notation_pairs['lanuk']: pred_rt_bfg_lanuk}
         models_to_bfg = {inst_notation_pairs['uba']: pred_rt_uba_bfg, inst_notation_pairs['lfuby']: pred_rt_lfu_bfg,
-                         inst_notation_pairs['lanuv']: pred_rt_lanuv_bfg}
+                         inst_notation_pairs['lanuk']: pred_rt_lanuk_bfg}
 
         # Get list of institutions in order of importance to predict BfG RT
         check_order = check_order_pred_bfg_rt()

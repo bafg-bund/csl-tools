@@ -164,7 +164,7 @@ def mock_inst_method_pairs():
         'bfg': 'method_a',
         'uba': 'method_b',
         'lfuby': 'method_c',
-        'lanuv': 'method_d'
+        'lanuk': 'method_d'
     }
 
 
@@ -175,7 +175,7 @@ def mock_inst_notation_pairs():
         'bfg': 'inst_a',
         'uba': 'inst_b',
         'lfuby': 'inst_c',
-        'lanuv': 'inst_d'
+        'lanuk': 'inst_d'
     }
 
 

@@ -4,7 +4,7 @@ Main function to process MS2 data files from various formats.
 Process Classes:
     lfuby : Workflow for 'lfuby' (Bayerisches Landesamt für Umwelt).
     bfg   : Workflow for 'bfg' (Bundesanstalt für Gewässerkunde).
-    lanuv : Workflow for 'lanuv' (Landesamt für Natur, Umwelt und Verbraucherschutz Nordrhein-Westfalen).
+    lanuk : Workflow for 'lanuk' (Landesamt für Natur, Umwelt und Klima Nordrhein-Westfalen).
     lubw  : Workflow for 'lubw' (Landesanstalt für Umwelt Baden-Württemberg).
     uba   : Workflow for 'uba' (Umweltbundesamt).
 """
@@ -25,7 +25,7 @@ setup_logger(log_fpath)  # Sets basic logger configuration and adds stream handl
 # Define process workflow dictionary
 WORKFLOWS = {
     "lfuby": LfubyProcess,
-    "lanuv": LanuvProcess,
+    "lanuk": LanukProcess,
     "lubw": LubwProcess,
     "mbank": MbankProcess,
 }

@@ -42,7 +42,7 @@ def test_rtscan(mock_session, mock_inst_method_pairs, mock_inst_notation_pairs, 
         mock_default_inst_mapping.return_value = mock_inst_notation_pairs
         mock_create_session.return_value = mock_session
         mock_session.query(RetentionTime.compound_id).all.return_value = [[1443]]
-        mock_check_order_pred_bfg_rt.return_value = ['lfuby', 'uba', 'lanuv']
+        mock_check_order_pred_bfg_rt.return_value = ['lfuby', 'uba', 'lanuk']
         mock_update_version_filename.return_value = 'mock_filename'
         mock_get_inst_rt_info.return_value = (mock_inst_rt, mock_inst_exp_rt, mock_inst_pred_rt)
         mock_check_exp_data.return_value = ([], [], [])

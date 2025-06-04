@@ -21,6 +21,6 @@ DEFAULT_PAIRS_INST_CHROM = {
     'bfg': 'dx.doi.org/10.1016/j.chroma.2015.11.014',
     'uba': 'uba_nts_rp1',
     'lfuby': 'lfu_nts_rp1',
-    'lanuv': 'lanuv_nts',
+    'lanuk': 'lanuk_nts',
     'lubw': 'lubw_nts_rp1'
 }

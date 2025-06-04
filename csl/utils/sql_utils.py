@@ -12,7 +12,7 @@ def inst_code_csl_mapping():
         dict: Dictionary mapping institution codes to CSL institution notation.
     """
     # Todo: LUBW not in CSL yet
-    return {'bfg': 'BfG', 'uba': 'UBA', 'lfuby': 'LfU', 'lanuv': 'LANUV', 'lubw': 'LUBW'}
+    return {'bfg': 'BfG', 'uba': 'UBA', 'lfuby': 'LfU', 'lanuk': 'LANUK', 'lubw': 'LUBW'}
 
 
 def create_session(path_csl):

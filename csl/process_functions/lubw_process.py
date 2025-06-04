@@ -21,7 +21,7 @@ class LubwProcess(FormatProcess):
         extract_data = self.read_files(var_regex)
         # todo: Reading function (extract_data_regex_lubw) adjustments:
         #       - splitting identifier such as "=" and "[|]" for LUBW (could be set in config)
-        #         wait for LANUV workflow to see if its worth it to combine
+        #         wait for LANUK workflow to see if its worth it to combine
         #         line: delim = '=' if '=' in line else '[|]'
         #       - chunk_identifier differs (e.g. 'MS:1009003|Name' for lubw and 'Name :' for lfuby)
         #         could be also set in config file

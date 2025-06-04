@@ -3,8 +3,8 @@ import os
 from config import ROOT_DIR
 
 # Path to retention time models
-DEFAULT_GAM_BFG_TO_LANUV_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'gam_bfg_to_lanuv.pkl')
-DEFAULT_GAM_LANUV_TO_BFG_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'gam_lanuv_to_bfg.pkl')
+DEFAULT_GAM_BFG_TO_LANUK_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'gam_bfg_to_lanuk.pkl')
+DEFAULT_GAM_LANUK_TO_BFG_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'gam_lanuk_to_bfg.pkl')
 
 
 def check_order_pred_bfg_rt():
@@ -17,4 +17,4 @@ def check_order_pred_bfg_rt():
     Returns:
         list : List of institutions in order of importance to predict bfg retention times.
     """
-    return ['lfuby', 'uba', 'lanuv']
+    return ['lfuby', 'uba', 'lanuk']
