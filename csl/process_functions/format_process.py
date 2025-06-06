@@ -6,9 +6,9 @@ from config import DEFAULT_PAIRS_INST_CHROM
 
 
 class FormatProcess(ABC):
-    def __init__(self, path_data, path_csl):
-        self.path_data = path_data
+    def __init__(self, path_csl, path_data):
         self.path_csl = path_csl
+        self.path_data = path_data
 
     def process(self):
         raise NotImplementedError("Subclasses should implement this!")

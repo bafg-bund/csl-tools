@@ -1,7 +1,7 @@
 # Python package for the Collective Spectral Library (CSL)
 
 ## Name
-pycsl
+csl-tools
 
 ## Description
 Import, export and curation of spectral data for the Collective Spectral Library (CSL).
@@ -70,7 +70,7 @@ Alternatively use `csl/main.py` directly in your commands.
 ### `process`
 Processes MS2 data files from a specified format (currently institutions) and imports data into the CSL.
 ```bash
-python main.py process [institution] [data_path] [--csl_path <path>]
+python main.py process [institution] [csl_path] [data_path]
 ```
 
 #### Arguments
@@ -80,41 +80,53 @@ python main.py process [institution] [data_path] [--csl_path <path>]
   - `bfg`: BfG import format (not implemented).
   - `uba`: UBA import format (not implemented).
   - `lanuk`: LANUK import format (SCIEX/LibraryView) (not implemented).
+- [csl_path]: Path to CSL file.
 - [data_path]: (Optional) Path to data file or directory (Default: Opens dialog to select files)').
-- [--csl_path _path_]: (Optional) Path to CSL file (Default: Specified in `config.py`).
+
 
 #### Examples
 Process one data file from the LUBW:
 ```bash
-python main.py process lubw C:\path\to\data.msp --csl_path C:\path\to\csl.db
+python main.py process lubw C:\path\to\csl.db C:\path\to\data.msp 
 ```
 Process data from the LfU Bayern. Dialog window will open for file selection.
 ```bash
-python main.py process lfuby --csl_path C:\path\to\csl.db
+python main.py process lfuby C:\path\to\csl.db
 ```
 
 ### `export`
 Exports the CSL to a specified format.  
 ```bash
-python main.py export [format] [out_path] [csl_path]
+python main.py export [format] [csl_path] [out_path]
 ```
 
 #### Arguments
 - [format]: Specify the export format. Choose from:
-  - `txt`: (not implemented).
-  - `envi`: (not implemented).
+  - `thermo`: MSP/NIST export format e.g. for mzVault.
+  - `envi`: enviMass export format.
   - `mbank`: MassBank export format.
-- [institution]: Specify subset of spectral data by data provider (institution). Choose from:
+- [csl_path]: Path to CSL file.
+- [out_path]: Path to the directory where the exported file(s) will be saved.
+- [subset]: (Optional) Data source (institution) for subsetting the CSL data before exporting. Choose from:
   - `bfg`: BfG (Federal Institute of Hydrology)
   - `lfuby`: LfU Bayern (Bavarian Environment Agency)
   - `uba`: UBA (Federal Environment Agency)
-- [out_path]: Path to the directory where the exported file(s) will be saved.
-- [csl_path]: (Optional) Path to CSL file (Default: Specified in `config.py`).
+  - `lubw`: LUBW (Baden-Württemberg State Institute for the Environment)
+  - `lanuk`: LANUK (North Rhine-Westphalia Office of Nature, Environment and Climate) 
+  - `all`: No subsetting (Default) 
+
 
 #### Example
+Exports all BfG-files from the CSL in the MassBank format.
 ```bash
-python main.py export mbank bfg C:\path\to\output_dir C:\path\to\csl.db
+python main.py export mbank C:\path\to\csl.db C:\path\to\output_dir bfg
 ```
+
+Exports all files from the CSL in the MSP/NIST format.
+```bash
+python main.py export thermo C:\path\to\csl.db C:\path\to\output_dir
+```
+
 
 ### `rtscan`
  Operates on retention time stored in the CSL.  
@@ -127,7 +139,7 @@ python main.py rtscan [operation] [csl_path]
   - `check`: Checks the consistency of non-experimental retention time data (not implemented).
   - `update`: Calculates missing non-experimental retention times based on available experimental data.
   - `recalc`: Re-calculates all non-experimental retention times based on available experimental data (not implemented).
-- [csl_path]: (Optional) Path to CSL file (Default: Specified in `config.py`).
+- [csl_path]: Path to CSL file.
 
 #### Example
 ```bash
@@ -136,7 +148,7 @@ python main.py rtscan update C:\path\to\csl.db
 
 ### Notes
 - For file paths with spaces, enclose them in quotes, e.g., "C:\My Documents\data.msp".
-- Use the --help/--h flag with any command to see additional usage information: `python main.py [command] --help`
+- Use the --help/--h flag with any command to see additional usage information: `python csl/main.py [command] --help`
 
 ## Roadmap
 [Goals for future releases](https://gitlab.lan.bafg.de/nts/collective-spectral-library/-/wikis/Goals-for-future-releases)
@@ -150,11 +162,8 @@ Ole Lessmann, BfG, lessmann@bafg.de
 Björn Ehlig, BfG, ehlig@bafg.de  
 Kevin S. Jewell, BfG, jewell@bafg.de  
 
-Todo: Add acknowledgements for data contributions
-
-
 ## License
-Todo
+GPLv3
 
 ## Project status
 _Under development_
