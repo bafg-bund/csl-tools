@@ -2,7 +2,7 @@ from export_functions.format_export import FormatExport
 from export_functions.utils import *
 from utils.sql_utils import create_session
 from utils.file_utils import get_csl_version
-from config import pycsl_version
+from config import CSLTOOLS_VERSION
 
 class MbankExport(FormatExport):
     def export(self):
@@ -40,7 +40,7 @@ class MbankExport(FormatExport):
         for i, exp_id in tqdm(enumerate(experiment_ids), total=len(experiment_ids), ncols=77):
             try:
                 # Extracts data for a specific experiment id and formats data to meet MassBank requirements.
-                export_data = extract_experiment_chunk_mbank(session, exp_id, chrom_method, csl_version, pycsl_version,
+                export_data = extract_experiment_chunk_mbank(session, exp_id, chrom_method, csl_version, CSLTOOLS_VERSION,
                                                        dict_mbank_exp_id_fn)
 
                 # Skip experiment ID if compound is an internal standard (export_data is None)

@@ -2,7 +2,7 @@ from export_functions.format_export import FormatExport
 from export_functions.utils import *
 from utils.sql_utils import create_session
 from utils.file_utils import get_csl_version
-from config import pycsl_version
+from config import CSLTOOLS_VERSION
 
 class ThermoExport(FormatExport):
     def export(self):
@@ -45,7 +45,7 @@ class ThermoExport(FormatExport):
             for i, exp_id in tqdm(enumerate(experiment_ids), total=len(experiment_ids), ncols=77):
                 try:
                     # Extract the text chunk for the current experiment
-                    export_data = extract_experiment_chunk_thermo(session, exp_id, chrom_method, csl_version, pycsl_version)
+                    export_data = extract_experiment_chunk_thermo(session, exp_id, chrom_method, csl_version, CSLTOOLS_VERSION)
                     if not export_data:
                         logger.info(f'Skipping {exp_id}')
                         continue

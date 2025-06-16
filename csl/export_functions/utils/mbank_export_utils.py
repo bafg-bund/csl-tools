@@ -32,7 +32,7 @@ def get_exp_ids_mbank(path_mbank_files):
     }
     return dict_mbank_exp_id_fn
 
-def extract_experiment_chunk_mbank(session, exp_id, chrom_method, csl_version, pycsl_version, dict_mbank_exp_id_fn):
+def extract_experiment_chunk_mbank(session, exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, dict_mbank_exp_id_fn):
     """
     Extracts data for a specific experiment id and formats data for MassBank requirements.
 
@@ -41,7 +41,7 @@ def extract_experiment_chunk_mbank(session, exp_id, chrom_method, csl_version, p
         exp_id (int)                : Experiment ID used to query the database.
         chrom_method (str)          : Chromatographic method identifier.
         csl_version (str)           : Current version of the CSL database.
-        pycsl_version (str)         : Current version of the python package.
+        CSLTOOLS_VERSION (str)      : Current version of the python package.
         dict_mbank_exp_id_fn (dict) : Pairs of existing of accession strings and experiment IDs.
 
     Returns:
@@ -57,7 +57,7 @@ def extract_experiment_chunk_mbank(session, exp_id, chrom_method, csl_version, p
         return None
 
     # Format data to meet MassBank format requirements
-    FormattedData = extract_and_format_mbank_data(exp_id, chrom_method, csl_version, pycsl_version, SqlQueryResult, dict_mbank_exp_id_fn)
+    FormattedData = extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, SqlQueryResult, dict_mbank_exp_id_fn)
 
     # Assemble text chunk for the MassBank document
     export_chunk = build_export_chunk_mbank(FormattedData)
@@ -98,7 +98,7 @@ class FormattedDataMbank:
     title: str
 
 
-def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, pycsl_version, sql_data: SqlQueryResult, dict_mbank_exp_id_fn):
+def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, sql_data: SqlQueryResult, dict_mbank_exp_id_fn):
     """
     Extracts, processes, and formats experimental data into a structured format for MassBank documents.
 
@@ -106,7 +106,7 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, pycsl_versi
         exp_id (int)                : Experiment ID used to query the database.
         chrom_method (str)          : Chromatographic method identifier.
         csl_version (str)           : Current version of the CSL database.
-        pycsl_version (str)         : Current version of the python package.
+        CSLTOOLS_VERSION (str)      : Current version of the python package.
         sql_data (dataclass)        : Dataclass containing experiment data and metadata.
         dict_mbank_exp_id_fn (dict) : Pairs of existing of accession strings and experiment IDs.
 
@@ -197,7 +197,7 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, pycsl_versi
     else:
         chrom_chunk = f"AC$CHROMATOGRAPHY: RETENTION_TIME {rt} min\n"
 
-    data_proc_chunk = f"MS$DATA_PROCESSING: COMMENT Export with pycsl {pycsl_version} and CSL {csl_version}\n"
+    data_proc_chunk = f"MS$DATA_PROCESSING: COMMENT Export with csl-tools {CSLTOOLS_VERSION} and CSL {csl_version}\n"
 
 
     return FormattedDataMbank(accession, adduct, authors, cas, ce, comment_chunk, compound_classes, compound_name,

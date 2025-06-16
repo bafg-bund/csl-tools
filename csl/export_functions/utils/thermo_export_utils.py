@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Optional, Union, List
 
 
-def extract_experiment_chunk_thermo(session, exp_id, chrom_method, csl_version, pycsl_version):
+def extract_experiment_chunk_thermo(session, exp_id, chrom_method, csl_version, CSLTOOLS_VERSION):
     """
     Extracts data for a specific experiment id and formats data for MSP/NIST documents (mzVault/ThermoFisher).
 
@@ -12,7 +12,7 @@ def extract_experiment_chunk_thermo(session, exp_id, chrom_method, csl_version, 
         exp_id (int)                : Experiment ID used to query the database.
         chrom_method (str)          : Chromatographic method identifier.
         csl_version (str)           : Current version of the CSL database.
-        pycsl_version (str)         : Current version of the python package.
+        CSLTOOLS_VERSION (str)      : Current version of the python package.
 
     Returns:
         export_chunk (str) : Text chunk formatted for a single MSP/NIST document.
@@ -22,7 +22,7 @@ def extract_experiment_chunk_thermo(session, exp_id, chrom_method, csl_version, 
     SqlQueryResult = sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method)
 
     # Format data to meet MSP/NIST format requirements
-    FormattedDataThermo = extract_and_format_thermo_data(exp_id, chrom_method, csl_version, pycsl_version, SqlQueryResult)
+    FormattedDataThermo = extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, SqlQueryResult)
 
     # Assemble text chunk for the MSP/NIST document
     export_chunk = build_export_chunk_thermo(FormattedDataThermo)
@@ -64,16 +64,16 @@ class FormattedDataThermo:
     title: str
 
 
-def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, pycsl_version, sql_data: SqlQueryResult):
+def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, sql_data: SqlQueryResult):
     """
     Extracts, processes, and formats experimental data into a structured format for MSP/NIST documents.
 
     Args:
-        exp_id (int)         : Experiment ID used to query the database.
-        chrom_method (str)   : Chromatographic method identifier.
-        csl_version (str)    : Current version of the CSL database.
-        pycsl_version (str)  : Current version of the python package.
-        sql_data (dataclass) : Dataclass containing experiment data and metadata.
+        exp_id (int)           : Experiment ID used to query the database.
+        chrom_method (str)     : Chromatographic method identifier.
+        csl_version (str)      : Current version of the CSL database.
+        CSLTOOLS_VERSION (str) : Current version of the python package.
+        sql_data (dataclass)   : Dataclass containing experiment data and metadata.
 
     Returns:
           FormattedData (dataclass) : Dataclass containing the formatted data required for constructing the MassBank
@@ -149,7 +149,7 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, pycsl_vers
         f"COMMENT: CONFIDENCE Reference Standard (Level 1)\n",
         f"COMMENT: Chromatography method: {chrom_method}\n",
         f"COMMENT: Acquisition method: 10.1002/rcm.8541\n" if inst_notation_pairs['bfg'] in sql_data.exp_groups else None,
-        f"COMMENT: Export with pycsl {pycsl_version} and CSL {csl_version}\n"
+        f"COMMENT: Export with csl-tools {CSLTOOLS_VERSION} and CSL {csl_version}\n"
         ]))
 
     return FormattedDataThermo(accession, adduct, authors, cas, ce, comment_chunk, compound_classes, compound_name,
