@@ -10,4 +10,6 @@ class RecalcRtscan(OperationRtscan):
         logger = logging.getLogger(__name__)
         logger.info('Executing recalc rtscan workflow')
 
+        logger.info('Not implemented yet')
+
         logger.info('End of recalc rtscan workflow')

@@ -4,12 +4,12 @@ from utils.sql_utils import inst_code_csl_mapping, create_session
 from rtscan_functions.utils.rtscan_utils import *
 from config import DEFAULT_PAIRS_INST_CHROM
 from rtscan_functions.utils.rtscan_config import (DEFAULT_GAM_BFG_TO_LANUK_PATH, DEFAULT_GAM_LANUK_TO_BFG_PATH,
-                                                  check_order_pred_bfg_rt)  # todo test model results
+                                                  check_order_pred_bfg_rt)
 
 
 class UpdateRtscan(OperationRtscan):
     def rtscan(self):
-        """Workflow for updating missing retention time (RT) data in the CSL."""
+        """Workflow for updating missing retention times (RT) data in the CSL."""
 
         import joblib
         import os
@@ -101,7 +101,7 @@ class UpdateRtscan(OperationRtscan):
                     no_pred_rt_all.append(uq_comp_id)
 
         end = time.time()
-        print(f'elapsed time: {end - start}')
+        print(f'Elapsed time: {end - start}')
 
         # Summarize the result
         summarize_corrections_and_errors(uq_comp_ids, dupl_all, pred_to_false_all, no_exp_rt_all,
