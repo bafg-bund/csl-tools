@@ -72,19 +72,25 @@ rtscan_parser.add_argument('operation', type=str, choices=['check', 'update', 'r
 rtscan_parser.add_argument('csl_path', type=str,
                            help='Path to CSL file')
 
-# Parse the command-line arguments
-args: Namespace = parser.parse_args()
+def main():
+    # Parse the command-line arguments
+    args: Namespace = parser.parse_args()
 
-# Execute functions based on the command type
-if args.command == 'process':
-    if not args.data_path:
-        file_paths = select_data_files()
-        if not file_paths:
-            print("No files selected. Exiting.")
-            exit(1)
-        args.data_path = file_paths
-    run_process_workflow(args.format, args.csl_path, args.data_path)
-elif args.command == 'export':
-    run_export_workflow(args.format, args.csl_path, args.out_path, args.subset)
-elif args.command == 'rtscan':
-    run_rtscan_workflow(args.operation, args.csl_path)
+    # Execute functions based on the command type
+    if args.command == 'process':
+        if not args.data_path:
+            file_paths = select_data_files()
+            if not file_paths:
+                print("No files selected. Exiting.")
+                exit(1)
+            args.data_path = file_paths
+        run_process_workflow(args.format, args.csl_path, args.data_path)
+
+    elif args.command == 'export':
+        run_export_workflow(args.format, args.csl_path, args.out_path, args.subset)
+
+    elif args.command == 'rtscan':
+        run_rtscan_workflow(args.operation, args.csl_path)
+
+if __name__ == "__main__":
+    main()

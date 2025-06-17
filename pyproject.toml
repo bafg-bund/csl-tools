@@ -3,14 +3,16 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "csl"
-version = "0.1.0dev1"
-description = "Import, export and curation of spectral data for the CSL (Collective Spectral Library)."
+name = "csl-tools"
+version = "0.1.0"
+description = "Tools for import, export and curation of spectral data for the CSL (Collective Spectral Library)."
 authors = [
     { name = "Ole Lessmann", email = "lessmann@bafg.de" },
     { name = "Björn Ehlig", email = "ehlig@bafg.de" },
     { name = "Kevin S. Jewell", email = "jewell@bafg.de" },
 ]
+readme = "README.md"
+requires-python = ">=3.10"
 dependencies = [
     "pandas<2.2.2",
     "numpy<2.0.0",
@@ -34,3 +36,6 @@ testpaths = [
     "tests/unit",
     "tests/integration",
 ]
+
+[project.scripts]
+csl = "csl.main:main"
