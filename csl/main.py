@@ -14,9 +14,9 @@
 # """
 
 from argparse import ArgumentParser, Namespace
-from main_functions.process import run_process_workflow
-from main_functions.export import run_export_workflow
-from main_functions.rtscan import run_rtscan_workflow
+from csl.main_functions.process import run_process_workflow
+from csl.main_functions.export import run_export_workflow
+from csl.main_functions.rtscan import run_rtscan_workflow
 from tkinter import Tk
 from tkinter.filedialog import askopenfilenames
 
