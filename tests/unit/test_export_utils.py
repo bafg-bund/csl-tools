@@ -39,8 +39,8 @@ def test_get_splash_code():
     """Tests if get_splash_code returns the expected spectral hash code."""
     mock_spectrum = [(10.1, 1.1), (20.2, 2.2), (30.3, 3.3)]
     expected_temp_spectrum = [(10.1, 1100.0), (20.2, 2200.0), (30.3, 3300.0)]
-    with patch('export_functions.utils.export_utils.Spectrum') as MockSpectrum, \
-         patch('export_functions.utils.export_utils.Splash') as MockSplash:
+    with patch('csl.export_functions.utils.export_utils.Spectrum') as MockSpectrum, \
+         patch('csl.export_functions.utils.export_utils.Splash') as MockSplash:
         # Prepare mocks
         mock_spec = MagicMock()
         MockSpectrum.return_value = mock_spec

@@ -11,7 +11,7 @@ import pandas as pd
                           (['file1.txt', 'file2.txt'], None, ['file1.txt', 'file2.txt']),  # Expect no changes
                           ('dir', False, ['dir/file.txt']),  # Expect use of mock function `mock_match_file_paths`
                           ])  # List of file str should be unchanged.
-@patch('process_functions.utils.process_utils.match_file_paths')
+@patch('csl.process_functions.utils.process_utils.match_file_paths')
 def test_get_file_paths(mock_match_file_paths, mock_data_paths, mock_isfile, expected_file_paths):
     """Test if file paths are correctly returned."""
     with patch('os.path.isfile', return_value=mock_isfile):
