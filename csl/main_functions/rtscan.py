@@ -23,7 +23,6 @@ setup_logger(log_fpath)  # Sets basic logger configuration and adds stream handl
 
 # Define workflow dictionary
 WORKFLOWS = {
-    "check": CheckRtscan,
     "update": UpdateRtscan,
     "recalc": RecalcRtscan
 }
