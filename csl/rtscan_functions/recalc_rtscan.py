@@ -1,4 +1,4 @@
-from rtscan_functions.operation_rtscan import OperationRtscan
+from csl.rtscan_functions.operation_rtscan import OperationRtscan
 
 
 class RecalcRtscan(OperationRtscan):

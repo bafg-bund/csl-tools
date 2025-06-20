@@ -2,7 +2,7 @@ from csl.config import DEFAULT_PAIRS_INST_CHROM
 from csl.utils import *
 from csl.rtscan_functions.operation_rtscan import OperationRtscan
 from csl.rtscan_functions.utils.rtscan_utils import *
-from rtscan_functions.utils.rtscan_config import *
+from csl.rtscan_functions.utils.rtscan_config import *
 
 
 class UpdateRtscan(OperationRtscan):
