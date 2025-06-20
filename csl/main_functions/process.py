@@ -9,11 +9,12 @@ Process Classes:
     uba   : Workflow for 'uba' (Umweltbundesamt).
 """
 
+from csl.utils import validate_file_path, setup_logger
+from csl.process_functions import *
+from csl.config import ROOT_DIR
+
 import os.path
 from datetime import datetime
-from utils import validate_file_path, setup_logger
-from process_functions import *
-from config import ROOT_DIR
 
 # Setup logs folder and set the root logger
 fname = datetime.now().strftime('%Y%m%d_%H%M%S') + '_log'

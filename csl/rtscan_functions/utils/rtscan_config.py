@@ -1,6 +1,6 @@
 # Set configurations and constant for the rtscan workflow in this file
+from csl.config import ROOT_DIR
 import os
-from config import ROOT_DIR
 
 # Path to retention time models
 DEFAULT_GAM_BFG_TO_LANUK_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'gam_bfg_to_lanuk.pkl')

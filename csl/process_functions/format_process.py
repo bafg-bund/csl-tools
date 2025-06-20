@@ -1,9 +1,9 @@
-from process_functions.utils import *
-from utils import inst_code_csl_mapping
-from utils.sql_utils import create_session
-from abc import ABC, abstractmethod
-from config import DEFAULT_PAIRS_INST_CHROM
+from csl.process_functions.utils import *
+from csl.utils import inst_code_csl_mapping
+from csl.utils.sql_utils import create_session
+from csl.config import DEFAULT_PAIRS_INST_CHROM
 
+from abc import ABC, abstractmethod
 
 class FormatProcess(ABC):
     def __init__(self, path_csl, path_data):

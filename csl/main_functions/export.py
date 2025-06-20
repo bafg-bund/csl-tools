@@ -7,11 +7,12 @@ Export classes:
     mbank  : Workflow for exporting the CSL as txt files for MassBank.
 """
 
+from csl.utils import validate_file_path, setup_logger
+from csl.export_functions import *
+from csl.config import ROOT_DIR
+
 import os.path
 from datetime import datetime
-from utils import validate_file_path, setup_logger
-from export_functions import *
-from config import ROOT_DIR
 
 # Setup logs folder and set the root logger
 fname = datetime.now().strftime('%Y%m%d_%H%M%S') + '_log'

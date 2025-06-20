@@ -1,4 +1,4 @@
-from utils.sql_utils import close_session_remove_file, RetentionTime, ExperimentGroup, expGroupExp, Experiment
+from csl.utils.sql_utils import close_session_remove_file, RetentionTime, ExperimentGroup, expGroupExp, Experiment
 
 
 def get_inst_rt_info(uq_comp_id, session, inst_method_pairs):

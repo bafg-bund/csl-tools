@@ -1,6 +1,7 @@
-from dataclasses import dataclass
-from utils.sql_utils import (inst_code_csl_mapping, Experiment, Compound, Parameter, Fragment, expGroupExp,
+from csl.utils.sql_utils import (inst_code_csl_mapping, Experiment, Compound, Parameter, Fragment, expGroupExp,
                              ExperimentGroup, CompoundGroup, RetentionTime)
+
+from dataclasses import dataclass
 from splash import Spectrum, SpectrumType, Splash
 
 @dataclass

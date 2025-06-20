@@ -1,5 +1,5 @@
-from process_functions import FormatProcess
-from process_functions.utils import *
+from csl.process_functions import FormatProcess
+from csl.process_functions.utils import *
 
 
 class MbankProcess(FormatProcess):

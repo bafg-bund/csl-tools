@@ -1,10 +1,8 @@
-from rtscan_functions.operation_rtscan import OperationRtscan
-from utils.file_utils import update_version_filename
-from utils.sql_utils import inst_code_csl_mapping, create_session
-from rtscan_functions.utils.rtscan_utils import *
-from config import DEFAULT_PAIRS_INST_CHROM
-from rtscan_functions.utils.rtscan_config import (DEFAULT_GAM_BFG_TO_LANUK_PATH, DEFAULT_GAM_LANUK_TO_BFG_PATH,
-                                                  check_order_pred_bfg_rt)
+from csl.config import DEFAULT_PAIRS_INST_CHROM
+from csl.utils import *
+from csl.rtscan_functions.operation_rtscan import OperationRtscan
+from csl.rtscan_functions.utils.rtscan_utils import *
+from rtscan_functions.utils.rtscan_config import *
 
 
 class UpdateRtscan(OperationRtscan):

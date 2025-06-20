@@ -1,6 +1,7 @@
-from export_functions.utils import *
-from utils.sql_utils import inst_code_csl_mapping
-from config import DEFAULT_PAIRS_INST_CHROM
+from csl.export_functions.utils import *
+from csl.utils.sql_utils import inst_code_csl_mapping
+from csl.config import DEFAULT_PAIRS_INST_CHROM
+
 from dataclasses import dataclass
 from typing import Optional, Union, List
 
