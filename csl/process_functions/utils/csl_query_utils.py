@@ -1,3 +1,6 @@
+from csl.utils.sql_utils import (Experiment, Fragment, Parameter, Compound, RetentionTime, CompoundGroup,
+                                 ExperimentGroup)
+
 def check_duplicate(session, entry):
     """
     Checks if the experimental information are already present in the CSL. Constructs and executes a query using the
@@ -17,7 +20,6 @@ def check_duplicate(session, entry):
         res_count (int) : Number of matches returned by executing the query.
                           Returns -1 if matching was not attempted due to missing CAS RN and InChIKey.
     """
-    from utils.sql_utils import Experiment, Parameter, Compound
     from sqlalchemy import func
 
     # Prepare query
@@ -100,7 +102,6 @@ def add_exp_to_session(session, entry, inst_def):
     Returns:
         (No return variables, but the session object is updated)
     """
-    from utils.sql_utils import (Experiment, Fragment, Parameter, Compound, RetentionTime, CompoundGroup, ExperimentGroup)
     from datetime import datetime
     from sqlalchemy import func
     import logging

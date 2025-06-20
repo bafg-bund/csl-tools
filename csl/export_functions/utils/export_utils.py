@@ -1,5 +1,5 @@
 from csl.utils.sql_utils import (inst_code_csl_mapping, Experiment, Compound, Parameter, Fragment, expGroupExp,
-                             ExperimentGroup, CompoundGroup, RetentionTime)
+                             ExperimentGroup, CompoundGroup, RetentionTime, compGroupComp)
 
 from dataclasses import dataclass
 from splash import Spectrum, SpectrumType, Splash
@@ -58,7 +58,6 @@ def sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method):
     Returns:
         SqlQueryResult (dataclass) : Dataclass containing the queried experiment data and metadata.
     """
-    from utils.sql_utils import Experiment, RetentionTime, ExperimentGroup, expGroupExp, CompoundGroup, compGroupComp
     from sqlalchemy.orm import joinedload
 
     # Get experiment table and preload related tables

@@ -1,4 +1,3 @@
-
 def extract_data_regex_lanuk(file_path, var_regex):
     """
     Splits file content into chunks by identifying the first line of a chunk and extracts relevant data based on

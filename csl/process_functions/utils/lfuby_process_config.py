@@ -16,6 +16,9 @@
 # Use this when necessary information cannot be extracted from the data files or is fixed (e.g. one instrument name).
 #   → Define in var_fix_<institution>.
 
+from csl.config import DEFAULT_PAIRS_INST_CHROM
+from csl.utils.sql_utils import inst_code_csl_mapping
+
 def var_regex_lfuby():
     """
     Mapping of CSL-relevant parameters (keys) to lfuby-specific identifiers (values) for data extraction.
@@ -45,8 +48,6 @@ def var_fix_lfuby():
     Mapping of CSL-relevant variables (keys) to lfuby-specific default/fixed information (values).
     The information is currently fixed for this format or does not appear in the data files (can't be extracted).
     """
-    from config import DEFAULT_PAIRS_INST_CHROM
-    from utils.sql_utils import inst_code_csl_mapping
     all_methods = DEFAULT_PAIRS_INST_CHROM
     inst_notation_pairs = inst_code_csl_mapping()
 

@@ -38,7 +38,6 @@ def var_fix_mbank():
     Mapping of CSL-relevant variables (keys) to mbank-specific default/fixed information (values).
     The information is currently fixed for this format or does not appear in the data files (can't be extracted).
     """
-
     mbank_var_fix = {
         'var_chrom_method': None,       # Chromatographic method
         'var_isotope': 'monoisotopic',  # Type of molecular mass
@@ -54,9 +53,6 @@ def defaults_mbank():
     Mapping of mbank-specific default settings for data processing.
     These settings are expected to never have more than one state within each process workflow.
     """
-    from utils.sql_utils import inst_code_csl_mapping
-    # inst_notation_pairs = inst_code_csl_mapping()
-
     mbank_defaults = {
         'def_pol_p': 'POSITIVE',                        # Default identifier for positive ion mode
         'def_pol_n': 'NEGATIVE',                        # Default identifier for positive ion mode
