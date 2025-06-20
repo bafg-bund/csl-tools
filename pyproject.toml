@@ -33,8 +33,8 @@ where = ["."]
 minversion = "6.0"
 addopts = "-ra -q"
 testpaths = [
-    "csl/tests/unit",
-    "csl/tests/integration",
+    "tests/unit",
+    "tests/integration",
 ]
 
 [project.scripts]
