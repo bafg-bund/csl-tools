@@ -1,6 +1,7 @@
+from csl.utils import *
 import pytest
 from unittest.mock import patch
-from utils import *
+
 
 def test_validate_file_path_not_exists():
     """Tests if validate_file_path returns the expected FileNotFoundError when path does not exist."""

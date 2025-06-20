@@ -1,7 +1,7 @@
+from csl.process_functions import FormatProcess
 import pytest
 from unittest.mock import patch
 import pandas as pd
-from process_functions import FormatProcess
 
 
 # Define a fixture for the TestProcess class

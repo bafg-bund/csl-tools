@@ -1,7 +1,7 @@
+from csl.rtscan_functions import UpdateRtscan
+from csl.rtscan_functions.utils.rtscan_utils import *
 import pytest
 from unittest.mock import patch
-from rtscan_functions import UpdateRtscan
-from rtscan_functions.utils.rtscan_utils import *
 
 
 @pytest.mark.parametrize("mock_inst_rt, mock_inst_exp_rt, mock_inst_pred_rt, mock_predict_bfg_rt_called", [

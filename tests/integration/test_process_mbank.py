@@ -1,6 +1,6 @@
-from main_functions.process import run_process_workflow
-from utils.sql_utils import create_session, Experiment, Compound
-from config import ROOT_DIR
+from csl.main_functions.process import run_process_workflow
+from csl.utils.sql_utils import create_session, Experiment, Compound
+from csl.config import ROOT_DIR
 import os
 import shutil
 from pathlib import Path

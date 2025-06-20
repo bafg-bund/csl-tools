@@ -1,9 +1,9 @@
+from csl.process_functions.utils.process_utils import *
 import pytest
 from unittest.mock import patch
 import os
 import tempfile
 import pandas as pd
-from process_functions.utils.process_utils import *
 
 
 @pytest.mark.parametrize("mock_data_paths, mock_isfile, expected_file_paths",

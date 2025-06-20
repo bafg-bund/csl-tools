@@ -1,5 +1,5 @@
+from csl.process_functions.utils import check_duplicate, add_exp_to_session
 from unittest.mock import MagicMock
-from process_functions.utils import check_duplicate, add_exp_to_session
 
 
 def test_check_duplicate_inchikey_only(mock_session, mock_entry_df):

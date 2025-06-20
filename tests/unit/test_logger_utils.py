@@ -1,5 +1,5 @@
+from csl.utils import setup_logger, ColoredFormatter
 from unittest.mock import patch
-from utils import setup_logger, ColoredFormatter
 import logging
 
 

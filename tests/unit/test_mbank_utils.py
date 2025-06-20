@@ -1,6 +1,6 @@
+from csl.export_functions.utils.mbank_export_utils import *
 import pytest
 from unittest.mock import patch
-from export_functions.utils.mbank_export_utils import *
 
 
 def test_get_exp_ids_mbank():
