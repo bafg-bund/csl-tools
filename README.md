@@ -67,16 +67,15 @@ If you want to make changes to the code, please do not directly push into the ma
 Instead, create a new branch for your work and open a pull request to the `dev` branch.
 
 ## Contributing (spectral data)
-For contributor who wish to submit spectral data for inclusion in the CSL, 
+To contribute spectral data to the CSL, please follow the linked guidelines for the respective file formats.  
+Currently, the package can read:
 
-For contribution of spectral data to the CSL, please follow the guidelines for different data formats.
+- Files exported by the software mzVault (_Thermo Fisher Scientific; Version 2.3 SP1; Build 2.3.64.0; July 8, 2021_) &#8594; [Requirements for MSP/NIST files](/docs/SOP_msp_nist_import)
+- MassBank documents. For these, please refer to the official [MassBank documentation](https://github.com/MassBank/MassBank-web/blob/main/Documentation/MassBankRecordFormat.md).
 
-This documentation applies to all contributor who wish to submit spectral data for inclusion in the **Collective Spectral Library (CSL)**. 
-It describes the required format for submitting spectral data for successful processing and import using the **csl-tools** package.
+In the future we plan to support the file format:
+- SCIEX / LibraryView files (SDF format) 
 
-With a growing number of standard spectra in the CSL the power of t
-
-[MSP/NIST files](/docs/SOP_msp_nist_import)
 
 ## Usage
 The package provides both a Command-Line Interface (CLI) and Python API for operations on the CSL.
