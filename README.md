@@ -136,7 +136,7 @@ csl export mbank C:\path\to\csl.db C:\path\to\output_dir bfg
 ```
 
 Exports all files from the CSL into the MSP/NIST format.
-```bash
+```
 csl export thermo C:\path\to\csl.db C:\path\to\output_dir
 ```
 
