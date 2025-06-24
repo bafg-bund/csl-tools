@@ -23,19 +23,19 @@ The newest CSL file is available at **(not yet uploaded)** and will be regularly
 
 
 ## Installation
-```commandline
+```
 pip install git+https://github.com/bafg-bund/csl-tools.git
 ```
 
 ## Development
 To contribute or run the project in development mode:
 1. Clone the repository
-    ```commandline
+    ```
     git clone https://github.com/bafg-bund/csl-tools.git
     cd csl-tools
     ```
 2. Create and activate a virtual environment (recommended)
-   ```commandline
+   ```
    python -m venv .venv
    ```
     If using default command prompt (cmd):
@@ -47,11 +47,11 @@ To contribute or run the project in development mode:
     .\venv\Scripts\Activate.ps1
     ```
 3. Install in editable mode
-    ```commandline
+    ```
     pip install -e .
     ```
 4. Run tests
-    ```commandline
+    ```
     pytest
     ```
  
@@ -63,18 +63,18 @@ If you want to make changes to the code, please do not directly push into the ma
 Instead, create a new branch for your work and open a pull request to the `dev` branch.
 
 ## Contributing (spectral data)
-Todo: Add SOPs for formats of spectral data files
 
+[MSP/NIST files](/docs/SOP_import.md)
 
 ## Usage
 The package provides both a Command-Line Interface (CLI) and Python API for operations on the CSL.
 
 After installing the package, you can run the CLI using:
-```commandline
+```
 csl [command] [options]
 ```
 During development, the CLI can also be run directly via:
-```commandline
+```
 python main.py [command] [options]
 ```
 
@@ -88,7 +88,7 @@ You can either run the tools via terminal commands or import and run the corresp
 
 ### `process`
 Processes MS2 data files from a specified format and imports data into the CSL.
-```commandline
+```
 csl process [format] [csl_path] [data_path]
 ```
 
@@ -103,13 +103,13 @@ csl process [format] [csl_path] [data_path]
 
 #### Examples
 Process data from the Bavarian Environment Agency (LfU).
-```commandline
+```
 csl process lfuby C:\path\to\csl.db C:\path\to\data.txt 
 ```
 
 ### `export`
 Exports the CSL to the specified format.  
-```commandline
+```
 csl export [format] [csl_path] [out_path]
 ```
 
@@ -131,7 +131,7 @@ csl export [format] [csl_path] [out_path]
 
 #### Example
 Exports all BfG-files from the CSL into the MassBank format.
-```commandline
+```
 csl export mbank C:\path\to\csl.db C:\path\to\output_dir bfg
 ```
 
@@ -143,7 +143,7 @@ csl export thermo C:\path\to\csl.db C:\path\to\output_dir
 
 ### `rtscan`
  Operates on retention-time data stored in the CSL.  
-```commandline
+```
 csl rtscan [operation] [csl_path]
 ```
 
@@ -154,7 +154,7 @@ csl rtscan [operation] [csl_path]
 - [csl_path]: Path to CSL file.
 
 #### Example
-```commandline
+```
 csl rtscan update C:\path\to\csl.db
 ```
 
