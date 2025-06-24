@@ -11,16 +11,20 @@ Import, export and curation of spectral data for the Collective Spectral Library
 ## Background
 The CSL is a collection of spectral data (standards) that can be used by [ntsworkflow](https://github.com/bafg-bund/ntsworkflow) <sup>[1]</sup> to screen environmental data retrospectively and is integrated with [NTSPortal](https://ntsportal.bafg.de) <sup>[2]</sup>. 
 
+Our goal is to grow this collection, making the retrospective analysis of historical data in NTSPortal more powerful and valuable for all users <sup>[3]</sup>.
+
+If you wish to contribute spectral data, please see the section [Contribution (spectral data)](#contributing-spectral-data).
+
 Currently, the CSL holds data from these institutions:
-- BfG (Federal Institute of Hydrology)
-- LfU Bayern (Bavarian Environment Agency)
-- UBA (Federal Environment Agency)
+- [BfG](https://www.bafg.de) (Federal Institute of Hydrology)
+- [LfU Bayern](https://www.lfu.bayern.de) (Bavarian Environment Agency)
+- [UBA](https://www.umweltbundesamt.de) (Federal Environment Agency)
 
-The newest CSL file is available at **(not yet uploaded)** and will be regularly updated there.
+The most recent CSL file is available at **(will be uploaded to an open repository soon)** and will be regularly updated there.
 
-><sup>**[1]** K. S. Jewell et al., Rapid Commun. MassSpectrom. 2020, 34, e8541. [https://doi.org/10.1002/rcm.8541](https://doi.org/10.1002/rcm.8541)  
-**[2]** K. S. Jewell et al., Online-Portal „Non-Target Screening für die Umweltüberwachung der Zukunft“, Umweltbundesamt, Dessau-Roßlau, 2025. [UBA report](https://www.umweltbundesamt.de/sites/default/files/medien/11850/publikationen/21_2025_texte.pdf)</sup>
-
+><sup>**[1]** Jewell, K. S., et al. (2020). Rapid Commun. Mass Spectrom., 34, e8541. [https://doi.org/10.1002/rcm.8541](https://doi.org/10.1002/rcm.8541)  
+**[2]** Jewell, K. S., et al. (2025). Online-Portal „Non-Target Screening für die Umweltüberwachung der Zukunft“, Umweltbundesamt, Dessau-Roßlau. [https://www.umweltbundesamt.de/sites/default/files/medien/11850/publikationen/21_2025_texte.pdf](https://www.umweltbundesamt.de/sites/default/files/medien/11850/publikationen/21_2025_texte.pdf)
+**[3]** Lessmann, O., et al. (2025, May). Development and Application of a Collective Spectral Library for Collaborative Non-Target Screening [Poster presentation], Wasser 2025, Münster, Germany. [Poster Download](https://github.com/user-attachments/files/20883434/poster_wasser_lessmann.pdf)</sup>
 
 ## Installation
 ```
@@ -63,8 +67,16 @@ If you want to make changes to the code, please do not directly push into the ma
 Instead, create a new branch for your work and open a pull request to the `dev` branch.
 
 ## Contributing (spectral data)
+For contributor who wish to submit spectral data for inclusion in the CSL, 
 
-[MSP/NIST files](/docs/SOP_import.md)
+For contribution of spectral data to the CSL, please follow the guidelines for different data formats.
+
+This documentation applies to all contributor who wish to submit spectral data for inclusion in the **Collective Spectral Library (CSL)**. 
+It describes the required format for submitting spectral data for successful processing and import using the **csl-tools** package.
+
+With a growing number of standard spectra in the CSL the power of t
+
+[MSP/NIST files](/docs/SOP_msp_nist_import)
 
 ## Usage
 The package provides both a Command-Line Interface (CLI) and Python API for operations on the CSL.

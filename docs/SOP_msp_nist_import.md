@@ -1,37 +1,33 @@
-# Import-file format documentation for contributors
-This documentation applies to all contributor who wish to submit spectral data for inclusion in the **Collective Spectral Library (CSL)**. 
-It describes the required format for submitting spectral data for successful processing and import using the **csl-tools** package.
+# MSP/NIST-files format for contributors
 
 **Table of Contents**
-* [MSP/NIST Files](#mspnist-files)
-  * [Parameter Reference Table](#parameter-reference-table)
-    * [Compound name](#compound-name)
-    * [Special adduct / Source fragment](#special-adduct--source-fragment)
-      * [Additional information:](#additional-information)
-    * [Precursor m/z](#precursor-mz)
-    * [Collision energy (CE)](#collision-energy-ce)
-    * [Ionization](#ionization)
-    * [Ion mode](#ion-mode)
-    * [Retention time](#retention-time)
-    * [InChIKey](#inchikey)
-    * [Compound formula](#compound-formula)
-    * [CAS Registry Number](#cas-registry-number)
-    * [SMILES code](#smiles-code)
-    * [Compound class](#compound-class)
-    * [Number of peaks](#number-of-peaks)
-    * [Spectrum](#spectrum)
-* [MassBank Files](#massbank-files)
+* [Default information](#default-information)
+* [Parameter Reference Table](#parameter-reference-table)
+  * [Compound name](#compound-name)
+  * [Special adduct / Source fragment](#special-adduct--source-fragment)
+  * [Precursor m/z](#precursor-mz)
+  * [Collision energy (CE)](#collision-energy-ce)
+  * [Ionization](#ionization)
+  * [Ion mode](#ion-mode)
+  * [Retention time](#retention-time)
+  * [InChIKey](#inchikey)
+  * [Compound formula](#compound-formula)
+  * [CAS Registry Number](#cas-registry-number)
+  * [SMILES code](#smiles-code)
+  * [Compound class](#compound-class)
+  * [Number of peaks](#number-of-peaks)
+  * [Spectrum](#spectrum)
 
-# MSP/NIST Files
+## Default information
 Default information that needs to be provided by the contributors separately:
-- Authors
-- License
+
 - Method: 
    + Type of molecular mass (e.g., `monoisotopic`)
    + Collision type (e.g., `HCD`, `Q`)
    + Instrument type (e.g., `LC-ESI-Orbitrap`, `LC-ESI-QTOF`)
    + Instrument name (e.g., `TripleTOF 5600 SCIEX`, `QExactive`, `Agilent 6500 Series Q-TOF`)
-
+- License
+- Authors
 
 ## Parameter Reference Table
 - Based on mzVault™ (_Thermo Fisher Scientific; Version 2.3 SP1; Build 2.3.64.0; July 8, 2021_)
@@ -54,9 +50,12 @@ Default information that needs to be provided by the contributors separately:
 | Spectrum (m/z and intensity)      | Lines directly after `Num peaks` | Yes | [Spectrum](#spectrum)                                                |
 <sup>*</sup> At least one of the following is required: InChIKey or CAS.
 
+---
 
 ### Compound name
 Chemical name of the compound.
+
+- The naming conventions are based on the entries in PubChem.
 
 Examples: 
 ```
@@ -100,7 +99,7 @@ Some special cases don't follow standard conventions and are hardcoded:
 | `NaFA`         | `[M+NaCOO-]-`             |
 
 
-#### Additional information:
+**Additional information**:  
 For MS2 spectra of **special adducts** and **source fragments**, 
 the associated entry must include the molecular formula, CAS number, SMILES code, and other metadata of the **neutral molecule**.
 
@@ -111,16 +110,29 @@ For cations the SMILES code and the InChIKey are derived from the cation, i.e., 
 ### Precursor m/z
 Mass-to-charge ratio of the precursor ion selected for fragmentation (MS2).
 
+- Decimal separator: `.`
+
+Example:
+```
+PrecursorMz: 328.14312
+```
 
 ---
 
 ### Collision energy (CE)
 Collision energy used for fragmentation.
 
-- Can be written as `20` or `20.00`
-- When using multiple CEs the order is important to determine the spread correctly: `20, 40, 60` and not `20, 60, 40`
-- Multiple CEs must be equidistant. `20, 30, 50` can not be accepted.
+- CE can be written as `20` or `20.00`
+- Multiple CEs:
+   + The order is important to determine the spread correctly: `20, 40, 60` and not `20, 60, 40`
+   + CEs must be equidistant. `20, 30, 50` can not be accepted.
+   + CEs separated by `,`. `20,30,40` or `20, 30, 40` is both acceptable.
 
+Examples:
+```
+Collision_energy: 10.00
+Collision_energy: 20.00,40.00,60.00
+```
 
 ---
 
@@ -155,7 +167,6 @@ Examples:
 RetentionTime: 12.24153
 RetentionTime: 9.4
 ```
-
 
 ---
 
@@ -201,6 +212,7 @@ Smiles: OC(Cc1c(Nc2c(Cl)cccc2Cl)cccc1)=O
 Smiles: CCOC(=O)Nc1cccc(c1)OC(=O)Nc2ccccc2
 ```
 
+---
 
 ### Compound class
 Classification or use category of the compound.
@@ -213,34 +225,32 @@ CompoundClass: Herbicide;Pesticide
 
 Currently, the following compound classes are defined in the CSL:
 
-|    | Compound class                    |
-|----|-----------------------------------|
-| 1  | BfG                               |
-| 2  | Pharmaceutical                    |
-| 3  | Transformation_product            |
-| 4  | Antimicrobial                     |
-| 5  | Food_additive                     |
-| 6  | Fungicide                         |
-| 7  | Herbicide                         |
-| 8  | Industrial_process                |
-| 9  | Insecticide                       |
-| 10 | Metabolite                        |
-| 11 | Natural_product                   |
-| 12 | Personal_care_product             |
-| 13 | Pesticide                         |
-| 14 | LfU                               |
-| 15 | Pigment                           |
-| 16 | Surrogate_standard                |
-| 17 | Diclofenac-lactam                 |
-| 18 | UBA                               |
-| 19 | Acaricide                         |
-| 20 | Biocide                           |
-| 21 | Nitrification_inhibitor           |
-| 22 | PFAS                              |
-| 23 | Research                          |
-| 24 | Rodenticide                       |
-| 25 | Transformation_product-Metabolite |
-| 26 | Urease_inhibitor                  |
+| Compound class                    |
+|-----------------------------------|
+| Pharmaceutical                    |
+| Transformation_product            |
+| Antimicrobial                     |
+| Food_additive                     |
+| Fungicide                         |
+| Herbicide                         |
+| Industrial_process                |
+| Insecticide                       |
+| Metabolite                        |
+| Natural_product                   |
+| Personal_care_product             |
+| Pesticide                         |
+| Pigment                           |
+| Surrogate_standard                |
+| Diclofenac-lactam                 |
+| Acaricide                         |
+| Biocide                           |
+| Nitrification_inhibitor           |
+| PFAS                              |
+| Research                          |
+| Rodenticide                       |
+| Transformation_product-Metabolite |
+| Urease_inhibitor                  |
+>Note: The compound class groups are planned to be reworked in the future.
 
 ---
 
@@ -258,6 +268,7 @@ Num peaks: 5
 List of fragment peaks with m/z and intensity values.
 
 - Directly follows the line after `Num peaks`
+- Line format: <mz_value> (space) <int_value>
 
 Examples:
 ```
@@ -273,11 +284,5 @@ Num peaks: 5
 98.4724 1169.04
 122.8026 1769.46
 ```
-
----
-
-# MassBank Files
-
-~
 
 ---
