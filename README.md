@@ -150,7 +150,7 @@ csl rtscan [operation] [csl_path]
 #### Arguments
 - [operation]: Specify the operation. Choose from:
   - `update`: Calculates missing non-experimental retention times based on available experimental data (currently broken).
-  - `recalc`: Re-calculates all non-experimental retention times based on available experimental data (not implemented).
+  - `recalc`: Re-calculates all non-experimental retention times based on available experimental data (not implemented yet).
 - [csl_path]: Path to CSL file.
 
 #### Example
@@ -162,14 +162,10 @@ csl rtscan update C:\path\to\csl.db
 - For file paths with spaces, enclose them in quotes, e.g., "C:\My Documents\data.msp".
 - Use the --help/--h flag with any command to see additional usage information, e.g., `csl export --help`
 
-
-## Authors and acknowledgments
+## Authors
 Ole Lessmann, BfG, lessmann@bafg.de  
 Björn Ehlig, BfG, ehlig@bafg.de  
 Kevin S. Jewell, BfG, jewell@bafg.de  
 
 ## License
-GPLv3
-
-## Project status
-_Under development_
+This package is licensed under the [GNU General Public License v3.0](LICENSE).
