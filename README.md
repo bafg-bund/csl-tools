@@ -23,7 +23,7 @@ Currently, the CSL holds data from these institutions:
 The most recent CSL file is available at **(will be uploaded to an open repository soon)** and will be regularly updated there.
 
 ><sup>**[1]** Jewell, K. S., et al. (2020). Rapid Commun. Mass Spectrom., 34, e8541. [https://doi.org/10.1002/rcm.8541](https://doi.org/10.1002/rcm.8541)  
-**[2]** Jewell, K. S., et al. (2025). Online-Portal „Non-Target Screening für die Umweltüberwachung der Zukunft“, Umweltbundesamt, Dessau-Roßlau. [https://www.umweltbundesamt.de/sites/default/files/medien/11850/publikationen/21_2025_texte.pdf](https://www.umweltbundesamt.de/sites/default/files/medien/11850/publikationen/21_2025_texte.pdf)
+**[2]** Jewell, K. S., et al. (2025). Online-Portal „Non-Target Screening für die Umweltüberwachung der Zukunft“, Umweltbundesamt, Dessau-Roßlau. [https://www.umweltbundesamt.de/sites/default/files/medien/11850/publikationen/21_2025_texte.pdf](https://www.umweltbundesamt.de/sites/default/files/medien/11850/publikationen/21_2025_texte.pdf)  
 **[3]** Lessmann, O., et al. (2025, May). Development and Application of a Collective Spectral Library for Collaborative Non-Target Screening [Poster presentation], Wasser 2025, Münster, Germany. [Poster Download](https://github.com/user-attachments/files/20883434/poster_wasser_lessmann.pdf)</sup>
 
 ## Installation
