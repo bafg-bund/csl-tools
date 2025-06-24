@@ -70,8 +70,8 @@ Instead, create a new branch for your work and open a pull request to the `dev` 
 To contribute spectral data to the CSL, please follow the linked guidelines for the respective file formats.  
 Currently, the package can read:
 
-- Files exported by the software mzVault (_Thermo Fisher Scientific; Version 2.3 SP1; Build 2.3.64.0; July 8, 2021_) &#8594; [Requirements for MSP/NIST files](/docs/SOP_msp_nist_import)
-- MassBank documents. For these, please refer to the official [MassBank documentation](https://github.com/MassBank/MassBank-web/blob/main/Documentation/MassBankRecordFormat.md).
+- mzVault-based export files (_Thermo Fisher Scientific; Version 2.3 SP1; Build 2.3.64.0; July 8, 2021_) &#8594; [Requirements for MSP/NIST files](/docs/SOP_msp_nist_import.md)
+- MassBank documents &#8594; Please refer to the official [MassBank documentation](https://github.com/MassBank/MassBank-web/blob/main/Documentation/MassBankRecordFormat.md)
 
 In the future we plan to support the file format:
 - SCIEX / LibraryView files (SDF format) 
