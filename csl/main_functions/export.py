@@ -5,6 +5,7 @@ Export classes:
     thermo : Workflow for exporting the CSL as a txt file readable by mzVault.
     envi   : Workflow for exporting the CSL as a target list usable for enviMass.
     mbank  : Workflow for exporting the CSL as txt files for MassBank.
+    sqlite : Workflow for exporting a subset of the CSL as SQLite file.
 """
 
 from csl.utils import validate_file_path, setup_logger
@@ -25,7 +26,8 @@ setup_logger(log_fpath)  # Sets basic logger configuration and adds stream handl
 WORKFLOWS = {
     "thermo": ThermoExport,
     "envi": EnviExport,
-    "mbank": MbankExport
+    "mbank": MbankExport,
+    "sqlite": SqliteExport
 }
 
 

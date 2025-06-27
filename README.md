@@ -129,6 +129,7 @@ csl export [format] [csl_path] [out_path]
   - `thermo`: MSP/NIST export format (e.g., for mzVault).
   - `envi`: enviMass export format.
   - `mbank`: MassBank export format.
+  - `sqlite`: SQLite export format (used to subset the CSL by a specific data source).
 - [csl_path]: Path to the CSL file.
 - [out_path]: Path to the directory where the exported file(s) will be saved.
 - [subset]: (Optional) Data source (institution) for subsetting the CSL data before exporting. Choose from:
