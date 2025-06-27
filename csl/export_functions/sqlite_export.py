@@ -62,6 +62,11 @@ class SqliteExport(FormatExport):
                 )
             ).delete(synchronize_session=False)
 
+            # Delete retention times
+            session.query(RetentionTime).filter(~RetentionTime.compound_id.in_(
+                session.query(Experiment.compound_id)
+            )).delete(synchronize_session=False)
+
             # Delete experiment group information
             session.query(expGroupExp).filter(
                 ~expGroupExp.c.experiment_id.in_(

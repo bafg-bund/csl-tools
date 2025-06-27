@@ -14,7 +14,7 @@ def test_process_thermo():
     """
     # Prepare paths
     data_path = os.path.join(ROOT_DIR, 'tests/integration/fixtures/lfuby_testfiles')  # Todo: lfuby_workflow
-    csl_template_path = os.path.join(ROOT_DIR,'tests/integration/fixtures/CSL_v0_process_4entries.db')
+    csl_template_path = os.path.join(ROOT_DIR,'tests/integration/fixtures/sqlite_testfiles/CSL_v0_process_4entries.db')
     csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_process_4entries.db')
     temp_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 
@@ -36,7 +36,7 @@ def test_process_thermo():
 
     # Process thermo workflow
     with mock.patch('builtins.input', return_value='yes'):  # Mocks user input
-        process_data(format='lfuby', path_data=data_path, path_csl=csl_copy_path)  # Todo: lfuby_workflow
+        process_data(format='lfuby', path_csl=csl_copy_path, path_data=data_path)  # Todo: lfuby_workflow
 
     # Connect to CSL database
     session = create_session(path_csl=csl_copy_path)

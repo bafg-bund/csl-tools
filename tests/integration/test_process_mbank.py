@@ -13,7 +13,7 @@ def test_process_mbank():
     """
     # Prepare paths
     data_path = os.path.join(ROOT_DIR, 'tests/integration/fixtures/mbank_testfiles')
-    csl_template_path = os.path.join(ROOT_DIR,'tests/integration/fixtures/CSL_v0_process_4entries.db')
+    csl_template_path = os.path.join(ROOT_DIR,'tests/integration/fixtures/sqlite_testfiles/CSL_v0_process_4entries.db')
     csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_process_4entries.db')
     temp_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 
@@ -35,7 +35,7 @@ def test_process_mbank():
 
     # Process mbank workflow
     with mock.patch('builtins.input', side_effect=['1','1','1','yes']):  # Mocks user input
-        process_data(format='mbank', path_data=data_path, path_csl=csl_copy_path)
+        process_data(format='mbank', path_csl=csl_copy_path, path_data=data_path)
 
     # Connect to CSL database
     session = create_session(path_csl=csl_copy_path)
