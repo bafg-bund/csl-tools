@@ -31,7 +31,7 @@ WORKFLOWS = {
 }
 
 
-def run_export_workflow(format, path_csl, path_out, subset):
+def run_export_workflow(format: str, path_csl: str, path_out: str, subset: str = 'all'):
     """
     Executes the appropriate workflow for exporting CSL data as various formats.
 

@@ -28,7 +28,7 @@ WORKFLOWS = {
 }
 
 
-def run_rtscan_workflow(operation, path_csl):
+def run_rtscan_workflow(operation: str, path_csl: str):
     """
     Executes the appropriate workflow for exporting CSL data as various formats.
 

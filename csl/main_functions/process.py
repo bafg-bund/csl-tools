@@ -32,7 +32,7 @@ WORKFLOWS = {
 }
 
 
-def run_process_workflow(format, path_csl, path_data):
+def run_process_workflow(format: str, path_csl: str, path_data: str):
     """
     Executes the appropriate workflow for processing MS2 data files based on the institution type.
 
