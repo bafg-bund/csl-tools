@@ -48,5 +48,5 @@ def export_data(format: str, path_csl: str, path_out: str, subset: str = 'all'):
 
     # Select and execute the appropriate workflow based on the institution
     workflow_class = WORKFLOWS[format]
-    workflow = workflow_class(path_csl,  path_out, subset)
+    workflow = workflow_class(path_csl, path_out, subset)
     workflow.export()

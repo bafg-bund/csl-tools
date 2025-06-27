@@ -44,9 +44,9 @@ process_parser = subparsers.add_parser('process', help='Processes MS2 data files
 
 process_parser.add_argument('format', type=str, choices=['mbank', 'lfuby', 'lanuk', 'lubw'],  # Todo: change format to thermo and sciex
                             help='Specify format')
-process_parser.add_argument('csl_path', type=str,
+process_parser.add_argument('path_csl', type=str,
                             help='Path to CSL file')
-process_parser.add_argument('data_path', type=str, nargs='?',
+process_parser.add_argument('path_data', type=str, nargs='?',
                             help='(Optional) Path to data file or directory (Default: Opens dialog to select files)')
 
 
@@ -54,9 +54,9 @@ process_parser.add_argument('data_path', type=str, nargs='?',
 export_parser = subparsers.add_parser('export', help='Exports the CSL to various formats')
 export_parser.add_argument('format', type=str, choices=['thermo', 'envi', 'mbank', 'sqlite'],
                            help='Specify export format',)
-export_parser.add_argument('csl_path', type=str,
+export_parser.add_argument('path_csl', type=str,
                            help='Path to CSL file')
-export_parser.add_argument('out_path', type=str, help='Path to the directory where the exported file will be saved. '
+export_parser.add_argument('path_out', type=str, help='Path to the directory where the exported file will be saved. '
                                                       'For mbank format: Use path of local clone of '
                                                       'https://github.com/MassBank/MassBank-data/tree/dev/BAFG '
                                                       'to check the existing MassBank ACCESSION strings from file names.')
@@ -67,9 +67,9 @@ export_parser.add_argument('subset', type=str, nargs='?', choices=['lfuby', 'bfg
 
 # Define 'rtscan' command and its arguments
 rtscan_parser = subparsers.add_parser('rtscan', help='Operates on retention time data saved in the CSL')  # todo descr
-rtscan_parser.add_argument('operation', type=str, choices=['check', 'update', 'recalc'],
+rtscan_parser.add_argument('operation', type=str, choices=['update', 'recalc'],
                            help='Specify operation type',)  # todo: where to describe each option?
-rtscan_parser.add_argument('csl_path', type=str,
+rtscan_parser.add_argument('path_csl', type=str,
                            help='Path to CSL file')
 
 def main():
@@ -78,19 +78,19 @@ def main():
 
     # Execute functions based on the command type
     if args.command == 'process':
-        if not args.data_path:
+        if not args.path_data:
             file_paths = select_data_files()
             if not file_paths:
                 print("No files selected. Exiting.")
                 exit(1)
-            args.data_path = file_paths
-        process_data(args.format, args.csl_path, args.data_path)
+            args.path_data = file_paths
+        process_data(args.format, args.path_csl, args.path_data)
 
     elif args.command == 'export':
-        export_data(args.format, args.csl_path, args.out_path, args.subset)
+        export_data(args.format, args.path_csl, args.path_out, args.subset)
 
     elif args.command == 'rtscan':
-        scan_rt(args.operation, args.csl_path)
+        scan_rt(args.operation, args.path_csl)
 
 if __name__ == "__main__":
     main()
