@@ -32,14 +32,14 @@ WORKFLOWS = {
 }
 
 
-def run_process_workflow(format: str, path_csl: str, path_data: str):
+def process_data(format: str, path_csl: str, path_data: str or list[str]):
     """
     Executes the appropriate workflow for processing MS2 data files based on the institution type.
 
     Args:
         format (str)                    : Format of files to be processed. Used to select the appropriate workflow.
         path_csl (str)                  : Path to the CSL file.
-        path_data (str or list of str)  : File path(s) or directory path containing the MS2 data files to process.
+        path_data (str or list[str])  : File path(s) or directory path containing the MS2 data files to process.
     """
 
     # Validate the provided file path(s)

@@ -1,4 +1,4 @@
-from csl.main_functions.export import run_export_workflow
+from csl.main_functions.export import export_data
 from csl.config import ROOT_DIR
 import os
 import re
@@ -28,7 +28,7 @@ def test_export_mbank_bfg():
             print(f"Could not delete {f}: {e}")
 
     # Export mbank workflow
-    run_export_workflow(format='mbank', path_out=out_path, path_csl=csl_path, subset='bfg')
+    export_data(format='mbank', path_out=out_path, path_csl=csl_path, subset='bfg')
 
     # Assert that only one file was produced (CSL subset contains only one bfg experiment, that is not an internal standard)
     files = glob.glob(os.path.join(out_path, '*'))  # List all files in the output folder

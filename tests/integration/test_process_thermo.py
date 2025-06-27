@@ -1,4 +1,4 @@
-from csl.main_functions.process import run_process_workflow
+from csl.main_functions.process import process_data
 from csl.utils.sql_utils import create_session, Experiment, Compound
 from csl.config import ROOT_DIR
 import os
@@ -36,7 +36,7 @@ def test_process_thermo():
 
     # Process thermo workflow
     with mock.patch('builtins.input', return_value='yes'):  # Mocks user input
-        run_process_workflow(format='lfuby', path_data=data_path, path_csl=csl_copy_path)  # Todo: lfuby_workflow
+        process_data(format='lfuby', path_data=data_path, path_csl=csl_copy_path)  # Todo: lfuby_workflow
 
     # Connect to CSL database
     session = create_session(path_csl=csl_copy_path)

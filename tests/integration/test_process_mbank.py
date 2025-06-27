@@ -1,4 +1,4 @@
-from csl.main_functions.process import run_process_workflow
+from csl.main_functions.process import process_data
 from csl.utils.sql_utils import create_session, Experiment, Compound
 from csl.config import ROOT_DIR
 import os
@@ -35,7 +35,7 @@ def test_process_mbank():
 
     # Process mbank workflow
     with mock.patch('builtins.input', side_effect=['1','1','1','yes']):  # Mocks user input
-        run_process_workflow(format='mbank', path_data=data_path, path_csl=csl_copy_path)
+        process_data(format='mbank', path_data=data_path, path_csl=csl_copy_path)
 
     # Connect to CSL database
     session = create_session(path_csl=csl_copy_path)

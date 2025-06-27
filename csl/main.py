@@ -14,9 +14,9 @@
 # """
 
 from argparse import ArgumentParser, Namespace
-from csl.main_functions.process import run_process_workflow
-from csl.main_functions.export import run_export_workflow
-from csl.main_functions.rtscan import run_rtscan_workflow
+from csl.main_functions.process import process_data
+from csl.main_functions.export import export_data
+from csl.main_functions.rtscan import scan_rt
 from tkinter import Tk
 from tkinter.filedialog import askopenfilenames
 
@@ -84,13 +84,13 @@ def main():
                 print("No files selected. Exiting.")
                 exit(1)
             args.data_path = file_paths
-        run_process_workflow(args.format, args.csl_path, args.data_path)
+        process_data(args.format, args.csl_path, args.data_path)
 
     elif args.command == 'export':
-        run_export_workflow(args.format, args.csl_path, args.out_path, args.subset)
+        export_data(args.format, args.csl_path, args.out_path, args.subset)
 
     elif args.command == 'rtscan':
-        run_rtscan_workflow(args.operation, args.csl_path)
+        scan_rt(args.operation, args.csl_path)
 
 if __name__ == "__main__":
     main()
