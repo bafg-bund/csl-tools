@@ -37,6 +37,8 @@ def test_update_version_filename(filename, update_type, year, expected_updated_f
                          [('CSL_v24.0.4.db', '24.0.4'),
                           ('CSL_v0.db', '0'),
                           ('CSL_v25.1_subset.db', '25.1'),
+                          ('CSL_v25.1-subset.db', '25.1'),
+                          ('CSL_v25.1-subset_1.2.db', '25.1'),
                           ('CSL_v25.1test.db', '25.1'),
                           ('CSL_v0sub_test.db', '0'),
                           ('C:User/user/CSL_v2.8_test/CSL_v25.7.db', '25.7')
