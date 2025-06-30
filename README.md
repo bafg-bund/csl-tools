@@ -140,7 +140,7 @@ csl export [format] [path_csl] [path_out]
   - `sqlite`: SQLite export format (used to subset the CSL by a specific data source).
 - [path_csl]: Path to the CSL file.
 - [path_out]: Path to the directory where the exported file(s) will be saved.
-- [subset]: (Optional) Data source (institution) for subsetting the CSL data before exporting. Choose from:
+- [subset]: (Optional) Data source(s) for subsetting the CSL data before exporting. Choose one or more from:
   - `bfg`: BfG (Federal Institute of Hydrology)
   - `lfuby`: LfU Bayern (Bavarian Environment Agency)
   - `uba`: UBA (Federal Environment Agency)
@@ -149,13 +149,22 @@ csl export [format] [path_csl] [path_out]
   - `all`: No subsetting (Default)
 
 #### Example
-Exports all CSL-files from the data source 'bfg' into the MassBank format.
+Exports CSL-files from the data source 'bfg' into the MassBank format.
 ```
 csl export mbank path/to/CSL.db path/to/output_dir bfg
 ```
 ```python
 from csl import export_data
 export_data(format='mbank', path_csl='path/to/CSL.db', path_out='path/to/output_dir', subset='bfg')
+```
+
+Exports CSL-files from the data sources 'bfg' and 'uba' into the MSP/NIST format.
+```
+csl export thermo path/to/CSL.db path/to/output_dir bfg uba
+```
+```python
+from csl import export_data
+export_data(format='thermo', path_csl='path/to/CSL.db', path_out='path/to/output_dir', subset=['bfg', 'uba'])
 ```
 
 Exports all CSL-files into the MSP/NIST format.

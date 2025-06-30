@@ -17,7 +17,7 @@ class SqliteExport(FormatExport):
         logger.info('Executing export workflow for creating a CSL subset (sqlite workflow)')
 
         # Generate the output file name based on the csl file and the subset information
-        fname = f"{Path(self.path_csl).stem}-{self.subset}.db"
+        fname = f"{Path(self.path_csl).stem}-{'-'.join(self.subset)}.db"
         fpath_out = os.path.join(self.path_out, fname)
 
         # Connect to the CSL database

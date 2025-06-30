@@ -60,8 +60,8 @@ export_parser.add_argument('path_out', type=str, help='Path to the directory whe
                                                       'For mbank format: Use path of local clone of '
                                                       'https://github.com/MassBank/MassBank-data/tree/dev/BAFG '
                                                       'to check the existing MassBank ACCESSION strings from file names.')
-export_parser.add_argument('subset', type=str, nargs='?', choices=['lfuby', 'bfg', 'uba', 'lanuk', 'lubw', 'all'],
-                            default= 'all', help='(Optional) Data source (institution) for subsetting the CSL data '
+export_parser.add_argument('subset', type=str, nargs='*', choices=['lfuby', 'bfg', 'uba', 'lanuk', 'lubw', 'all'],
+                            default= 'all', help='(Optional) Choose data source(s) for subsetting the CSL data '
                                                  'before exporting (choices: lfuby, bfg, uba, lanuk, lubw, all; '
                                                  'Default: all)')
 

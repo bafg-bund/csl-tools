@@ -1,6 +1,9 @@
 from csl.export_functions.utils.export_utils import *
+from config import ROOT_DIR
+from csl.utils.sql_utils import create_session
 import pytest
 from unittest.mock import patch, Mock, MagicMock
+import os
 
 
 @pytest.mark.parametrize("adduct_form, expected_precursor_charge",
@@ -100,3 +103,21 @@ def test_get_contributors_copyright(exp_group, year, expected_inst_copyright):
         _, inst_copyright, _, _ = get_contributors_copyright(exp_group)
         # Assert
         assert inst_copyright == expected_inst_copyright
+
+@pytest.mark.parametrize("data_source, expected_exp_id",
+                         [('all', [1, 14166, 34937]),
+                          ('bfg', [1]),
+                          (['bfg', 'uba'], [1, 34937]),
+                          ])
+def test_get_experiment_ids_by_exp_group(data_source, expected_exp_id):
+    """Tests if the function returns the expected experiment ids."""
+
+    # Prepare
+    csl_path = os.path.join(ROOT_DIR, 'tests/integration/fixtures/sqlite_testfiles/CSL_v0_export_1bfg_1lfuby_1uba.db')
+    session = create_session(csl_path)
+
+    # Run function
+    exp_id = get_experiment_ids_by_exp_group(session, data_source)
+
+    # Assert
+    assert exp_id == expected_exp_id

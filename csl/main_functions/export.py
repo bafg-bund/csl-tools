@@ -31,15 +31,15 @@ WORKFLOWS = {
 }
 
 
-def export_data(format: str, path_csl: str, path_out: str, subset: str = 'all'):
+def export_data(format: str, path_csl: str, path_out: str, subset: str or list[str] = 'all'):
     """
     Executes the appropriate workflow for exporting CSL data as various formats.
 
     Args:
-        format (str)     : Export format.
-        path_csl (str)   : Path to the CSL file.
-        path_out (str)   : Path to export directory.
-        subset (str)     : Data source (institution), used to subset the CSL data before exporting.
+        format (str)              : Export format.
+        path_csl (str)            : Path to the CSL file.
+        path_out (str)            : Path to export directory.
+        subset (str or list[str]) : Data source(s), used to subset the CSL data before exporting.
     """
 
     # Validate the provided file paths

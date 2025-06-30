@@ -20,8 +20,9 @@ def get_experiment_ids_by_exp_group(session, data_source):
     Get experiment IDs from the CSL. Can be subset by data source.
 
     Args:
-        session (obj)     : SQLAlchemy session object connected to the CSL database.
-        data_source (str) : Corresponds to ExperimentGroup in CSL (e.g., 'bfg'), or 'all' for all experiment IDs.
+        session (obj)                  : SQLAlchemy session object connected to the CSL database.
+        data_source (str or list[str]) : One or more data sources (e.g., ['bfg', 'uba'] or 'all').
+                                         Corresponds to ExperimentGroup in CSL.
 
     Returns:
         experiment_ids (list of int) :  Experiment IDs of the data entries (experiments) in the CSL.
@@ -33,14 +34,21 @@ def get_experiment_ids_by_exp_group(session, data_source):
         experiment_ids = session.query(Experiment.experiment_id).all()
         experiment_ids = [exp_id[0] for exp_id in experiment_ids]  # Convert to a flat list
     else:
+        # Normalize input to list
+        if isinstance(data_source, str):
+            data_source = [data_source]
+
         # Get experiment IDs based on subset (query at specific ExperimentGroup name)
         inst_notation_pairs = inst_code_csl_mapping()
+        group_names = [inst_notation_pairs[d_src] for d_src in data_source]
+
         stmt = (
             select(Experiment.experiment_id)
             .join(expGroupExp, Experiment.experiment_id == expGroupExp.c.experiment_id)
             .join(ExperimentGroup, expGroupExp.c.experimentGroup_id == ExperimentGroup.experimentGroup_id)
-            .where(ExperimentGroup.name == inst_notation_pairs[data_source])
+            .where(ExperimentGroup.name.in_(group_names))
         )
+
         # Execute the query
         experiment_ids = session.execute(stmt).scalars().all()
     return experiment_ids
