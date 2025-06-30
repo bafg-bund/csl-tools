@@ -42,13 +42,12 @@ class EnviExport(FormatExport):
         logger.info("Starting CSL data export")
 
         # Generate the output file name based on the CSL version and the current date
-        data_source = self.subset
         csl_version = get_csl_version(self.path_csl)
         date_code = datetime.now().strftime("%y%m%d")
 
         envi_filter_def = default_sql_query_filter_envi()
         fragment_cutoff_percent = envi_filter_def['fragment_cutoff_percent_def']
-        fname = f"ENVI-{data_source}-CSLv{csl_version}-cutoff{str(fragment_cutoff_percent)}perc-{date_code}.txt"
+        fname = f"ENVI-{'-'.join(self.subset)}-CSLv{csl_version}-cutoff{str(fragment_cutoff_percent)}perc-{date_code}.txt"
         fpath_out = os.path.join(self.path_out, fname)
 
         # Get csl data based on query filters

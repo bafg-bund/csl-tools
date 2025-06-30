@@ -30,10 +30,9 @@ class ThermoExport(FormatExport):
         chrom_method = "dx.doi.org/10.1016/j.chroma.2015.11.014"  # Todo: needs to be a command
 
         # Generate the output file name based on the CSL version and the current date
-        data_source = self.subset
         csl_version = get_csl_version(self.path_csl)
         date_code = datetime.now().strftime("%y%m%d")
-        fname = f"THERMO-{data_source}-CSLv{csl_version}-{date_code}.msp"
+        fname = f"THERMO-{'-'.join(self.subset)}-CSLv{csl_version}-{date_code}.msp"
         fpath_out = os.path.join(self.path_out, fname)
 
         # Initialize a list to accumulate data for batch writing
