@@ -33,7 +33,7 @@ def sql_query_with_filters_envi(session, chrom_method):
         .filter(
             and_(
                 Parameter.CE.between(ce_filter[0], ce_filter[1]),
-                Parameter.CES >= ces_filter,
+                Parameter.CES.between(ces_filter[0], ces_filter[1]),
                 # Parameter.instrument.in_(instrument_filter),  # Filtering by instrument not needed currently
                 RetentionTime.chrom_method == chrom_method,
             )

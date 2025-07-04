@@ -15,8 +15,8 @@ def default_sql_query_filter_envi():
     """
     envi_default_filter_config = {
         'fragment_cutoff_percent_def': 20,  # Intensity cutoff as a percentage of the maximum intensity (%)
-        'ce_def': [0, 60],                  # Collision energy filter range
-        'ces_def': 0,                       # Collision energy spread lower threshold
+        'ce_def': [0, 60],                  # Collision energy filter range (inclusive)
+        'ces_def': [0, 0],                  # Collision energy spread range (inclusive)
         'tolerance_def': 0.015,             # Tolerance for identifying duplicate fragments (Da)
     }
     return envi_default_filter_config
