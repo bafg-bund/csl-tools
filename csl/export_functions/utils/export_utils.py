@@ -34,7 +34,7 @@ def get_experiment_ids_by_exp_group(session, data_source):
         experiment_ids = session.query(Experiment.experiment_id).all()
         experiment_ids = [exp_id[0] for exp_id in experiment_ids]  # Convert to a flat list
     else:
-        # Normalize input to list
+        # Normalize to list
         if isinstance(data_source, str):
             data_source = [data_source]
 
@@ -51,6 +51,32 @@ def get_experiment_ids_by_exp_group(session, data_source):
 
         # Execute the query
         experiment_ids = session.execute(stmt).scalars().all()
+    return experiment_ids
+
+
+def get_experiment_ids_by_chrom_method(session, chrom_method):
+    """
+    Get experiment IDs from the CSL. Can be subset by chrom. method.
+
+    Args:
+        session (obj)      : SQLAlchemy session object connected to the CSL database.
+        chrom_method (str) : Chromatographic method (e.g., 'uba_nts_rp1').
+                             Corresponds to chrom_method in table retention_time in CSL.
+
+    Returns:
+        experiment_ids (list of int) :  Experiment IDs of the data entries (experiments) in the CSL.
+    """
+    from sqlalchemy import select
+
+    stmt = (
+        select(Experiment.experiment_id)
+        .join(Experiment.compound)  # Join Experiment → Compound
+        .join(Compound.retention_times)  # Join Compound → RetentionTime
+        .where(RetentionTime.chrom_method == chrom_method)
+    )
+
+    # Execute the query
+    experiment_ids = session.execute(stmt).scalars().all()
     return experiment_ids
 
 

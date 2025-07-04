@@ -14,12 +14,10 @@ def default_sql_query_filter_envi():
         envi_default_filter_config (dict) : Dictionary containing default filter configuration.
     """
     envi_default_filter_config = {
-        'fragment_cutoff_percent_def': 20,              # Intensity cutoff as a percentage of the maximum intensity (%)
-        'ce_def': [35, 40],                             # Collision energy filter range
-        'ces_def': 0,                                   # Collision energy spread lower threshold
-        'instrument_def':                               # Instrument type filter
-            ['LC-ESI-QTOF TripleTOF 5600 SCIEX', 'LC-ESI-QTOF TripleTOF 6600 SCIEX'],
-        'chrom_method_def': 'dx.doi.org/10.1016/j.chroma.2015.11.014'  # Chromatographic method filter
+        'fragment_cutoff_percent_def': 20,  # Intensity cutoff as a percentage of the maximum intensity (%)
+        'ce_def': [0, 60],                  # Collision energy filter range
+        'ces_def': 0,                       # Collision energy spread lower threshold
+        'tolerance_def': 0.015,             # Tolerance for identifying duplicate fragments (Da)
     }
     return envi_default_filter_config
 
