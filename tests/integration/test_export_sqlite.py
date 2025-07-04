@@ -10,7 +10,7 @@ from pathlib import Path
 def test_export_sqlite_bfg():
     """Tests correct export of CSL subset only with BfG experiments."""
     # Prepare paths
-    csl_path = os.path.join(ROOT_DIR,'tests/integration/fixtures/sqlite_testfiles/CSL_v0_export_1bfg_1lfuby_1uba.db')
+    csl_path = os.path.join(ROOT_DIR,'tests/fixtures/export/CSL_v0_export_sqlite_1bfg_1lfuby_1uba.db')
     out_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 
     # Create out_path folder if necessary

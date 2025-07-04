@@ -110,10 +110,10 @@ def test_get_contributors_copyright(exp_group, year, expected_inst_copyright):
                           (['bfg', 'uba'], [1, 34937]),
                           ])
 def test_get_experiment_ids_by_exp_group(data_source, expected_exp_id):
-    """Tests if the function returns the expected experiment ids."""
+    """Tests if the function returns the expected experiment ids based on data source filtering."""
 
     # Prepare
-    csl_path = os.path.join(ROOT_DIR, 'tests/integration/fixtures/sqlite_testfiles/CSL_v0_export_1bfg_1lfuby_1uba.db')
+    csl_path = os.path.join(ROOT_DIR, 'tests/fixtures/export/CSL_v0_export_sqlite_1bfg_1lfuby_1uba.db')
     session = create_session(csl_path)
 
     # Run function
@@ -121,3 +121,23 @@ def test_get_experiment_ids_by_exp_group(data_source, expected_exp_id):
 
     # Assert
     assert exp_id == expected_exp_id
+
+
+@pytest.mark.parametrize("chrom_method, expected_exp_id",
+                         [('dx.doi.org/10.1016/j.chroma.2015.11.014', [34030, 12249, 14224, 31447]),
+                          ('lfu_nts_rp1', [34030, 14224, 31447]),
+                          ('uba_nts_rp1', [14224, 31447]),
+                          ('lanuv_nts', [31447]),
+                          ])
+def test_get_experiment_ids_by_chrom_method(chrom_method, expected_exp_id):
+    """Tests if the function returns the expected experiment ids based on chrom. method filtering."""
+
+    # Prepare
+    csl_path = os.path.join(ROOT_DIR, 'tests/fixtures/csl_testfiles/CSL_v0_export_4expid_chrommethod.db')
+    session = create_session(csl_path)
+
+    # Run function
+    exp_id = get_experiment_ids_by_chrom_method(session, chrom_method)
+
+    # Assert
+    assert set(exp_id) == set(expected_exp_id)

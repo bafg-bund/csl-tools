@@ -11,7 +11,7 @@ from pathlib import Path
 def test_export_mbank_bfg():
     """Tests correct export of BfG experiments as MassBank documents."""
     # Prepare paths
-    csl_path = os.path.join(ROOT_DIR,'tests/integration/fixtures/sqlite_testfiles/CSL_v0_export_1bfg_1bfgIS_1lfuby_1uba.db')
+    csl_path = os.path.join(ROOT_DIR,'tests/fixtures/export/CSL_v0_export_mbank_1bfg_1bfgIS_1lfuby_1uba.db')
     out_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 
     # Create out_path folder if necessary

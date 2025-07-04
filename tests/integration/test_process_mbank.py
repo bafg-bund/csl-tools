@@ -12,9 +12,9 @@ def test_process_mbank():
     Tests correct processing of MassBank documents and import into the CSL.
     """
     # Prepare paths
-    data_path = os.path.join(ROOT_DIR, 'tests/integration/fixtures/mbank_testfiles')
-    csl_template_path = os.path.join(ROOT_DIR,'tests/integration/fixtures/sqlite_testfiles/CSL_v0_process_4entries.db')
-    csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_process_4entries.db')
+    data_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/mbank_testfiles')
+    csl_template_path = os.path.join(ROOT_DIR,'tests/fixtures/import/CSL_v0_4entries.db')
+    csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_4entries.db')
     temp_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 
     # Create temp_path folder if necessary
