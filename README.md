@@ -82,7 +82,7 @@ The package provides both a Command-Line Interface (CLI) and a Python API for op
 
 After installation, you can run the CLI using:
 ```
-csl [command] [options]
+csl <command> <arguments>
 ```
 Alternatively, use the functions directly in Python:
 ```python
@@ -103,17 +103,17 @@ You can either run the tools via terminal commands or import and run the corresp
 ### `process`
 Processes MS2 data files from a specified format and imports data into the CSL.
 ```
-csl process [format] [path_csl] [path_data]
+csl process <format> <path_csl> <path_data>
 ```
 
 #### Arguments
-- [format]: Specify import format. Choose from:
+- `format`: Specify import format. Choose from:
   - `mbank`: MassBank documents.
   - `lfuby`: LfU Bayern import format (ThermoFisher/mzVault).
-  - `lubw`: LUBW import format (ThermoFisher/mzVault).
+  - `lubw` : LUBW import format (ThermoFisher/mzVault).
   - `lanuk`: LANUK import format (SCIEX/LibraryView) (not implemented).
-- [path_csl]: Path to the CSL file.
-- [path_data]: (Optional) Path to the data file or directory (Default: Opens dialog to select files)').
+- `path_csl`: Path to the CSL file.
+- `path_data`: (Optional) Path to the data file or directory (Default: Opens dialog to select files)').
 
 #### Examples
 Process data from the Bavarian Environment Agency (LfU).
@@ -129,18 +129,18 @@ process_data(format='thermo', path_csl='path/to/CSL.db', path_data='path/to/data
 ### `export`
 Exports the CSL to the specified format.  
 ```
-csl export [format] [path_csl] [path_out]
+csl export <format> <path_csl> <path_out> <subset>
 ```
 
 #### Arguments
-- [format]: Specify the export format. Choose from:
+- `format`: Specify the export format. Choose from:
   - `thermo`: MSP/NIST export format (e.g., for mzVault).
-  - `envi`: enviMass export format.
-  - `mbank`: MassBank export format.
+  - `envi`  : enviMass export format.
+  - `mbank` : MassBank export format.
   - `sqlite`: SQLite export format (used to subset the CSL by a specific data source).
-- [path_csl]: Path to the CSL file.
-- [path_out]: Path to the directory where the exported file(s) will be saved.
-- [subset]: (Optional) Data source(s) for subsetting the CSL data before exporting. Choose one or more from:
+- `path_csl`: Path to the CSL file.
+- `path_out`: Path to the directory where the exported file(s) will be saved.
+- `subset`: (Optional) Data source(s) for subsetting the CSL data before exporting. Choose one or more from:
   - `bfg`: BfG (Federal Institute of Hydrology)
   - `lfuby`: LfU Bayern (Bavarian Environment Agency)
   - `uba`: UBA (Federal Environment Agency)
@@ -179,14 +179,14 @@ export_data(format='thermo', path_csl='path/to/CSL.db', path_out='path/to/output
 ### `rtscan`
  Operates on retention-time data stored in the CSL.  
 ```
-csl rtscan [operation] [path_csl]
+csl rtscan <operation> <path_csl>
 ```
 
 #### Arguments
-- [operation]: Specify the operation. Choose from:
+- `operation`: Specify the operation. Choose from:
   - `update`: Calculates missing non-experimental retention times based on available experimental data (currently broken).
   - `recalc`: Re-calculates all non-experimental retention times based on available experimental data (not implemented yet).
-- [path_csl]: Path to CSL file.
+- `path_csl`: Path to CSL file.
 
 #### Example
 ```

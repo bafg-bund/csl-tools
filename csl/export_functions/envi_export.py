@@ -1,3 +1,4 @@
+from config import DEFAULT_PAIRS_INST_CHROM
 from csl.export_functions.format_export import FormatExport
 from csl.export_functions.utils import *
 from csl.utils.sql_utils import create_session
@@ -6,20 +7,7 @@ from csl.utils.file_utils import get_csl_version
 
 class EnviExport(FormatExport):
     def export(self):
-        """
-        Workflow to export CSL data as a target list usable for enviMass.
-
-        This function loads the default configuration, conducts a CSL query to collect relevant data, processes the CSL
-        data, formats it according to the enviMass target list, and then exports the formatted data to a text file.
-
-        Todo: Filtering by other data sources beside 'bfg' (e.g. lfuby, lubw) currently does not work, as it filtering
-             is done always for the bfg method (dx.doi.org/10.1016/j.chroma.2015.11.014) which is imported from
-             the default settings (envi_config). Therefore, using the data source 'lfuby' will return an empty file.
-             Options: a) Filtering only by methods; b) Filtering by data sources for all methods;
-                    What is needed?
-
-        Todo: Unit and integration tests
-        """
+        """Workflow to export CSL data as a target list usable for enviMass."""
 
         import os.path
         from datetime import datetime
