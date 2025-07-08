@@ -1,5 +1,4 @@
 from csl.export_functions.utils import *
-from csl.utils.sql_utils import inst_code_csl_mapping
 from csl.config import DEFAULT_PAIRS_INST_CHROM
 
 from dataclasses import dataclass
@@ -176,13 +175,12 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VE
     date = datetime.now().strftime('%Y.%m.%d')
 
     # Comments
-    inst_notation_pairs = inst_code_csl_mapping()
     all_methods = DEFAULT_PAIRS_INST_CHROM
     comment_chunk = \
         (f"COMMENT: CONFIDENCE Reference Standard (Level 1)\n"
          f"COMMENT: Chromatography method: {chrom_method}\n"
          )
-    if inst_notation_pairs['bfg'] in sql_data.exp_groups:
+    if 'bfg' in sql_data.exp_groups:
         comment_chunk += f"COMMENT: Acquisition method: 10.1002/rcm.8541\n"
 
     # Chromatography

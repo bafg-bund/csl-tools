@@ -18,10 +18,8 @@ class UpdateRtscan(OperationRtscan):
         logger = logging.getLogger(__name__)
         logger.info('Executing update rtscan workflow')
 
-        # Blend a new dictionary that maps of institution notation and method notation for CSL queries
-        all_methods = DEFAULT_PAIRS_INST_CHROM
-        inst_notation_pairs = inst_code_csl_mapping()
-        inst_method_pairs = {inst_notation_pairs[key]: all_methods[key] for key in all_methods}
+        # Load institution notation and method notation for CSL queries
+        inst_method_pairs = DEFAULT_PAIRS_INST_CHROM
 
         # Functions for predicting RTs between institutions
         # Models need to be updated when institution are added, or when existing notations are modified.
@@ -33,10 +31,10 @@ class UpdateRtscan(OperationRtscan):
         def pred_rt_lanuk_bfg(rt_lanuk): return round(gam_lb.predict(rt_lanuk)[0], 3)
         def pred_rt_bfg_lfu(rt_bfg): return rt_bfg
         def pred_rt_lfu_bfg(rt_lfu): return rt_lfu
-        models_from_bfg = {inst_notation_pairs['uba']: pred_rt_bfg_uba, inst_notation_pairs['lfuby']: pred_rt_bfg_lfu,
-                           inst_notation_pairs['lanuk']: pred_rt_bfg_lanuk}
-        models_to_bfg = {inst_notation_pairs['uba']: pred_rt_uba_bfg, inst_notation_pairs['lfuby']: pred_rt_lfu_bfg,
-                         inst_notation_pairs['lanuk']: pred_rt_lanuk_bfg}
+        models_from_bfg = {'uba': pred_rt_bfg_uba, 'lfuby': pred_rt_bfg_lfu,
+                           'lanuk': pred_rt_bfg_lanuk}
+        models_to_bfg = {'uba': pred_rt_uba_bfg, 'lfuby': pred_rt_lfu_bfg,
+                         'lanuk': pred_rt_lanuk_bfg}
 
         # Get list of institutions in order of importance to predict BfG RT
         check_order = check_order_pred_bfg_rt()
@@ -69,8 +67,7 @@ class UpdateRtscan(OperationRtscan):
             inst_rt, inst_exp_rt, inst_pred_rt = get_inst_rt_info(uq_comp_id, session, inst_method_pairs)
 
             # Check experimental RT data
-            dupl, pred_to_false, no_exp_rt = check_experimental_data(
-                uq_comp_id, inst_exp_rt, session, inst_method_pairs)
+            dupl, pred_to_false, no_exp_rt = check_experimental_data(uq_comp_id, inst_exp_rt, session, inst_method_pairs)
             dupl_all.append(dupl)
             pred_to_false_all.append(pred_to_false)
             no_exp_rt_all.append(no_exp_rt)
@@ -80,19 +77,18 @@ class UpdateRtscan(OperationRtscan):
             pred_to_true_all.append(pred_to_true)
 
             # Check predicted RT data and predict missing RTs
-            if not inst_notation_pairs['bfg'] in inst_rt:
+            if not 'bfg' in inst_rt:
                 # Predict BfG RT if it doesn't exist yet and add entry to session
-                rt_bfg_pred = predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt,
-                                             inst_method_pairs, inst_notation_pairs)
+                rt_bfg_pred = predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, inst_method_pairs)
                 if rt_bfg_pred:
                     # Add BfG to the list of institutions with available RTs
-                    inst_rt.append(inst_notation_pairs['bfg'])
+                    inst_rt.append('bfg')
                     pred_to_bfg_all.append(uq_comp_id)
 
             inst_miss_rt = list(set(inst_method_pairs.keys()) - set(inst_rt))  # Get list of institutions without any RT
             for inst in inst_miss_rt:
                 # Predict the RTs for all other institution without any RT
-                rt_pred = predict_rt(uq_comp_id, session, models_from_bfg, inst, inst_method_pairs, inst_notation_pairs)
+                rt_pred = predict_rt(uq_comp_id, session, models_from_bfg, inst, inst_method_pairs)
                 if rt_pred:
                     pred_from_bfg_all.append(uq_comp_id)
                 else:

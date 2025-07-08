@@ -17,7 +17,6 @@
 #   → Define in var_fix_<institution>.
 
 from csl.config import DEFAULT_PAIRS_INST_CHROM
-from csl.utils.sql_utils import inst_code_csl_mapping
 
 def var_regex_lanuk():
     """
@@ -45,7 +44,6 @@ def var_fix_lanuk():
     The information is currently fixed for this format or does not appear in the data files (can't be extracted).
     """
     all_methods = DEFAULT_PAIRS_INST_CHROM
-    inst_notation_pairs = inst_code_csl_mapping()
 
     lanuk_var_fix = {
         'var_chrom_method': all_methods['lanuk'],      # Chromatographic method
@@ -61,8 +59,8 @@ def var_fix_lanuk():
         'var_inchi': None,                             # InChI
         'var_instrument_type': None,                   # Instrument type # todo: see below
         'var_accession': None,                         # Accession string (used in MassBank)
-        'var_expg_csl': inst_notation_pairs['lanuk'],  # Default label for experimentGroup.name in CSL
-        'var_compg_csl': inst_notation_pairs['lanuk'], # Default label for compoundGroup.name in CSL
+        'var_expg_csl': 'lanuk',                       # Default label for experimentGroup.name in CSL
+        'var_compg_csl': 'lanuk',                      # Default label for compoundGroup.name in CSL
     }
     return lanuk_var_fix
 

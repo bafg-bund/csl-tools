@@ -3,16 +3,15 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 
-def test_get_inst_rt_info(mock_session, mock_inst_method_pairs, mock_inst_notation_pairs):
+def test_get_inst_rt_info(mock_session, mock_inst_method_pairs):
     """ Test that the function returns the expected institution strings."""
     # Prepare function inputs and return values
     uq_comp_id = 1000
     mock_session.query(RetentionTime.chrom_method).filter_by().all.return_value = [('method_a',), ('method_b',)]
     mock_session.query(ExperimentGroup).join().join().filter().all.return_value = ['inst_a_ExpGroup']
-    mock_pairs = {mock_inst_notation_pairs[key]: mock_inst_method_pairs[key] for key in mock_inst_method_pairs}
 
     # Call the function
-    inst_rt, inst_exp_rt, inst_pred_rt = get_inst_rt_info(uq_comp_id, mock_session, mock_pairs)
+    inst_rt, inst_exp_rt, inst_pred_rt = get_inst_rt_info(uq_comp_id, mock_session, mock_inst_method_pairs)
 
     # Assert
     assert inst_rt == ['inst_a', 'inst_b']
@@ -27,7 +26,7 @@ def test_get_inst_rt_info(mock_session, mock_inst_method_pairs, mock_inst_notati
                           (['inst_a'], 2, 0, 'FALSE', 'FALSE', [99], []),  # Duplicate entries for one institution
                           (['inst_a'], 1, 1, 'TRUE', 'FALSE', [], [99])  # Predicted flag is incorrect
                           ])
-def test_check_experimental_data(mock_session, mock_inst_method_pairs, mock_inst_notation_pairs, mock_inst,
+def test_check_experimental_data(mock_session, mock_inst_method_pairs, mock_inst,
                                  mock_entry_count, expected_query_call_count, mock_pred_bool, expected_pred_bool,
                                  expected_dupl, expected_pred_to_false):
     """Parametrized test to check different scenarios."""
@@ -38,11 +37,10 @@ def test_check_experimental_data(mock_session, mock_inst_method_pairs, mock_inst
     mock_rt_res = MagicMock(spec=RetentionTime)
     mock_rt_res.predicted = mock_pred_bool
     mock_session.query(RetentionTime).filter_by().one_or_none.return_value = mock_rt_res
-    mock_pairs = {mock_inst_notation_pairs[key]: mock_inst_method_pairs[key] for key in mock_inst_method_pairs}
 
     # Call the function
     dupl, pred_to_false, no_exp_rt = check_experimental_data(
-    uq_comp_id, mock_inst_exp_rt, mock_session, mock_pairs)
+    uq_comp_id, mock_inst_exp_rt, mock_session, mock_inst_method_pairs)
 
     # Assert
     assert dupl == expected_dupl
@@ -52,18 +50,17 @@ def test_check_experimental_data(mock_session, mock_inst_method_pairs, mock_inst
     assert mock_session.query().filter_by().one_or_none.call_count == expected_query_call_count
 
 
-def test_check_experimental_data_no_exp_rt(mock_session, mock_inst_method_pairs, mock_inst_notation_pairs):
+def test_check_experimental_data_no_exp_rt(mock_session, mock_inst_method_pairs):
     """Test case when no RT is found for an experimental data entry."""
     # Prepare function inputs and return values
     uq_comp_id = 99
     mock_inst_exp_rt = ['inst_a']
     mock_session.query(RetentionTime).filter_by().count.return_value = 0
     mock_session.query(RetentionTime).filter_by().one_or_none.return_value = None
-    mock_pairs = {mock_inst_notation_pairs[key]: mock_inst_method_pairs[key] for key in mock_inst_method_pairs}
 
     # Call the function
     dupl, pred_to_false, no_exp_rt = check_experimental_data(
-    uq_comp_id, mock_inst_exp_rt, mock_session, mock_pairs)
+    uq_comp_id, mock_inst_exp_rt, mock_session, mock_inst_method_pairs)
 
     # Assert
     assert dupl == []
@@ -73,8 +70,7 @@ def test_check_experimental_data_no_exp_rt(mock_session, mock_inst_method_pairs,
 
 
 @pytest.mark.parametrize("predicted_flag, expected_pred_to_true", [('TRUE', []), ('FALSE', [99]), (None, [99])])
-def test_check_predicted_flags_pred_data(mock_session, mock_inst_method_pairs, mock_inst_notation_pairs, predicted_flag,
-                                         expected_pred_to_true):
+def test_check_predicted_flags_pred_data(mock_session, mock_inst_method_pairs, predicted_flag, expected_pred_to_true):
     """Test that "predicted" flags are corrected as expected."""
     # Prepare function inputs and return values
     uq_comp_id = 99
@@ -82,26 +78,26 @@ def test_check_predicted_flags_pred_data(mock_session, mock_inst_method_pairs, m
     mock_return = MagicMock()
     mock_return.predicted = predicted_flag
     mock_session.query().filter_by().one_or_none.return_value = mock_return
-    mock_pairs = {mock_inst_notation_pairs[key]: mock_inst_method_pairs[key] for key in mock_inst_method_pairs}
 
     # Call the function
-    pred_to_true = check_predicted_flags_pred_data(uq_comp_id, mock_inst_pred_rt, mock_session, mock_pairs)
+    pred_to_true = check_predicted_flags_pred_data(uq_comp_id, mock_inst_pred_rt, mock_session, mock_inst_method_pairs)
 
     # Assert
     assert pred_to_true == expected_pred_to_true
 
 
-def test_predict_bfg_rt(mock_session, mock_models_to_bfg, mock_inst_method_pairs, mock_inst_notation_pairs):
+def test_predict_bfg_rt(mock_session, mock_models_to_bfg, mock_inst_method_pairs):
     """Test that the BfG retention time (RT) was predicted correctly and the expected model was used."""
     # Prepare function inputs and return values
-    mock_check_order = ['lfuby', 'uba']  # Order of preference
+    mock_check_order = ['inst_c', 'inst_b']  # Order of preference
     mock_inst_rt = ['inst_b', 'inst_c']  # Available institutions with RTs
     mock_session.query().filter_by().one_or_none.return_value = [15.0]
-    mock_pairs = {mock_inst_notation_pairs[key]: mock_inst_method_pairs[key] for key in mock_inst_method_pairs}
+    # Add 'bfg' to method pairs
+    mock_inst_method_pairs['bfg'] = 'method_a'
 
     # Call the function
     predicted_rt = predict_bfg_rt(99, mock_session, mock_models_to_bfg, mock_check_order, mock_inst_rt,
-                                  mock_pairs, mock_inst_notation_pairs)
+                                  mock_inst_method_pairs)
 
     # Assert
     assert predicted_rt == 7.0
@@ -109,31 +105,30 @@ def test_predict_bfg_rt(mock_session, mock_models_to_bfg, mock_inst_method_pairs
     mock_session.add.assert_called_once()  # Check if the RT was added to the session
 
 
-def test_predict_bfg_rt_none(mock_session, mock_models_to_bfg, mock_inst_method_pairs, mock_inst_notation_pairs):
+def test_predict_bfg_rt_none(mock_session, mock_models_to_bfg, mock_inst_method_pairs):
     """Test that the BfG retention time (RT) was not predicted due to missing available institutions with RT data."""
     # Prepare function inputs and return values
-    mock_check_order = ['lfuby', 'uba']  # Order of preference
+    mock_check_order = ['inst_c', 'inst_b']  # Order of preference
     mock_inst_rt = []  # No available institutions with RTs
-    mock_pairs = {mock_inst_notation_pairs[key]: mock_inst_method_pairs[key] for key in mock_inst_method_pairs}
 
     # Call the function
     predicted_rt = predict_bfg_rt(99, mock_session, mock_models_to_bfg, mock_check_order, mock_inst_rt,
-                                  mock_pairs, mock_inst_notation_pairs)
+                                  mock_inst_method_pairs)
 
     # Assert
     assert predicted_rt is None
 
 
-def test_predict_rt(mock_session, mock_models_from_bfg, mock_inst_method_pairs, mock_inst_notation_pairs):
+def test_predict_rt(mock_session, mock_models_from_bfg, mock_inst_method_pairs):
     """Test that the retention time (RT) was predicted correctly and the expected model was used."""
     # Prepare function inputs and return values
     mock_inst_str = 'inst_b'  # Institute that needs prediction of an RT
     mock_session.query().filter_by().one_or_none.return_value = [7.0]
-    mock_pairs = {mock_inst_notation_pairs[key]: mock_inst_method_pairs[key] for key in mock_inst_method_pairs}
+    # Add 'bfg' to method pairs
+    mock_inst_method_pairs['bfg'] = 'method_a'
 
     # Call the function
-    predicted_rt = predict_rt(99, mock_session, mock_models_from_bfg, mock_inst_str, mock_pairs,
-                              mock_inst_notation_pairs)
+    predicted_rt = predict_rt(99, mock_session, mock_models_from_bfg, mock_inst_str, mock_inst_method_pairs)
 
     # Assert
     assert predicted_rt == 12.5
@@ -141,16 +136,16 @@ def test_predict_rt(mock_session, mock_models_from_bfg, mock_inst_method_pairs, 
     mock_session.add.assert_called_once()  # Check if the RT was added to the session
 
 
-def test_predict_rt_none(mock_session, mock_models_from_bfg, mock_inst_method_pairs, mock_inst_notation_pairs):
+def test_predict_rt_none(mock_session, mock_models_from_bfg, mock_inst_method_pairs):
     """Test that the retention time (RT) was not predicted due to missing available BfG RT data."""
     # Prepare function inputs and return values
     mock_inst_str = 'inst_b'  # Institute that needs prediction of an RT
     mock_session.query().filter_by().one_or_none.return_value = None
-    mock_pairs = {mock_inst_notation_pairs[key]: mock_inst_method_pairs[key] for key in mock_inst_method_pairs}
+    # Add 'bfg' to method pairs
+    mock_inst_method_pairs['bfg'] = 'method_a'
 
     # Call the function
-    predicted_rt = predict_rt(99, mock_session, mock_models_from_bfg, mock_inst_str, mock_pairs,
-                              mock_inst_notation_pairs)
+    predicted_rt = predict_rt(99, mock_session, mock_models_from_bfg, mock_inst_str, mock_inst_method_pairs)
 
     # Assert
     assert predicted_rt is None
@@ -214,23 +209,20 @@ def test_commit_changes_choice_no_changes(mock_remove, mock_session, caplog):
     assert "No changes in current session detected." in caplog.text
 
 
-
-
 ### Examples for checking : Todo: use for pytests later..
 # Example 1 (BfG FALSE)
-# 3743	8.82194	lfu_nts_rp1	                            1443
-# 3555	16.85	lanuv_nts	                            1443	TRUE
-# 2159	9.147	dx.doi.org/10.1016/j.chroma.2015.11.014	1443	FALSE
+# 3743	8.82194	lfuby_nts_rp1	                            1443
+# 3555	16.85	lanuk_nts	                            1443	TRUE
+# 2159	9.147	bfg_nts	1443	FALSE
 
 # Example 2 (BfG TRUE)
-# 3854	13.31	dx.doi.org/10.1016/j.chroma.2015.11.014	1672	TRUE
+# 3854	13.31	bfg_nts	1672	TRUE
 # 3853	11.208	uba_nts_rp1	                            1672	FALSE
 
 # Example 3 (BfG missing)
 # 3851	5.703	uba_nts_rp1	    1670	FALSE
 
 # Example 4 (Only LfU, but with prediction = empty)
-# 3846	13.27532	lfu_nts_rp1	    1666
+# 3846	13.27532	lfuby_nts_rp1	    1666
 
 # uq_comp_ids = [1443, 1672, 1670, 1666]  # Todo: ..until here
-

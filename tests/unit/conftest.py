@@ -161,21 +161,10 @@ def mock_df_envi():
 def mock_inst_method_pairs():
     """Mock the mapping of institutions to chromatographic methods"""
     return {
-        'bfg': 'method_a',
-        'uba': 'method_b',
-        'lfuby': 'method_c',
-        'lanuk': 'method_d'
-    }
-
-
-@pytest.fixture
-def mock_inst_notation_pairs():
-    """Mock the mapping of institution code to CSL institution notation"""
-    return {
-        'bfg': 'inst_a',
-        'uba': 'inst_b',
-        'lfuby': 'inst_c',
-        'lanuk': 'inst_d'
+        'inst_a': 'method_a',
+        'inst_b': 'method_b',
+        'inst_c': 'method_c',
+        'inst_d': 'method_d'
     }
 
 

@@ -17,7 +17,6 @@
 #   → Define in var_fix_<institution>.
 
 from csl.config import DEFAULT_PAIRS_INST_CHROM
-from csl.utils.sql_utils import inst_code_csl_mapping
 
 def var_regex_lubw():
     """
@@ -48,7 +47,6 @@ def var_fix_lubw():
     The information is currently fixed for this format or does not appear in the data files (can't be extracted).
     """
     all_methods = DEFAULT_PAIRS_INST_CHROM
-    inst_notation_pairs = inst_code_csl_mapping()
 
     lubw_var_fix = {
         'var_chrom_method': all_methods['lubw'],      # Chromatographic method
@@ -59,8 +57,8 @@ def var_fix_lubw():
         'var_ionization': 'ESI',                      # Ionization type
         'var_adduct': None,                           # Adduct
         'var_inchi': None,                            # InChI
-        'var_expg_csl': inst_notation_pairs['lubw'],  # Default label for experimentGroup.name in CSL
-        'var_compg_csl': inst_notation_pairs['lubw'], # Default label for compoundGroup.name in CSL
+        'var_expg_csl': 'lubw',  # Default label for experimentGroup.name in CSL
+        'var_compg_csl': 'lubw', # Default label for compoundGroup.name in CSL
         'var_instrument_type': 'LC-ESI-Orbitrap',     # Instrument type
         'var_accession': None,                        # Accession string (used in MassBank)
     }

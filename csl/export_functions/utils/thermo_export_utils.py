@@ -144,11 +144,10 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_V
     accession = f"{exp_id}"
 
     # Comments
-    inst_notation_pairs = inst_code_csl_mapping()
     comment_chunk = "".join(filter(None, [
         f"COMMENT: CONFIDENCE Reference Standard (Level 1)\n",
         f"COMMENT: Chromatography method: {chrom_method}\n",
-        f"COMMENT: Acquisition method: 10.1002/rcm.8541\n" if inst_notation_pairs['bfg'] in sql_data.exp_groups else None,
+        f"COMMENT: Acquisition method: 10.1002/rcm.8541\n" if 'bfg' in sql_data.exp_groups else None,
         f"COMMENT: Export with csl-tools {CSLTOOLS_VERSION} and CSL {csl_version}\n"
         ]))
 

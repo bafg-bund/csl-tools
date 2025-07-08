@@ -3,16 +3,16 @@ from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Float, cre
 from sqlalchemy.schema import Table
 from sqlalchemy.pool import NullPool
 
-def inst_code_csl_mapping():
-    """
-    Provides mapping of institution code to institution notation as they appear in the CSL.
-    Needs to be updates when new institution notations are added, or when existing ones are updated.
-
-    Returns:
-        dict: Dictionary mapping institution codes to CSL institution notation.
-    """
-    # Todo: LUBW not in CSL yet
-    return {'bfg': 'BfG', 'uba': 'UBA', 'lfuby': 'LfU', 'lanuk': 'LANUK', 'lubw': 'LUBW'}
+# def inst_code_csl_mapping():
+#     """
+#     Provides mapping of institution code to institution notation as they appear in the CSL.
+#     Needs to be updates when new institution notations are added, or when existing ones are updated.
+#
+#     Returns:
+#         dict: Dictionary mapping institution codes to CSL institution notation.
+#     """
+#     # Todo: LUBW not in CSL yet
+#     return {'bfg': 'BfG', 'uba': 'UBA', 'lfuby': 'LfU', 'lanuk': 'LANUK', 'lubw': 'LUBW'}
 
 
 def create_session(path_csl):
@@ -101,7 +101,6 @@ class Parameter(Base):
     __tablename__ = 'parameter'
     # Primary key: parameter_id
     parameter_id = Column(Integer, primary_key=True)
-    # Todo: One-to-many relationship with Experiment missing?
     # Other columns
     instrument = Column(String, nullable=False)
     polarity = Column(String, nullable=False)
@@ -142,7 +141,7 @@ class Compound(Base):
 
 
 class RetentionTime(Base):
-    __tablename__ = 'retention_time'
+    __tablename__ = 'retentionTime'
     # Primary key: ret_time_id
     ret_time_id = Column(Integer, primary_key=True)
     # Many-to-one relationship with compound

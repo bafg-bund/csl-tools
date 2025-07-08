@@ -1,5 +1,4 @@
 from csl.process_functions.utils import *
-from csl.utils import inst_code_csl_mapping
 from csl.utils.sql_utils import create_session
 from csl.config import DEFAULT_PAIRS_INST_CHROM
 
@@ -52,6 +51,7 @@ class FormatProcess(ABC):
     # noinspection PyMethodMayBeStatic
     def add_fixed_variables(self, extract_data, var_fix):
         """Adds fixed information (specified in <institution>_config.py) to each entry."""
+        # Todo: See if this can be simplified
         import logging
         logger = logging.getLogger(__name__)
 
@@ -67,15 +67,15 @@ class FormatProcess(ABC):
                 extract_data_add[var[0]] = choice
                 logger.info(f"Chromatographic method: {choice}")
             elif not var[1] and var[0] == 'var_expg_csl':
-                options = inst_code_csl_mapping()
+                options = DEFAULT_PAIRS_INST_CHROM.keys()
                 message = 'Select the default value for the experiment group for the experiments to be added'
-                choice = get_user_choice(list(options.values()), message)
+                choice = get_user_choice(list(options), message)
                 extract_data_add[var[0]] = choice
                 logger.info(f"Default experiment group: {choice}")
             elif not var[1] and var[0] == 'var_compg_csl':
-                options = inst_code_csl_mapping()
+                options = DEFAULT_PAIRS_INST_CHROM.keys()
                 message = 'Select the default value for the compound group for the experiments to be added'
-                choice = get_user_choice(list(options.values()), message)
+                choice = get_user_choice(list(options), message)
                 extract_data_add[var[0]] = choice
                 logger.info(f"Default compound group: {choice}")
             else:

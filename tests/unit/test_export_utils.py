@@ -61,12 +61,12 @@ def test_get_compound_classes():
     """Tests if get_compound_classes returns only non-institutional compound classes in the MassBank specific format."""
     # Mock objects with a 'name' attribute
     compound_groups = [
-        Mock(name="BfG"),
+        Mock(name="bfg"),
         Mock(name="Industrial_process"),
         Mock(name="Pharmaceutical"),
     ]
     # Set the 'name' attribute for each Mock explicitly
-    for mock, value in zip(compound_groups, ["BfG", "Industrial_process", "Pharmaceutical"]):
+    for mock, value in zip(compound_groups, ["bfg", "Industrial_process", "Pharmaceutical"]):
         mock.name = value
     # Call the function
     compound_classes = get_compound_classes(compound_groups)
@@ -77,11 +77,11 @@ def test_get_compound_classes_none():
     """Tests if get_compound_classes returns None when input is only institutional compound classes."""
     # Mock objects with a 'name' attribute
     compound_groups = [
-        Mock(name="BfG"),
-        Mock(name="LfU"),
+        Mock(name="bfg"),
+        Mock(name="lfuby"),
     ]
     # Set the 'name' attribute for each Mock explicitly
-    for mock, value in zip(compound_groups, ["BfG", "LfU"]):
+    for mock, value in zip(compound_groups, ["bfg", "lfuby"]):
         mock.name = value
     # Call the function
     compound_classes = get_compound_classes(compound_groups)
@@ -89,9 +89,9 @@ def test_get_compound_classes_none():
 
 
 @pytest.mark.parametrize("exp_group, year, expected_inst_copyright",
-                         [('BfG', '2025', 'Copyright 2025 Federal Institute of Hydrology, Koblenz, Germany'),
-                          ('LfU', '2025', 'Copyright 2025 Bavarian Environment Agency, Augsburg, Germany'),
-                          ('UBA', '2025', 'Copyright 2025 Federal Environment Agency, Berlin, Germany'),
+                         [('bfg', '2025', 'Copyright 2025 Federal Institute of Hydrology, Koblenz, Germany'),
+                          ('lfuby', '2025', 'Copyright 2025 Bavarian Environment Agency, Augsburg, Germany'),
+                          ('uba', '2025', 'Copyright 2025 Federal Environment Agency, Berlin, Germany'),
                           ('not_an_institution', '2025', None)
                           ])
 def test_get_contributors_copyright(exp_group, year, expected_inst_copyright):
@@ -124,10 +124,10 @@ def test_get_experiment_ids_by_exp_group(data_source, expected_exp_id):
 
 
 @pytest.mark.parametrize("chrom_method, expected_exp_id",
-                         [('dx.doi.org/10.1016/j.chroma.2015.11.014', [34030, 12249, 14224, 31447]),
-                          ('lfu_nts_rp1', [34030, 14224, 31447]),
+                         [('bfg_nts_rp1', [34030, 12249, 14224, 31447]),
+                          ('lfuby_nts_rp1', [34030, 14224, 31447]),
                           ('uba_nts_rp1', [14224, 31447]),
-                          ('lanuv_nts', [31447]),
+                          ('lanuk_nts', [31447]),
                           ])
 def test_get_experiment_ids_by_chrom_method(chrom_method, expected_exp_id):
     """Tests if the function returns the expected experiment ids based on chrom. method filtering."""

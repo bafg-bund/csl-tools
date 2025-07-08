@@ -119,7 +119,7 @@ def check_predicted_flags_pred_data(uq_comp_id, inst_pred_rt, session, inst_meth
     return pred_to_true
 
 
-def predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, inst_method_pairs, inst_notation_pairs):
+def predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, inst_method_pairs):
     """
     Predicts missing BfG retention time (RT) for a given compound ID based on available data from other institutions
     (following an order of importance).
@@ -131,7 +131,6 @@ def predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, ins
         check_order (list of str)  : List of institutions in order of importance to predict BfG RTs.
         inst_rt (list of str)      : List of institutions with available RT data (both experimental and predicted).
         inst_method_pairs (dict)   : Mapping of institutions to chromatographic methods.
-        inst_notation_pairs (dict) : Mapping of institution codes to CSL institution notation.
 
     Returns:
         float or None: The predicted BfG RT, or None if no prediction could be made.
@@ -140,12 +139,12 @@ def predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, ins
     import logging
     logger = logging.getLogger(__name__)
 
-    bfg_str = inst_notation_pairs['bfg']  # Prepare BfG institution string
+    bfg_str = 'bfg'  # BfG institution string
     rt_bfg_pred = None  # Initialize predicted BfG RT variable
 
     # Predict missing BfG RT based on available data (in order of importance)
     for check_inst in check_order:
-        inst_str = inst_notation_pairs[check_inst]
+        inst_str = check_inst
         if inst_str in inst_rt:
             rt_inst = session.query(RetentionTime.rt).filter_by(
                 compound_id=uq_comp_id, chrom_method=inst_method_pairs[inst_str]).one_or_none()
@@ -167,7 +166,7 @@ def predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, ins
     return rt_bfg_pred
 
 
-def predict_rt(uq_comp_id, session, models_from_bfg, inst_str, inst_method_pairs, inst_notation_pairs):
+def predict_rt(uq_comp_id, session, models_from_bfg, inst_str, inst_method_pairs):
     """
     Predicts missing retention time (RT) for a given compound ID based on an available experimental or predicted BfG RT.
 
@@ -177,7 +176,6 @@ def predict_rt(uq_comp_id, session, models_from_bfg, inst_str, inst_method_pairs
         models_from_bfg (dict)     : Mapping of institutions to models for predicting RTs from BfG data.
         inst_str (str)             : Institution that needs RT prediction.
         inst_method_pairs (dict)   : Mapping of institutions to chromatographic methods.
-        inst_notation_pairs (dict) : Mapping of institution codes to CSL institution notation.
 
     Returns:
         float or None: The predicted RT, or None if no prediction could be made.
@@ -186,7 +184,7 @@ def predict_rt(uq_comp_id, session, models_from_bfg, inst_str, inst_method_pairs
     import logging
     logger = logging.getLogger(__name__)
 
-    bfg_str = inst_notation_pairs['bfg']  # Prepare BfG institution string
+    bfg_str = 'bfg'  # BfG institution string
     rt_pred = None
 
     # Predict missing RT based on BfG RT

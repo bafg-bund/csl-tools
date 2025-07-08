@@ -1,4 +1,5 @@
-from csl.utils.sql_utils import (inst_code_csl_mapping, Experiment, Compound, Parameter, Fragment, expGroupExp,
+from config import DEFAULT_PAIRS_INST_CHROM
+from csl.utils.sql_utils import (Experiment, Compound, Parameter, Fragment, expGroupExp,
                              ExperimentGroup, CompoundGroup, RetentionTime, compGroupComp)
 
 from dataclasses import dataclass
@@ -39,8 +40,7 @@ def get_experiment_ids_by_exp_group(session, data_source):
             data_source = [data_source]
 
         # Get experiment IDs based on subset (query at specific ExperimentGroup name)
-        inst_notation_pairs = inst_code_csl_mapping()
-        group_names = [inst_notation_pairs[d_src] for d_src in data_source]
+        group_names = [d_src for d_src in data_source]  # Todo: check if necessary after changes
 
         stmt = (
             select(Experiment.experiment_id)
@@ -137,7 +137,6 @@ def get_precursor_charge(adduct_form):
 
 def get_spectrum(fragments):
     """Extracts m/z and intensity values from fragments and sorts them by ascending m/z values."""
-
     # Extract m/z and intensity values from fragments
     spectrum = [(frag.mz, frag.int) for frag in fragments]
 
@@ -154,7 +153,6 @@ def get_splash_code(spectrum):
 
     Intensity values are multiplied by 1000 before spectral hash code generation to avoid splash code issues.
     """
-
     # Multiply intensities by 1000 to avoid splash code issues
     temp_spectrum = []
     for entry in spectrum:
@@ -168,10 +166,8 @@ def get_splash_code(spectrum):
 
 def get_compound_classes(compound_groups):
     """Extracts the non-institute compound classes from a list of compound groups."""
-    inst_notation_pairs = inst_code_csl_mapping()
-
     compound_groups = [group.name for group in compound_groups]
-    compound_groups_filtered = [cg for cg in compound_groups if cg not in inst_notation_pairs.values()]
+    compound_groups_filtered = [cg for cg in compound_groups if cg not in DEFAULT_PAIRS_INST_CHROM.keys()]
 
     if compound_groups_filtered:
         compound_classes = "; ".join(compound_groups_filtered)
@@ -194,20 +190,19 @@ def get_contributors_copyright(exp_group):
         inst_license (str) : Type of licence for the institute's data.
     """
     from datetime import datetime
-    inst_notation_pairs = inst_code_csl_mapping()
 
     current_year = datetime.now().strftime('%Y')
-    if inst_notation_pairs['bfg'] == exp_group or 'bfg' == exp_group:
+    if 'bfg' == exp_group or 'bfg' == exp_group:
         authors = 'Ole Lessmann; Kevin S. Jewell; Björn Ehlig; Arne Wick'
         inst_copyright = f'Copyright {current_year} Federal Institute of Hydrology, Koblenz, Germany'
         contrib_prefix = 'BAFG'  # Todo: change?
         inst_license = 'dl-de/by-2-0'
-    elif inst_notation_pairs['lfuby'] == exp_group or 'lfuby' == exp_group:
+    elif 'lfuby' == exp_group or 'lfuby' == exp_group:
         authors = 'André Macherius; Uwe Kunkel'
         inst_copyright = f'Copyright {current_year} Bavarian Environment Agency, Augsburg, Germany'
         contrib_prefix = 'LFUBY'
         inst_license = None  # Todo licence for lfuby?
-    elif inst_notation_pairs['uba'] == exp_group or 'uba' == exp_group:
+    elif 'uba' == exp_group or 'uba' == exp_group:
         authors = 'Eric Rosenheinrich; Anja Duffek'
         inst_copyright = f'Copyright {current_year} Federal Environment Agency, Berlin, Germany'
         contrib_prefix = 'UBA'

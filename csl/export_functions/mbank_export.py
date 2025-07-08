@@ -27,7 +27,7 @@ class MbankExport(FormatExport):
         logger.info("Starting CSL data export")
 
         # Temporary settings
-        chrom_method = "dx.doi.org/10.1016/j.chroma.2015.11.014"  # Todo: needs to be a command
+        chrom_method = "bfg_nts_rp1"  # Todo: needs to be a command
 
         # Get CSL version number
         csl_version = get_csl_version(self.path_csl)

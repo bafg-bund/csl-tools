@@ -6,14 +6,14 @@ from unittest.mock import patch
 
 @pytest.mark.parametrize("mock_inst_rt, mock_inst_exp_rt, mock_inst_pred_rt, mock_predict_bfg_rt_called", [
                          # Case 1: Main RT (a) is available as experimental RT
-                         (['inst_a', 'inst_b'],  # All available RTs
-                          ['inst_a'],  # Experimental RT
+                         (['bfg', 'inst_b'],  # All available RTs
+                          ['bfg'],  # Experimental RT
                           ['inst_b'],  # Predicted RT
                           False),  # Function to predict main RT not called
                          # Case 2: Main RT (a) is not available as experimental RT, but as predicted RT
-                         (['inst_a', 'inst_c'],
+                         (['bfg', 'inst_c'],
                           ['inst_c'],
-                          ['inst_a'],
+                          ['bfg'],
                           False),
                          # Case 3: Main RT (a) is not available and needs to be predicted first
                          (['inst_b'],
@@ -22,10 +22,9 @@ from unittest.mock import patch
                           True)  # Function to predict main RT called
                          ])
 @patch('tqdm.tqdm', lambda x: x)  # Disable tqdm progress bar
-def test_rtscan(mock_session, mock_inst_method_pairs, mock_inst_notation_pairs, mock_inst_rt, mock_inst_exp_rt,
+def test_rtscan(mock_session, mock_inst_method_pairs, mock_inst_rt, mock_inst_exp_rt,
                 mock_inst_pred_rt, mock_predict_bfg_rt_called):
     with patch('csl.rtscan_functions.update_rtscan.DEFAULT_PAIRS_INST_CHROM', mock_inst_method_pairs), \
-         patch('csl.rtscan_functions.update_rtscan.inst_code_csl_mapping') as mock_default_inst_mapping, \
          patch('csl.rtscan_functions.update_rtscan.check_order_pred_bfg_rt') as mock_check_order_pred_bfg_rt, \
          patch('csl.rtscan_functions.update_rtscan.update_version_filename') as mock_update_version_filename, \
          patch('shutil.copy'), \
@@ -39,7 +38,6 @@ def test_rtscan(mock_session, mock_inst_method_pairs, mock_inst_notation_pairs, 
          patch('csl.rtscan_functions.update_rtscan.commit_changes_choice'):
 
         # Mock function returns
-        mock_default_inst_mapping.return_value = mock_inst_notation_pairs
         mock_create_session.return_value = mock_session
         mock_session.query(RetentionTime.compound_id).all.return_value = [[1443]]
         mock_check_order_pred_bfg_rt.return_value = ['lfuby', 'uba', 'lanuk']
@@ -60,5 +58,4 @@ def test_rtscan(mock_session, mock_inst_method_pairs, mock_inst_notation_pairs, 
         mock_session.query.assert_called_with(RetentionTime.compound_id)  # Check if query was called
         assert mock_predict_bfg_rt.called == mock_predict_bfg_rt_called
         # Check the number of time other RTs were predicted
-        mock_pairs = {mock_inst_notation_pairs[key]: mock_inst_method_pairs[key] for key in mock_inst_method_pairs}
-        assert mock_predict_rt.call_count == len(list(set(mock_pairs.keys()) - set(mock_inst_rt)))
+        assert mock_predict_rt.call_count == len(list(set(mock_inst_method_pairs.keys()) - set(mock_inst_rt)))
