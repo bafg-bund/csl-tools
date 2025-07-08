@@ -22,17 +22,21 @@
 Default information that needs to be provided by the contributors separately:
 
 - Method: 
-   + Type of molecular mass (e.g., `monoisotopic`)
+   + Isotopologue description. Examples: <!-- needs to be moved - not part of the method, but a property of the compound being analyzed  -->
+	   - `monoisotopic` -- all atoms are most abbundant 
+     - `37Cl` -- One Cl atom replaced with <sup>37</sup>Cl
+		 - `37Cl2` -- two Cl atoms replaced with <sup>37</sup>Cl
+		 - `37Cl81Br` -- One Cl atom replaced with <sup>37</sup>Cl and one Br atom replaced with <sup>81</sup>Br
    + Collision type (e.g., `HCD`, `Q`)
    + Instrument type (e.g., `LC-ESI-Orbitrap`, `LC-ESI-QTOF`)
    + Instrument name (e.g., `TripleTOF 5600 SCIEX`, `QExactive`, `Agilent 6500 Series Q-TOF`)
-- License
-- Authors
+- License: please choose an open data license for your data (e.g., `CC BY-NC 4` or `dl-de/by-2-0`)
+- Authors: list of author names and affiliations
 
 ## Parameter Reference Table
 - Based on mzVault™ (_Thermo Fisher Scientific; Version 2.3 SP1; Build 2.3.64.0; July 8, 2021_)
 
-| Parameter description             | Line identifier in file          | Required | Subsection                                                           |
+| Parameter description             | Line identifier in file          | Required | Subsection                                                      |
 |-----------------------------------|----------------------------------|-----|----------------------------------------------------------------------|
 | Compound name                     | `Name`                           | Yes | [Compound name](#compound-name)                                      |
 | Special adduct or source fragment | `Name`                           | No  | [Special adduct / Source fragment](#special-adduct--source-fragment) |
@@ -41,14 +45,14 @@ Default information that needs to be provided by the contributors separately:
 | Ionization                        | `Ionization`                     | Yes | [Ionization](#ionization)                                            |
 | Ion mode                          | `IonMode`                        | Yes | [Ion mode](#ion-mode)                                                |
 | Retention time                    | `RetentionTime`                  | Yes | [Retention time](#retention-time)                                    |
-| InChIKey                          | `InChiKey`                       | Yes* | [InChIKey](#inchikey)                                                |
+| InChIKey                          | `InChiKey`                       | Yes<sup>1</sup> | [InChIKey](#inchikey)                                    |
 | Compound formula                  | `Formula`                        | Yes | [Compound formula](#compound-formula)                                |
-| CAS Registry Number               | `CASNo`                          | Yes* | [CAS Registry Number](#cas-registry-number)                          |
+| CAS Registry Number               | `CASNo`                          | Yes<sup>1</sup> | [CAS Registry Number](#cas-registry-number)              |
 | SMILES code                       | `Smiles`                         | Yes | [SMILES code](#smiles-code)                                          |
 | Compound class / category         | `CompoundClass`                  | No  | [Compound class](#compound-class)                                    |
 | Number of peaks                   | `Num peaks`                      | Yes | [Number of peaks](#number-of-peaks)                                  |
 | Spectrum (m/z and intensity)      | Lines directly after `Num peaks` | Yes | [Spectrum](#spectrum)                                                |
-<sup>*</sup> At least one of the following is required: InChIKey or CAS.
+<sup>1</sup> At least one of InChIKey or CAS is required.
 
 ---
 
@@ -65,12 +69,11 @@ Name: (2-dodecanoylamino-ethyl)-dimethyl-tetradecyl-ammonium
 
 ---
 
-### Special adduct / Source fragment
-Special adducts (i.e., not [M+H]+ or [M–H]–) and source fragments.
+### Adducts and in-source fragments
 
-Special adducts and source fragments are indicated in the compound name by parsing the suffix after an underscore (`_`), 
+Special adducts (i.e., not [M+H]+ or [M–H]–) and in-source fragments are indicated in the compound name by parsing the suffix after an underscore (`_`), 
 where adducts follow the format `<CompoundName>_<AdductName>` and source fragments follow `<CompoundName>_QF<number>` 
-with the nominal m/z as the number after "QF". 
+with the nominal m/z as the number after "QF" (Ger. Quellenfragment for "in-source fragment"). 
 
 Examples:
 ```
@@ -78,7 +81,6 @@ Name: Desmedipham_NH4
 Name: Diclofenac_QF250
 Name: Famoxadone_QF331
 ```
-
 The extracted adduct names are then converted into their corresponding ion notations.
 
 Example: `CompoundName_NH4`
@@ -100,15 +102,15 @@ Some special cases don't follow standard conventions and are hardcoded:
 
 
 **Additional information**:  
-For MS2 spectra of **special adducts** and **source fragments**, 
+For MS<sup>2</sup> spectra of **special adducts** and **source fragments**, 
 the associated entry must include the molecular formula, CAS number, SMILES code, and other metadata of the **neutral molecule**.
 
-For cations the SMILES code and the InChIKey are derived from the cation, i.e., the charged compound without its counterion.
+For cations (`[M+]`), the SMILES code and the InChIKey are derived from the cation, i.e., the charged compound without its counterion.
 
 ---
 
 ### Precursor m/z
-Mass-to-charge ratio of the precursor ion selected for fragmentation (MS2).
+Mass-to-charge ratio of the precursor ion selected for fragmentation (MS<sup>2</sup>).
 
 - Decimal separator: `.`
 
@@ -137,7 +139,7 @@ Collision_energy: 20.00,40.00,60.00
 ---
 
 ### Ionization
-Ionization method.
+Ionization type (LC-MS interface).
 
 Example:
 ```
@@ -170,9 +172,16 @@ RetentionTime: 9.4
 
 ---
 
-### InChIKey
-Unique identifier for molecules, represented as hashed version of the International Chemical Identifier (InChI).
-
+### InChI-key
+Unique identifier for molecules, represented as hashed version of the International Chemical Identifier (InChI). There are several rules that need to be followed when defining the structure and therefore the InChI-key:
+- If you are using the SMILES to generate the InChI, use the canonical SMILES
+- If the molecule has one chiral center, we remove the stereorepresentation and represent both enantiomers with one entry (since this can not be distinguished with standard LC-HRMS/MS)
+- If the molecule has two or more chiral centers, we keep the stereorepresentation, since diastereoisomers can (potentially) be distinguished by achiral phase HPLC. 
+<!-- this kind of information does not pertain only to msp-nist import but to all imports into CSL, so it should probably be moved to a "general import SOP" or a database documentation and cited here.
+ These are the current SOPs, but it may need reworking. 
+ analytical standards are usually racemates anyway. 
+look at this paper: https://jcheminf.biomedcentral.com/articles/10.1186/s13321-018-0299-2 
+ need better examples with structural formulae of enantiomers and diastereomers and corresponding InChI-keys  -->
 Examples:
 ``` 
 InChiKey: WZJZMXBKUWKXTQ-UHFFFAOYSA-N
@@ -182,7 +191,7 @@ InChiKey: DCOPUUMXTXDBNB-UHFFFAOYSA-N
 ---
 
 ### Compound formula
-The molecular formula of the neutral compound, using standard Hill notation.
+The molecular formula of the neutral compound, using standard Hill notation. 
 
 Examples:
 ``` 
@@ -193,7 +202,7 @@ Formula: C16H16N2O4
 ---
 
 ### CAS Registry Number
-The Chemical Abstracts Service (CAS) registry number for the compound.
+The Chemical Abstracts Service (CAS) registry number for the compound. In the case of salts or hydrates, use the CAS number of molecular ion or uncharged molecule.
 
 Examples:
 ``` 
@@ -204,7 +213,7 @@ CASNo: 13684-56-5
 ---
 
 ### SMILES code
-Simplified Molecular Input Line Entry System (SMILES) string.
+Simplified Molecular Input Line Entry System (SMILES) string (canonical form).
 
 Examples:
 ```
