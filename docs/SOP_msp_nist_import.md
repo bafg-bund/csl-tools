@@ -22,16 +22,17 @@
 Default information that needs to be provided by the contributors separately:
 
 - Method: 
-   + Isotopologue description. Examples: <!-- needs to be moved - not part of the method, but a property of the compound being analyzed  -->
-	   - `monoisotopic` -- all atoms are most abbundant 
-     - `37Cl` -- One Cl atom replaced with <sup>37</sup>Cl
-		 - `37Cl2` -- two Cl atoms replaced with <sup>37</sup>Cl
-		 - `37Cl81Br` -- One Cl atom replaced with <sup>37</sup>Cl and one Br atom replaced with <sup>81</sup>Br
    + Collision type (e.g., `HCD`, `Q`)
    + Instrument type (e.g., `LC-ESI-Orbitrap`, `LC-ESI-QTOF`)
    + Instrument name (e.g., `TripleTOF 5600 SCIEX`, `QExactive`, `Agilent 6500 Series Q-TOF`)
-- License: please choose an open data license for your data (e.g., `CC BY-NC 4` or `dl-de/by-2-0`)
+- License: please choose an open data license for your data (e.g., `CC BY 4.0` or `dl-de/by-2-0`)
 - Authors: list of author names and affiliations
+- Other information:
+   + Isotopologue description. This can only be predefined for all compounds (in one batch). For example:
+	   - `monoisotopic` - all atoms are most abbundant 
+      - `37Cl` - One Cl atom replaced with <sup>37</sup>Cl
+		- `37Cl2` - two Cl atoms replaced with <sup>37</sup>Cl
+		- `37Cl81Br` - One Cl atom replaced with <sup>37</sup>Cl and one Br atom replaced with <sup>81</sup>Br
 
 ## Parameter Reference Table
 - Based on mzVault™ (_Thermo Fisher Scientific; Version 2.3 SP1; Build 2.3.64.0; July 8, 2021_)
@@ -52,6 +53,7 @@ Default information that needs to be provided by the contributors separately:
 | Compound class / category         | `CompoundClass`                  | No  | [Compound class](#compound-class)                                    |
 | Number of peaks                   | `Num peaks`                      | Yes | [Number of peaks](#number-of-peaks)                                  |
 | Spectrum (m/z and intensity)      | Lines directly after `Num peaks` | Yes | [Spectrum](#spectrum)                                                |
+
 <sup>1</sup> At least one of InChIKey or CAS is required.
 
 ---
