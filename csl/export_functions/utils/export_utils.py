@@ -40,13 +40,11 @@ def get_experiment_ids_by_exp_group(session, data_source):
             data_source = [data_source]
 
         # Get experiment IDs based on subset (query at specific ExperimentGroup name)
-        group_names = [d_src for d_src in data_source]  # Todo: check if necessary after changes
-
         stmt = (
             select(Experiment.experiment_id)
             .join(expGroupExp, Experiment.experiment_id == expGroupExp.c.experiment_id)
             .join(ExperimentGroup, expGroupExp.c.experimentGroup_id == ExperimentGroup.experimentGroup_id)
-            .where(ExperimentGroup.name.in_(group_names))
+            .where(ExperimentGroup.name.in_(data_source))
         )
 
         # Execute the query
@@ -195,7 +193,7 @@ def get_contributors_copyright(exp_group):
     if 'bfg' == exp_group or 'bfg' == exp_group:
         authors = 'Ole Lessmann; Kevin S. Jewell; Björn Ehlig; Arne Wick'
         inst_copyright = f'Copyright {current_year} Federal Institute of Hydrology, Koblenz, Germany'
-        contrib_prefix = 'BAFG'  # Todo: change?
+        contrib_prefix = 'BAFG'
         inst_license = 'dl-de/by-2-0'
     elif 'lfuby' == exp_group or 'lfuby' == exp_group:
         authors = 'André Macherius; Uwe Kunkel'
@@ -203,7 +201,7 @@ def get_contributors_copyright(exp_group):
         contrib_prefix = 'LFUBY'
         inst_license = None  # Todo licence for lfuby?
     elif 'uba' == exp_group or 'uba' == exp_group:
-        authors = 'Eric Rosenheinrich; Anja Duffek'
+        authors = 'Eric Rosenheinrich'
         inst_copyright = f'Copyright {current_year} Federal Environment Agency, Berlin, Germany'
         contrib_prefix = 'UBA'
         inst_license = 'dl-de/by-2-0'
