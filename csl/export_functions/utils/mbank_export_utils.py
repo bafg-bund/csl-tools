@@ -13,7 +13,7 @@ def get_exp_ids_mbank(path_mbank_files):
         path_mbank_files (str) : Path to directory with existing MassBank files.
 
     Returns:
-        dict_mbank_exp_id_fn (dict) : Pairs of existing of accession strings and experiment IDs.
+        dict_mbank_exp_id_fn (dict) : Pairs of existing accession strings and experiment IDs.
     """
     import os
     import re
@@ -196,7 +196,7 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VE
     else:
         chrom_chunk = f"AC$CHROMATOGRAPHY: RETENTION_TIME {rt} min\n"
 
-    data_proc_chunk = f"MS$DATA_PROCESSING: COMMENT Export with csl-tools {CSLTOOLS_VERSION} and CSL {csl_version}\n"
+    data_proc_chunk = f"MS$DATA_PROCESSING: COMMENT Export with csl-tools {CSLTOOLS_VERSION} and CSL_v{csl_version}\n"
 
 
     return FormattedDataMbank(accession, adduct, authors, cas, ce, comment_chunk, compound_classes, compound_name,

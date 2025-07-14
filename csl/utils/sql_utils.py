@@ -3,17 +3,6 @@ from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Float, cre
 from sqlalchemy.schema import Table
 from sqlalchemy.pool import NullPool
 
-# def inst_code_csl_mapping():
-#     """
-#     Provides mapping of institution code to institution notation as they appear in the CSL.
-#     Needs to be updates when new institution notations are added, or when existing ones are updated.
-#
-#     Returns:
-#         dict: Dictionary mapping institution codes to CSL institution notation.
-#     """
-#     # Todo: LUBW not in CSL yet
-#     return {'bfg': 'BfG', 'uba': 'UBA', 'lfuby': 'LfU', 'lanuk': 'LANUK', 'lubw': 'LUBW'}
-
 
 def create_session(path_csl):
     # Create engine using path of CSL and bind it to session

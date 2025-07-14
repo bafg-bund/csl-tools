@@ -1,4 +1,4 @@
-# Python package for the Collective Spectral Library (CSL)
+# Tools for the Collective Spectral Library (CSL)
 
 ## Name
 csl-tools
@@ -15,10 +15,10 @@ Our goal is to grow this collection, making the retrospective analysis of histor
 
 If you wish to contribute spectral data, please see the section [Contribution (spectral data)](#contributing-spectral-data).
 
-Currently, the CSL contains data from these sources:
-- [BfG](https://www.bafg.de) (Federal Institute of Hydrology)
-- [LfU Bayern](https://www.lfu.bayern.de) (Bavarian Environment Agency)
-- [UBA](https://www.umweltbundesamt.de) (Federal Environment Agency)
+Currently, the CSL contains data from the following sources:
+- [BfG](https://www.bafg.de) (Federal Institute of Hydrology, Koblenz, Germany)
+- [LfU Bayern](https://www.lfu.bayern.de) (Bavarian Environment Agency, Augsburg, Germany)
+- [UBA](https://www.umweltbundesamt.de) (Federal Environment Agency, Berlin, Germany)
 
 The most recent CSL file is available at **(will be uploaded to an open repository soon)** and will be regularly updated there.
 
@@ -58,7 +58,7 @@ To contribute or run the project in development mode:
     ```
     pytest
     ```
- 
+
 
 ## Contribution (source code)
 If you run into issues or have ideas for improvement, feel free to contact us.
@@ -66,7 +66,7 @@ If you run into issues or have ideas for improvement, feel free to contact us.
 If you want to make changes to the code, please do not directly push into the main branch. 
 Instead, create a new branch for your work and open a pull request to the `dev` branch.
 
-## Contributing (spectral data)
+## Contribution (spectral data)
 To contribute spectral data to the CSL, please follow the linked guidelines for the respective file formats.  
 Currently, the package can read:
 
@@ -144,20 +144,9 @@ csl export <format> <path_csl> <path_out> <subset>
   - `bfg`: BfG (Federal Institute of Hydrology)
   - `lfuby`: LfU Bayern (Bavarian Environment Agency)
   - `uba`: UBA (Federal Environment Agency)
-  - `lubw`: LUBW (Baden-Württemberg State Institute for the Environment)
-  - `lanuk`: LANUK (North Rhine-Westphalia Office of Nature, Environment and Climate) 
   - `all`: No subsetting (Default)
 
 #### Example
-Exports CSL-files from the data source 'bfg' into the MassBank format.
-```
-csl export mbank path/to/CSL.db path/to/output_dir bfg
-```
-```python
-from csl import export_data
-export_data(format='mbank', path_csl='path/to/CSL.db', path_out='path/to/output_dir', subset='bfg')
-```
-
 Exports CSL-files from the data sources 'bfg' and 'uba' into the MSP/NIST format.
 ```
 csl export thermo path/to/CSL.db path/to/output_dir bfg uba
@@ -175,6 +164,16 @@ csl export thermo path/to/CSL.db path/to/output_dir
 from csl import export_data
 export_data(format='thermo', path_csl='path/to/CSL.db', path_out='path/to/output_dir')
 ```
+
+Exports CSL-files from the data source 'bfg' into the MassBank format.
+```
+csl export mbank path/to/CSL.db path/to/output_dir bfg
+```
+```python
+from csl import export_data
+export_data(format='mbank', path_csl='path/to/CSL.db', path_out='path/to/output_dir', subset='bfg')
+```
+
 
 ### `rtscan`
  Operates on retention-time data stored in the CSL.  

@@ -80,8 +80,7 @@ def test_check_duplicate_no_inchikey_and_cas(mock_session, mock_entry_df):
 
 
 def test_add_exp_to_session_exp_group_not_exists(mock_session, mock_entry_df, mock_inst_def):
-    """Test if call is made to add experiment group when it is missing.
-    Todo: Don't add more tests for this function before it is not reworked (quality, smaller parts). """
+    """Test if call is made to add experiment group when it is missing."""
     # Mock query calls
     mock_query = MagicMock()
     mock_query.query.return_value = mock_query
