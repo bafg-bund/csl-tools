@@ -15,24 +15,26 @@ def get_inst_rt_info(uq_comp_id, session, inst_method_pairs):
         inst_exp_rt (list of str)  : Institution with an experimental RT entry for the compound ID.
         inst_pred_rt (list of str) : Institution with a predicted RT entry for the compound ID.
     """
-    # Get institutions with any RT entry for the compound ID
-    results = session.query(RetentionTime.chrom_method).filter_by(compound_id=uq_comp_id).all()
-    results_flat = [result[0] for result in results]  # Flatten list
-    inst_rt = [inst for inst, method in inst_method_pairs.items() if method in results_flat]
+    from sqlalchemy import select
 
-    # Get institutions with an experimental RT entry for the compound ID
-    results = session.query(ExperimentGroup).join(
-        expGroupExp, ExperimentGroup.experimentGroup_id == expGroupExp.c.experimentGroup_id
-    ).join(
-        Experiment, Experiment.experiment_id == expGroupExp.c.experiment_id
-    ).filter(
-        Experiment.compound_id == uq_comp_id
-    ).all()
-    results_string = ''.join([str(result) for result in results])  # Concatenate to one string
-    inst_exp_rt = [inst for inst in inst_method_pairs if inst in results_string]
+    # Query methods with any RT entry for the compound
+    methods = session.execute(
+        select(RetentionTime.chrom_method).where(RetentionTime.compound_id == uq_comp_id)
+    ).scalars().all()
 
-    # Get institutions with a predicted RT entry for the compound ID
-    inst_pred_rt = list(set(inst_rt) - set(inst_exp_rt))
+    inst_rt = [inst for inst, method in inst_method_pairs.items() if method in methods]
+
+    # Query data sources with experimental RT entry for the compound
+    exp_insts = session.execute(
+        select(ExperimentGroup.name)
+        .join(expGroupExp, ExperimentGroup.experimentGroup_id == expGroupExp.c.experimentGroup_id)
+        .join(Experiment, Experiment.experiment_id == expGroupExp.c.experiment_id)
+        .where(Experiment.compound_id == uq_comp_id)
+    ).scalars().all()
+
+    # Sort data sources of experimental and predicted RT entries
+    inst_exp_rt = [inst for inst in inst_method_pairs if inst in exp_insts]
+    inst_pred_rt = list(set(inst_rt).difference(inst_exp_rt))
 
     return inst_rt, inst_exp_rt, inst_pred_rt
 
@@ -49,7 +51,7 @@ def check_experimental_data(uq_comp_id, inst_exp_rt, session, inst_method_pairs)
 
     Args:
         uq_comp_id (int)               : Compound ID used to query the CSL database
-        inst_exp_rt (list of str) : List of institutions with an experimental RT entry for the compound ID.
+        inst_exp_rt (list of str)      : List of institutions with an experimental RT entry for the compound ID.
         session (obj)                  : SQLAlchemy session object connected to the CSL database.
         inst_method_pairs (dict)       : Dictionary mapping CSL institution notation to CSL method notation.
 
