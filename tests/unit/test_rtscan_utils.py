@@ -7,8 +7,20 @@ def test_get_inst_rt_info(mock_session, mock_inst_method_pairs):
     """ Test that the function returns the expected institution strings."""
     # Prepare function inputs and return values
     uq_comp_id = 1000
-    mock_session.query(RetentionTime.chrom_method).filter_by().all.return_value = [('method_a',), ('method_b',)]
-    mock_session.query(ExperimentGroup).join().join().filter().all.return_value = ['inst_a_ExpGroup']
+
+    # Mock the 'scalars().all()' chain
+    mock_scalars_1 = MagicMock()
+    mock_scalars_1.all.return_value = ['method_a', 'method_b']
+    mock_execute_1 = MagicMock()
+    mock_execute_1.scalars.return_value = mock_scalars_1
+
+    mock_scalars_2 = MagicMock()
+    mock_scalars_2.all.return_value = ['inst_a']
+    mock_execute_2 = MagicMock()
+    mock_execute_2.scalars.return_value = mock_scalars_2
+
+    # Setup side effect to return mocks in order
+    mock_session.execute.side_effect = [mock_execute_1, mock_execute_2]
 
     # Call the function
     inst_rt, inst_exp_rt, inst_pred_rt = get_inst_rt_info(uq_comp_id, mock_session, mock_inst_method_pairs)
@@ -207,22 +219,3 @@ def test_commit_changes_choice_no_changes(mock_remove, mock_session, caplog):
     mock_session.bind.dispose.assert_called_once()
     mock_remove.assert_called_once_with(path_csl)
     assert "No changes in current session detected." in caplog.text
-
-
-### Examples for checking : Todo: use for pytests later..
-# Example 1 (BfG FALSE)
-# 3743	8.82194	lfuby_nts_rp1	                            1443
-# 3555	16.85	lanuk_nts	                            1443	TRUE
-# 2159	9.147	bfg_nts	1443	FALSE
-
-# Example 2 (BfG TRUE)
-# 3854	13.31	bfg_nts	1672	TRUE
-# 3853	11.208	uba_nts_rp1	                            1672	FALSE
-
-# Example 3 (BfG missing)
-# 3851	5.703	uba_nts_rp1	    1670	FALSE
-
-# Example 4 (Only LfU, but with prediction = empty)
-# 3846	13.27532	lfuby_nts_rp1	    1666
-
-# uq_comp_ids = [1443, 1672, 1670, 1666]  # Todo: ..until here
