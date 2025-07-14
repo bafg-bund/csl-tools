@@ -51,7 +51,7 @@ def update_version_filename(filename, update_type):
         minor_version = match.group(3)  # Might be None
 
         # Determine next version
-        current_year = datetime.now().strftime("%y")
+        current_year = int(datetime.now().strftime("%y"))
         if year_version != current_year:
             year_version = current_year
             major_version = 0
