@@ -2,9 +2,8 @@
 Main function to operate on retention time data saved in the CSL.
 
 Rtscan Classes:
-    check   : Workflow for checking the status of the retention time data in the CSL, without making any changes.
-    update  : Workflow for updating missing retention time data in the CSL.
-    replace : Workflow for recalculating all retention time data in the CSL.
+    check   : Workflow for checking mistakes in retention time (RT) entries and adding missing RT in the CSL.
+    update  : Workflow for recalculating all retention time entries in the CSL.
 """
 
 from csl.utils import validate_file_path, setup_logger
@@ -23,8 +22,8 @@ setup_logger(log_fpath)  # Sets basic logger configuration and adds stream handl
 
 # Define workflow dictionary
 WORKFLOWS = {
-    "update": UpdateRtscan,
-    "recalc": RecalcRtscan
+    "check": CheckRtscan,
+    "update": UpdateRtscan
 }
 
 

@@ -1,4 +1,4 @@
-from csl.rtscan_functions.update_rtscan import UpdateRtscan
+from csl.rtscan_functions.check_rtscan import CheckRtscan
 from csl.rtscan_functions.utils.rtscan_utils import *
 import pytest
 from unittest.mock import patch
@@ -24,18 +24,18 @@ from unittest.mock import patch
 @patch('tqdm.tqdm', lambda x: x)  # Disable tqdm progress bar
 def test_rtscan(mock_session, mock_inst_method_pairs, mock_inst_rt, mock_inst_exp_rt,
                 mock_inst_pred_rt, mock_predict_bfg_rt_called):
-    with patch('csl.rtscan_functions.update_rtscan.DEFAULT_PAIRS_INST_CHROM', mock_inst_method_pairs), \
-         patch('csl.rtscan_functions.update_rtscan.check_order_pred_bfg_rt') as mock_check_order_pred_bfg_rt, \
-         patch('csl.rtscan_functions.update_rtscan.update_version_filename') as mock_update_version_filename, \
+    with patch('csl.rtscan_functions.check_rtscan.DEFAULT_PAIRS_INST_CHROM', mock_inst_method_pairs), \
+         patch('csl.rtscan_functions.check_rtscan.check_order_pred_bfg_rt') as mock_check_order_pred_bfg_rt, \
+         patch('csl.rtscan_functions.check_rtscan.update_version_filename') as mock_update_version_filename, \
          patch('shutil.copy'), \
-         patch('csl.rtscan_functions.update_rtscan.create_session') as mock_create_session, \
-         patch('csl.rtscan_functions.update_rtscan.get_inst_rt_info') as mock_get_inst_rt_info, \
-         patch('csl.rtscan_functions.update_rtscan.check_experimental_data') as mock_check_exp_data, \
-         patch('csl.rtscan_functions.update_rtscan.check_predicted_flags_pred_data') as mock_check_pred_flags, \
-         patch('csl.rtscan_functions.update_rtscan.predict_bfg_rt') as mock_predict_bfg_rt, \
-         patch('csl.rtscan_functions.update_rtscan.predict_rt') as mock_predict_rt, \
-         patch('csl.rtscan_functions.update_rtscan.summarize_corrections_and_errors'), \
-         patch('csl.rtscan_functions.update_rtscan.commit_changes_choice'):
+         patch('csl.rtscan_functions.check_rtscan.create_session') as mock_create_session, \
+         patch('csl.rtscan_functions.check_rtscan.get_inst_rt_info') as mock_get_inst_rt_info, \
+         patch('csl.rtscan_functions.check_rtscan.check_experimental_data') as mock_check_exp_data, \
+         patch('csl.rtscan_functions.check_rtscan.check_predicted_flags_pred_data') as mock_check_pred_flags, \
+         patch('csl.rtscan_functions.check_rtscan.predict_bfg_rt') as mock_predict_bfg_rt, \
+         patch('csl.rtscan_functions.check_rtscan.predict_rt') as mock_predict_rt, \
+         patch('csl.rtscan_functions.check_rtscan.summarize_corrections_and_errors'), \
+         patch('csl.rtscan_functions.check_rtscan.commit_changes_choice'):
 
         # Mock function returns
         mock_create_session.return_value = mock_session
@@ -49,10 +49,10 @@ def test_rtscan(mock_session, mock_inst_method_pairs, mock_inst_rt, mock_inst_ex
         mock_predict_rt.return_value = True
 
         # Instantiate workflow with dummy path
-        mock_update_workflow = UpdateRtscan(path_csl='path/to/csl')
+        mock_check_workflow = CheckRtscan(path_csl='path/to/csl')
 
         # Execute the rtscan method
-        mock_update_workflow.rtscan()
+        mock_check_workflow.rtscan()
 
         # Assert
         mock_session.query.assert_called_with(RetentionTime.compound_id)  # Check if query was called
