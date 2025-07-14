@@ -1,4 +1,4 @@
-from config import DEFAULT_PAIRS_INST_CHROM
+from csl.config import DEFAULT_PAIRS_INST_CHROM
 from csl.utils.sql_utils import (Experiment, Compound, Parameter, Fragment, expGroupExp,
                              ExperimentGroup, CompoundGroup, RetentionTime, compGroupComp)
 
@@ -16,6 +16,19 @@ class SqlQueryResult:
     retention_time: RetentionTime
 
 
+def get_chrom_methods(data_source):
+    """Get chromatographic methods by data source(s)."""
+    all_methods = DEFAULT_PAIRS_INST_CHROM
+    if 'all' in data_source:
+        chrom_methods = list(all_methods.values())
+    else:
+        # Normalize to list
+        if isinstance(data_source, str):
+            data_source = [data_source]
+        chrom_methods = [all_methods[k] for k in data_source]
+    return chrom_methods
+
+
 def get_experiment_ids_by_exp_group(session, data_source):
     """
     Get experiment IDs from the CSL. Can be subset by data source.
@@ -30,7 +43,7 @@ def get_experiment_ids_by_exp_group(session, data_source):
     """
     from sqlalchemy import select
 
-    if data_source == 'all':
+    if 'all' in data_source:
         # Get all experiment IDs
         experiment_ids = session.query(Experiment.experiment_id).all()
         experiment_ids = [exp_id[0] for exp_id in experiment_ids]  # Convert to a flat list

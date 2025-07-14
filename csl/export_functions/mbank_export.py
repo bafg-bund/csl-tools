@@ -1,13 +1,12 @@
+from csl.config import DEFAULT_PAIRS_INST_CHROM, CSLTOOLS_VERSION
 from csl.export_functions.format_export import FormatExport
 from csl.export_functions.utils import *
 from csl.utils.sql_utils import create_session
 from csl.utils.file_utils import get_csl_version
-from csl.config import CSLTOOLS_VERSION
 
 class MbankExport(FormatExport):
     def export(self):
         """Workflow to export CSL data for MassBank."""
-
         import os.path
         import re
         from tqdm import tqdm
@@ -26,22 +25,36 @@ class MbankExport(FormatExport):
         # Start CSL data extraction
         logger.info("Starting CSL data export")
 
-        # Temporary settings
-        chrom_method = "bfg_nts_rp1"  # Todo: needs to be a command
-
         # Get CSL version number
         csl_version = get_csl_version(self.path_csl)
+
+        # Create a mapping of experiment_id -> method
+        exp_method_pairs = []
+
+        if 'all' in self.subset:
+            data_sources = DEFAULT_PAIRS_INST_CHROM.keys()
+        else:
+            data_sources = self.subset
+
+        for data_source in data_sources:
+            # Get all experiment IDs based on data source in experiment group
+            experiment_ids = get_experiment_ids_by_exp_group(session, data_source)
+            logger.info(f"Found {len(experiment_ids)} experiment IDs for data source: {data_source}")
+            # Apply mapping
+            for exp_id in experiment_ids:
+                exp_method_pairs.append((exp_id, DEFAULT_PAIRS_INST_CHROM.get(data_source)))
 
         # Get list of current MassBank experiment IDs
         logger.info(f"Checking for existing MassBank files at {self.path_out}")
         dict_mbank_exp_id_fn = get_exp_ids_mbank(self.path_out)
 
         # Process experiment IDs and generate txt files
-        for i, exp_id in tqdm(enumerate(experiment_ids), total=len(experiment_ids), ncols=77):
+        for i, (exp_id, chrom_method) in tqdm(enumerate(exp_method_pairs), total=len(exp_method_pairs), ncols=77):
             try:
+
                 # Extracts data for a specific experiment id and formats data to meet MassBank requirements.
                 export_data = extract_experiment_chunk_mbank(session, exp_id, chrom_method, csl_version, CSLTOOLS_VERSION,
-                                                       dict_mbank_exp_id_fn)
+                                                             dict_mbank_exp_id_fn)
 
                 # Skip experiment ID if compound is an internal standard (export_data is None)
                 if not export_data:
@@ -61,7 +74,8 @@ class MbankExport(FormatExport):
         session.close()
 
         # Check for deprecated files
-        keys_not_in_exp_ids = set(dict_mbank_exp_id_fn.keys()) - set(experiment_ids)
+        exp_ids = [em_pair[0] for em_pair in exp_method_pairs]
+        keys_not_in_exp_ids = set(dict_mbank_exp_id_fn.keys()) - set(exp_ids)
         if keys_not_in_exp_ids:
             entries_not_in_exp_ids = [dict_mbank_exp_id_fn[key] for key in keys_not_in_exp_ids]
             logger.info(f"{len(entries_not_in_exp_ids)} files not found in current experiment IDs and may need to be marked as deprecated:\n"

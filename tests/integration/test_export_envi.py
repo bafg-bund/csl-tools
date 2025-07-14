@@ -34,7 +34,7 @@ def test_export_envi():
     assert len(files) == len(all_methods), f"Expected {len(all_methods)} file(s), but found {len(files)}: {files}"
 
     # Assert that the file content is as expected (using the BfG-method-file)
-    bfg_file = next(f for f in files if 'bfg' in f.lower()) # Todo: change 'bfg' to all_methods['bfg'], once methods are renamed in the CSL
+    bfg_file = next(f for f in files if all_methods['bfg'] in f.lower())
     with open(bfg_file, 'r') as f:
         content = f.read()
 

@@ -1,3 +1,4 @@
+from csl.config import DEFAULT_PAIRS_INST_CHROM
 from csl.export_functions.format_export import FormatExport
 from csl.export_functions.utils import *
 from csl.utils.sql_utils import create_session
@@ -19,20 +20,16 @@ class ThermoExport(FormatExport):
         # Connect to the CSL database
         session = create_session(self.path_csl)
 
-        # Get experiment IDs
-        experiment_ids = get_experiment_ids_by_exp_group(session, self.subset)
-        logger.info(f"Found {len(experiment_ids)} experiment ID's for subset: {self.subset}")
-
         # Start CSL data extraction
         logger.info("Starting CSL data export")
-
-        # Temporary settings
-        chrom_method = "dx.doi.org/10.1016/j.chroma.2015.11.014"  # Todo: needs to be a command
 
         # Generate the output file name based on the CSL version and the current date
         csl_version = get_csl_version(self.path_csl)
         date_code = datetime.now().strftime("%y%m%d")
-        fname = f"THERMO-{'-'.join(self.subset)}-CSLv{csl_version}-{date_code}.msp"
+        if 'all' in self.subset:
+            fname = f"THERMO-CSLv{csl_version}-{date_code}.msp"
+        else:
+            fname = f"THERMO-{'-'.join(self.subset)}-CSLv{csl_version}-{date_code}.msp"
         fpath_out = os.path.join(self.path_out, fname)
 
         # Initialize a list to accumulate data for batch writing
@@ -40,8 +37,25 @@ class ThermoExport(FormatExport):
 
         # Extract text chunks from the CSL data and append them to the export file
         with open(fpath_out, 'a', encoding='utf-8') as f:
+
+            # Create a mapping of experiment_id -> method
+            exp_method_pairs = []
+
+            if 'all' in self.subset:
+                data_sources = DEFAULT_PAIRS_INST_CHROM.keys()
+            else:
+                data_sources = self.subset
+
+            for data_source in data_sources:
+                # Get all experiment IDs based on data source in experiment group
+                experiment_ids = get_experiment_ids_by_exp_group(session, data_source)
+                logger.info(f"Found {len(experiment_ids)} experiment IDs for data source: {data_source}")
+                # Apply mapping
+                for exp_id in experiment_ids:
+                    exp_method_pairs.append((exp_id, DEFAULT_PAIRS_INST_CHROM.get(data_source)))
+
             # Process each experiment IDs
-            for i, exp_id in tqdm(enumerate(experiment_ids), total=len(experiment_ids), ncols=77):
+            for i, (exp_id, chrom_method) in tqdm(enumerate(exp_method_pairs), total=len(exp_method_pairs), ncols=77):
                 try:
                     # Extract the text chunk for the current experiment
                     export_data = extract_experiment_chunk_thermo(session, exp_id, chrom_method, csl_version, CSLTOOLS_VERSION)

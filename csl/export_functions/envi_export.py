@@ -1,4 +1,3 @@
-from config import DEFAULT_PAIRS_INST_CHROM
 from csl.export_functions.format_export import FormatExport
 from csl.export_functions.utils import *
 from csl.utils.sql_utils import create_session
@@ -18,15 +17,8 @@ class EnviExport(FormatExport):
         logger = logging.getLogger(__name__)
         logger.info('Executing export workflow for enviMass documents')
 
-        # Get relevant chrom. methods
-        all_methods = DEFAULT_PAIRS_INST_CHROM
-        if self.subset == 'all':
-            chrom_methods = list(all_methods.values())
-        else:
-            # Normalize to list
-            if isinstance(self.subset, str):
-                self.subset = [self.subset]
-            chrom_methods = [all_methods[k] for k in self.subset]
+        # Get chrom. methods
+        chrom_methods = get_chrom_methods(self.subset)
 
         # Connect to the CSL database
         session = create_session(self.path_csl)
@@ -35,19 +27,12 @@ class EnviExport(FormatExport):
         logger.info("Starting CSL data export, creating one file per chrom. method.")
 
         for chrom_method in chrom_methods:
-
-            # Todo: temporary until methods are renamed
-            if chrom_method == 'dx.doi.org/10.1016/j.chroma.2015.11.014':
-                chrom_method_str = 'bfg_nts_rp1'
-            else:
-                chrom_method_str = chrom_method
-
             # Generate the output file name based on the CSL version and the current date
             csl_version = get_csl_version(self.path_csl)
             date_code = datetime.now().strftime("%y%m%d")
             envi_filter_def = default_sql_query_filter_envi()
             fragment_cutoff_percent = envi_filter_def['fragment_cutoff_percent_def']
-            fname = f"ENVI-{chrom_method_str}-CSLv{csl_version}-cutoff{str(fragment_cutoff_percent)}perc-{date_code}.txt"  # Todo: change here too
+            fname = f"ENVI-{chrom_method}-CSLv{csl_version}-cutoff{str(fragment_cutoff_percent)}perc-{date_code}.txt"
             fpath_out = os.path.join(self.path_out, fname)
 
             # Get csl data based on query filters
