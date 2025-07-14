@@ -65,14 +65,16 @@ def get_experiment_ids_by_exp_group(session, data_source):
     return experiment_ids
 
 
-def get_experiment_ids_by_chrom_method(session, chrom_method):
+def get_experiment_ids_by_chrom_method(session, chrom_method, predicted=None):
     """
-    Get experiment IDs from the CSL. Can be subset by chrom. method.
+    Get experiment IDs from the CSL subset by chromatographic method and predicted value.
 
     Args:
-        session (obj)      : SQLAlchemy session object connected to the CSL database.
-        chrom_method (str) : Chromatographic method (e.g., 'uba_nts_rp1').
-                             Corresponds to chrom_method in table retention_time in CSL.
+        session (obj)             : SQLAlchemy session object connected to the CSL database.
+        chrom_method (str)        : Chromatographic method (e.g., 'uba_nts_rp1').
+                                    Corresponds to chrom_method in retentionTime table in CSL.
+        predicted (str|bool|None) : Filter for predicted column in retentionTime table in CSL.
+                                    Use "TRUE"/True, "FALSE"/False, or None (default) to not filter on prediction.
 
     Returns:
         experiment_ids (list of int) :  Experiment IDs of the data entries (experiments) in the CSL.
@@ -81,10 +83,20 @@ def get_experiment_ids_by_chrom_method(session, chrom_method):
 
     stmt = (
         select(Experiment.experiment_id)
-        .join(Experiment.compound)  # Join Experiment → Compound
-        .join(Compound.retention_times)  # Join Compound → RetentionTime
+        .join(Experiment.compound)
+        .join(Compound.retention_times)
         .where(RetentionTime.chrom_method == chrom_method)
     )
+
+    # Add prediction filter if specified
+    if isinstance(predicted, bool):
+        predicted = {True: "TRUE", False: "FALSE"}[predicted]
+    elif isinstance(predicted, str):
+        predicted = predicted.upper()
+        if predicted not in ("TRUE", "FALSE"):
+            raise ValueError(f"Invalid predicted value '{predicted}'. Must be True, False, 'TRUE', 'FALSE', or None.")
+    if predicted in ("TRUE", "FALSE"):
+        stmt = stmt.where(RetentionTime.predicted == predicted)
 
     # Execute the query
     experiment_ids = session.execute(stmt).scalars().all()

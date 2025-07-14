@@ -1,5 +1,5 @@
 from csl.export_functions.utils.export_utils import *
-from config import ROOT_DIR
+from csl.config import ROOT_DIR
 from csl.utils.sql_utils import create_session
 import pytest
 from unittest.mock import patch, Mock, MagicMock
@@ -111,33 +111,29 @@ def test_get_contributors_copyright(exp_group, year, expected_inst_copyright):
                           ])
 def test_get_experiment_ids_by_exp_group(data_source, expected_exp_id):
     """Tests if the function returns the expected experiment ids based on data source filtering."""
-
     # Prepare
     csl_path = os.path.join(ROOT_DIR, 'tests/fixtures/export/CSL_v0_export_sqlite_1bfg_1lfuby_1uba.db')
     session = create_session(csl_path)
-
     # Run function
     exp_id = get_experiment_ids_by_exp_group(session, data_source)
-
     # Assert
     assert exp_id == expected_exp_id
 
 
-@pytest.mark.parametrize("chrom_method, expected_exp_id",
-                         [('bfg_nts_rp1', [34030, 12249, 14224, 31447]),
-                          ('lfuby_nts_rp1', [34030, 14224, 31447]),
-                          ('uba_nts_rp1', [14224, 31447]),
-                          ('lanuk_nts', [31447]),
+@pytest.mark.parametrize("chrom_method, predicted, expected_exp_id",
+                         [('bfg_nts_rp1', None, [34030, 12249, 14224, 31447]),
+                          ('bfg_nts_rp1', False, [34030, 12249, 14224]),
+                          ('bfg_nts_rp1', True, [31447]),
+                          ('lfuby_nts_rp1', False, [34030, 14224]),
+                          ('uba_nts_rp1', False, [31447]),
+                          ('lanuk_nts', False, []),
                           ])
-def test_get_experiment_ids_by_chrom_method(chrom_method, expected_exp_id):
+def test_get_experiment_ids_by_chrom_method(chrom_method, predicted, expected_exp_id):
     """Tests if the function returns the expected experiment ids based on chrom. method filtering."""
-
     # Prepare
     csl_path = os.path.join(ROOT_DIR, 'tests/fixtures/csl_testfiles/CSL_v0_export_4expid_chrommethod.db')
     session = create_session(csl_path)
-
     # Run function
-    exp_id = get_experiment_ids_by_chrom_method(session, chrom_method)
-
+    exp_id = get_experiment_ids_by_chrom_method(session, chrom_method, predicted)
     # Assert
     assert set(exp_id) == set(expected_exp_id)
