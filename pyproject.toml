@@ -12,18 +12,18 @@ authors = [
     { name = "Kevin S. Jewell", email = "jewell@bafg.de" },
 ]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
-    "pandas<2.2.2",
-    "numpy<2.0.0",
-    "sqlalchemy<2.0.31",
-    "pytest<8.2.2",
-    "rdkit<2024.3.5",
-    "tqdm<4.66.5",
-    "joblib<1.4.2",
-    "pygam<0.9.1",
+    "pandas>=2.3.1",
+    "numpy>=2.3.1",
+    "sqlalchemy>=2.0.41",
+    "pytest>=8.4.1",
+    "rdkit>=2025.3.3",
+    "tqdm>=4.67.1",
+    "scipy>=1.16.0",
+    "joblib>=1.5.1",
     "splash @ git+https://github.com/berlinguyinca/spectra-hash.git@174fbf289a0357535f9bacda282b9a2dbb7807cc#egg=splash&subdirectory=python",
-    "pubchempy<1.0.4",
+    "pubchempy>=1.0.4",
 ]
 
 [tool.setuptools.packages.find]
