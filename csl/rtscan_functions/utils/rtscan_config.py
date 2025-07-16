@@ -3,8 +3,8 @@ from csl.config import ROOT_DIR
 import os
 
 # Path to retention time models
-DEFAULT_GAM_BFG_TO_LANUK_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'gam_bfg_to_lanuk.pkl')
-DEFAULT_GAM_LANUK_TO_BFG_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'gam_lanuk_to_bfg.pkl')
+DEFAULT_MODEL_BFG_TO_LANUK_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'spline_bfg_to_lanuk.pkl')
+DEFAULT_MODEL_LANUK_TO_BFG_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'spline_lanuk_to_bfg.pkl')
 
 
 def check_order_pred_bfg_rt():

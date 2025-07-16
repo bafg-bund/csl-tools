@@ -18,14 +18,14 @@ class CheckRtscan(OperationRtscan):
         logger = logging.getLogger(__name__)
         logger.info('Executing check rtscan workflow')
 
-        # Functions for predicting RTs between institutions
+        # Functions for predicting RTs between data sources
         # Models need to be updated when other data sources are added, or when existing notations are modified.
-        gam_bl = joblib.load(DEFAULT_GAM_BFG_TO_LANUK_PATH)  # GAM model for predicting LANUK RTs from BfG RTs
-        gam_lb = joblib.load(DEFAULT_GAM_LANUK_TO_BFG_PATH)  # GAM model for predicting BfG RTs from LANUK RTs
+        model_bl = joblib.load(DEFAULT_MODEL_BFG_TO_LANUK_PATH)  # Model for predicting LANUK RTs from BfG RTs
+        model_lb = joblib.load(DEFAULT_MODEL_LANUK_TO_BFG_PATH)  # Model for predicting BfG RTs from LANUK RTs
         def pred_rt_bfg_uba(rt_bfg): return round((rt_bfg - 0.75) / 1.12, 3)
         def pred_rt_uba_bfg(rt_uba): return round(1.12 * rt_uba + 0.75, 3)
-        def pred_rt_bfg_lanuk(rt_bfg): return round(gam_bl.predict(rt_bfg)[0], 3)
-        def pred_rt_lanuk_bfg(rt_lanuk): return round(gam_lb.predict(rt_lanuk)[0], 3)
+        def pred_rt_bfg_lanuk(rt_bfg): return round(model_bl(rt_bfg), 3)
+        def pred_rt_lanuk_bfg(rt_lanuk): return round(model_lb(rt_lanuk), 3)
         def pred_rt_bfg_lfu(rt_bfg): return rt_bfg
         def pred_rt_lfu_bfg(rt_lfu): return rt_lfu
         models_from_bfg = {'uba': pred_rt_bfg_uba, 'lfuby': pred_rt_bfg_lfu,
