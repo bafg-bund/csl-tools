@@ -206,4 +206,6 @@ Björn Ehlig, BfG, ehlig@bafg.de
 Kevin S. Jewell, BfG, jewell@bafg.de  
 
 ## License
+Copyright 2025 Bundesanstalt für Gewässerkunde (Federal Institute of Hydrology).
+
 This package is licensed under the [GNU General Public License v3.0](LICENSE).
