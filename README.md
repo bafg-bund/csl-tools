@@ -32,25 +32,15 @@ pip install git+https://github.com/bafg-bund/csl-tools.git
 ```
 
 ## Development
-To contribute or run the project in development mode:
+To contribute to the development or to run the project in development mode:
 1. Clone the repository
     ```
     git clone https://github.com/bafg-bund/csl-tools.git
     cd csl-tools
     ```
 2. Create and activate a virtual environment (recommended)
-   ```
-   python -m venv .venv
-   ```
-    If using default command prompt (cmd):
-    ```
-    .\venv\Scripts\activate
-    ```
-    If using Windows PowerShell (PS):
-    ```
-    .\venv\Scripts\Activate.ps1
-    ```
-3. Install in editable mode
+
+3. Install the package and dependencies in editable mode
     ```
     pip install -e .
     ```
@@ -134,7 +124,7 @@ csl export <format> <path_csl> <path_out> <subset>
 
 #### Arguments
 - `format`: Specify the export format. Choose from:
-  - `thermo`: MSP/NIST export format (e.g., for mzVault).
+  - `thermo`: MSP/NIST export format (e.g., for importing to mzVault).
   - `envi`  : enviMass export format.
   - `mbank` : MassBank export format.
   - `sqlite`: SQLite export format (used to subset the CSL by a specific data source).
