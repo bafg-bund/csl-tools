@@ -3,7 +3,7 @@ import pytest
 
 
 def test_build_export_chunk_thermo(mock_formatted_data_thermo):
-    """Test if the export chunk is correctly assembled."""
+    """Tests assembly of the export chunk."""
     # Prepare data
     expected_export_chunk = (
         "NAME: Compound\n"
@@ -41,28 +41,32 @@ def test_build_export_chunk_thermo(mock_formatted_data_thermo):
 
     # Call the function
     export_chunk = build_export_chunk_thermo(mock_formatted_data_thermo)
+
+    # Assert
     assert export_chunk == expected_export_chunk
 
 
 def test_format_spectrum_thermo():
-    """Test if the spectrum is correctly formatted."""
+    """Tests if the spectrum is correctly formatted."""
     # Prepare data
     spectrum =  [(87.0441, 0.0326), (101.060643, 0.04768), (723.468001, 23.0), (233.4, 0.0)]
     expected_formatted_spectrum = [(87.0441, 0.0326), (101.0606, 0.0477), (723.468, 23.0)]
 
     # Call the function
     formatted_spectrum = format_spectrum_thermo(spectrum)
+
+    # Assert
     assert formatted_spectrum == expected_formatted_spectrum
 
 
 @pytest.mark.parametrize("pol, expected_ion_mode",[('pos','Positive'),('neg','Negative')])
 def test_get_ion_mode_thermo(pol, expected_ion_mode):
-    """Test if the function returns the expected MassBank-specific ion mode strings."""
+    """Tests if the function returns the expected MassBank-specific ion mode strings."""
     ion_mode = get_ion_mode_thermo(pol)
     assert ion_mode == expected_ion_mode
 
 def test_get_ion_mode_thermo_error():
-    """Test if the function returns an error when input is not valid."""
+    """Tests if the function returns an error when input is not valid."""
     pol = 'non_valid_input'
     with pytest.raises(ValueError, match=f"Unknown polarity format {pol}."):
         get_ion_mode_thermo(pol)

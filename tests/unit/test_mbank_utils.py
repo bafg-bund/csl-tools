@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 
 def test_get_exp_ids_mbank():
-    """Test if dictionary is correctly created based on file paths."""
+    """Tests if the returned dictionary contains the valid file paths and is correctly formatted."""
     # Prepare data
     mock_files = [
         "MSBNK-BAFG-CSL250401123.txt",
@@ -20,11 +20,12 @@ def test_get_exp_ids_mbank():
     with patch("os.listdir", return_value=mock_files):
         dict_mbank_exp_id = get_exp_ids_mbank("/dummy/path")
 
+    # Assert
     assert dict_mbank_exp_id == expected_dict
 
 
 def test_build_export_chunk_mbank(mock_formatted_data_mbank):
-    """Test if the export chunk is correctly assembled."""
+    """Tests the assembly of the export chunk."""
     # Prepare data
     expected_export_chunk = (
         "ACCESSION: MSBNK-BAFG-CSL250109103\n"
@@ -63,17 +64,21 @@ def test_build_export_chunk_mbank(mock_formatted_data_mbank):
 
     # Call the function
     export_chunk = build_export_chunk_mbank(mock_formatted_data_mbank)
+
+    # Assert
     assert export_chunk == expected_export_chunk
 
 
 def test_format_spectrum_mbank():
-    """Test if the spectrum is correctly formatted and relative intensities are calculated."""
+    """Tests if the spectrum is correctly formatted and relative intensities are calculated."""
     # Prepare data
     spectrum =  [(87.0441, 0.0326), (101.060643, 0.04768), (723.468001, 23.0), (233.4, 0.0)]
     expected_formatted_spectrum = [(87.0441, 0.0326, 1), (101.0606, 0.0477, 2), (723.468, 23.0, 999)]
 
     # Call the function
     formatted_spectrum = format_spectrum_mbank(spectrum)
+
+    # Assert
     assert formatted_spectrum == expected_formatted_spectrum
 
 
@@ -82,7 +87,7 @@ def test_format_spectrum_mbank():
                           ('[M]-', 'C9H13NO3', '[C9H13NO3]-')
                           ])
 def test_format_formula_mbank(adduct, formula, expected_formula):
-    """Test if the function returns the expected MassBank-specific formula strings."""
+    """Tests if the function returns the expected MassBank-specific formula strings."""
     formula_res = format_formula_mbank(adduct, formula)
     assert formula_res == expected_formula
 
@@ -94,7 +99,7 @@ def test_get_ion_mode_mbank(pol, expected_ion_mode):
     assert ion_mode == expected_ion_mode
 
 def test_get_ion_mode_mbank_error():
-    """Test if the function returns an error when input is not valid."""
+    """Tests if the function returns an error when input is not valid."""
     pol = 'non_valid_input'
     with pytest.raises(ValueError, match=f"Unknown polarity format {pol}."):
         get_ion_mode_mbank(pol)
@@ -102,12 +107,12 @@ def test_get_ion_mode_mbank_error():
 
 @pytest.mark.parametrize("col_type, expected_frag_mode",[('Q','CID'),('HCD','HCD')])
 def test_get_fragmentation_mode_mbank(col_type, expected_frag_mode):
-    """Test if the function returns the expected MassBank-specific fragmentation mode strings."""
+    """Tests if the function returns the expected MassBank-specific fragmentation mode strings."""
     frag_mode = get_fragmentation_mode_mbank(col_type)
     assert frag_mode == expected_frag_mode
 
 def test_get_fragmentation_mode_mbank_error():
-    """Test if the function returns an error when input is not valid."""
+    """Tests if the function returns an error when input is not valid."""
     col_type = 'non_valid_input'
     with pytest.raises(ValueError, match=f"Unknown fragmentation mode {col_type}"):
         get_fragmentation_mode_mbank(col_type)
@@ -118,7 +123,7 @@ def test_get_fragmentation_mode_mbank_error():
                           (999, 'accession_string1')  # Existing accession string is used
                           ])
 def test_get_accession_mbank(exp_id, expected_accession):
-    """Test if accession strings are correctly build and pre-existing ones are correctly identified."""
+    """Tests if accession strings are correctly build and pre-existing ones are correctly identified."""
     # Prepare data
     mock_dict = {  # Dictionary for linking existing experiment ids to filenames (=accession string)
         999: "accession_string1",
@@ -126,9 +131,10 @@ def test_get_accession_mbank(exp_id, expected_accession):
     }
     mock_contrib_prefix = 'BAFG'
 
-    # Run the function with mocked datetime
+    # Call the function with mocked datetime
     with patch('datetime.datetime') as mock_datetime:
         mock_datetime.now().strftime.return_value = '250401'  # Mock current date
         accession = get_accession_mbank(exp_id, mock_contrib_prefix, mock_dict)
 
+    # Assert
     assert accession == expected_accession

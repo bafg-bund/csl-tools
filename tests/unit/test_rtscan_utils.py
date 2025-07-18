@@ -4,11 +4,10 @@ from unittest.mock import patch, MagicMock
 
 
 def test_get_inst_rt_info(mock_session, mock_inst_method_pairs):
-    """ Test that the function returns the expected institution strings."""
-    # Prepare function inputs and return values
+    """ Tests that the function returns the expected institution strings."""
+    # Prepare function inputs and mocks
     uq_comp_id = 1000
 
-    # Mock the 'scalars().all()' chain
     mock_scalars_1 = MagicMock()
     mock_scalars_1.all.return_value = ['method_a', 'method_b']
     mock_execute_1 = MagicMock()
@@ -25,7 +24,7 @@ def test_get_inst_rt_info(mock_session, mock_inst_method_pairs):
     # Call the function
     inst_rt, inst_exp_rt, inst_pred_rt = get_inst_rt_info(uq_comp_id, mock_session, mock_inst_method_pairs)
 
-    # Assert
+    # Assert that the returned institution strings are in the correct groups
     assert inst_rt == ['inst_a', 'inst_b']
     assert inst_exp_rt == ['inst_a']
     assert inst_pred_rt == ['inst_b']
@@ -41,7 +40,7 @@ def test_get_inst_rt_info(mock_session, mock_inst_method_pairs):
 def test_check_experimental_data(mock_session, mock_inst_method_pairs, mock_inst,
                                  mock_entry_count, expected_query_call_count, mock_pred_bool, expected_pred_bool,
                                  expected_dupl, expected_pred_to_false):
-    """Parametrized test to check different scenarios."""
+    """Tests the function returns under different scenarios."""
     # Prepare function inputs and return values
     uq_comp_id = 99
     mock_inst_exp_rt = mock_inst
@@ -63,7 +62,7 @@ def test_check_experimental_data(mock_session, mock_inst_method_pairs, mock_inst
 
 
 def test_check_experimental_data_no_exp_rt(mock_session, mock_inst_method_pairs):
-    """Test case when no RT is found for an experimental data entry."""
+    """Tests case where no RT is found for an experimental data entry."""
     # Prepare function inputs and return values
     uq_comp_id = 99
     mock_inst_exp_rt = ['inst_a']
@@ -83,7 +82,7 @@ def test_check_experimental_data_no_exp_rt(mock_session, mock_inst_method_pairs)
 
 @pytest.mark.parametrize("predicted_flag, expected_pred_to_true", [('TRUE', []), ('FALSE', [99]), (None, [99])])
 def test_check_predicted_flags_pred_data(mock_session, mock_inst_method_pairs, predicted_flag, expected_pred_to_true):
-    """Test that "predicted" flags are corrected as expected."""
+    """Tests correction of "predicted" flags."""
     # Prepare function inputs and return values
     uq_comp_id = 99
     mock_inst_pred_rt = ['inst_a']  # Institutions with predicted RTs
@@ -99,7 +98,7 @@ def test_check_predicted_flags_pred_data(mock_session, mock_inst_method_pairs, p
 
 
 def test_predict_bfg_rt(mock_session, mock_models_to_bfg, mock_inst_method_pairs):
-    """Test that the BfG retention time (RT) was predicted correctly and the expected model was used."""
+    """Tests that the BfG retention time (RT) is predicted correctly and the expected model is used."""
     # Prepare function inputs and return values
     mock_check_order = ['inst_c', 'inst_b']  # Order of preference
     mock_inst_rt = ['inst_b', 'inst_c']  # Available institutions with RTs
@@ -118,7 +117,7 @@ def test_predict_bfg_rt(mock_session, mock_models_to_bfg, mock_inst_method_pairs
 
 
 def test_predict_bfg_rt_none(mock_session, mock_models_to_bfg, mock_inst_method_pairs):
-    """Test that the BfG retention time (RT) was not predicted due to missing available institutions with RT data."""
+    """Tests that the BfG retention time (RT) is not predicted due to missing available institutions with RT data."""
     # Prepare function inputs and return values
     mock_check_order = ['inst_c', 'inst_b']  # Order of preference
     mock_inst_rt = []  # No available institutions with RTs
@@ -132,7 +131,7 @@ def test_predict_bfg_rt_none(mock_session, mock_models_to_bfg, mock_inst_method_
 
 
 def test_predict_rt(mock_session, mock_models_from_bfg, mock_inst_method_pairs):
-    """Test that the retention time (RT) was predicted correctly and the expected model was used."""
+    """Tests that the retention time (RT) is predicted correctly and the expected model is used."""
     # Prepare function inputs and return values
     mock_inst_str = 'inst_b'  # Institute that needs prediction of an RT
     mock_session.query().filter_by().one_or_none.return_value = [7.0]
@@ -149,7 +148,7 @@ def test_predict_rt(mock_session, mock_models_from_bfg, mock_inst_method_pairs):
 
 
 def test_predict_rt_none(mock_session, mock_models_from_bfg, mock_inst_method_pairs):
-    """Test that the retention time (RT) was not predicted due to missing available BfG RT data."""
+    """Tests that the retention time (RT) is not predicted due to missing available BfG RT data."""
     # Prepare function inputs and return values
     mock_inst_str = 'inst_b'  # Institute that needs prediction of an RT
     mock_session.query().filter_by().one_or_none.return_value = None
@@ -165,17 +164,16 @@ def test_predict_rt_none(mock_session, mock_models_from_bfg, mock_inst_method_pa
 
 @patch('os.remove')  # Mock os.remove to prevent actual file deletion
 def test_commit_changes_choice_commit(mock_remove, mock_session, monkeypatch):
-    """Test the scenario where session changes are committed after user confirmation."""
+    """Tests the scenario where session changes are committed after user confirmation."""
+    # Prepare mocks
     mock_session.new = True  # Simulate a change in session
     path_csl = "path/to/csl"
-
-    # Mock input to return 'yes'
-    monkeypatch.setattr('builtins.input', lambda: 'yes')
+    monkeypatch.setattr('builtins.input', lambda: 'yes') # Mock input to return 'yes'
 
     # Call the function
     commit_changes_choice(path_csl, mock_session)
 
-    # Assert
+    # Assert that calls were made once
     mock_session.commit.assert_called_once()
     mock_session.close.assert_called_once()
     mock_remove.assert_not_called()
@@ -183,18 +181,17 @@ def test_commit_changes_choice_commit(mock_remove, mock_session, monkeypatch):
 
 @patch('os.remove')  # Mock os.remove to prevent actual file deletion
 def test_commit_changes_choice_no_commit(mock_remove, mock_session, monkeypatch, caplog):
-    """Test the scenario where session changes are not committed after user cancels."""
+    """Tests the scenario where session changes are not committed after the user cancels the program."""
+    # Prepare mocks
     mock_session.new = True  # Simulate a change in session
     path_csl = "path/to/csl"
-
-    # Mock input to return '' (cancel)
-    monkeypatch.setattr('builtins.input', lambda: '')
+    monkeypatch.setattr('builtins.input', lambda: '')  # Mock input to return '' (cancel)
 
     # Call the function
     with caplog.at_level('INFO'):
         commit_changes_choice(path_csl, mock_session)
 
-    # Assert
+    # Assert that the expected calls were made
     mock_session.commit.assert_not_called()
     mock_session.close.assert_called_once()
     mock_session.bind.dispose.assert_called_once()
@@ -204,7 +201,8 @@ def test_commit_changes_choice_no_commit(mock_remove, mock_session, monkeypatch,
 
 @patch('os.remove')  # Mock os.remove to prevent actual file deletion
 def test_commit_changes_choice_no_changes(mock_remove, mock_session, caplog):
-    """Test the scenario where there are no session changes to commit."""
+    """Tests the scenario where there are no session changes to commit."""
+    # Prepare mocks
     mock_session.new = False  # Simulate no new objects in session
     mock_session.dirty = False  # Simulate no dirty objects in session
     path_csl = "path/to/csl"

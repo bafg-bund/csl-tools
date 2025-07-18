@@ -5,14 +5,14 @@ import pandas as pd
 
 @pytest.fixture
 def mock_session():
-    """Mock the session object."""
+    """Mocks the session object."""
     session = MagicMock()
     return session
 
 
 @pytest.fixture
 def mock_logger():
-    """Mock the logger to capture logging output."""
+    """Mocks the logger to capture logging output."""
     with patch('logging.getLogger') as mock_get_logger:
         logger = MagicMock()
         mock_get_logger.return_value = logger
@@ -21,7 +21,7 @@ def mock_logger():
 
 @pytest.fixture
 def mock_inst_def():
-    """Mock the institution-specific defaults used in process workflows."""
+    """Mocks the institution-specific defaults used in process workflows."""
     return {
         'def_pol_p': 'mock_pol_p',
         'def_pol_n': 'mock_pol_n',
@@ -31,6 +31,7 @@ def mock_inst_def():
 
 @pytest.fixture
 def mock_spec_adduct():
+    """Mocks special adduct notation used in process workflows."""
     return {
         'adduct_name': 'formatted_adduct'
     }
@@ -38,7 +39,7 @@ def mock_spec_adduct():
 
 @pytest.fixture
 def mock_extract_data():
-    """Mock the extracted data (DataFrame)."""
+    """Mocks the extracted data (DataFrame) used in process workflows."""
     data = [{
         "var_comp": 'mock_compound',
         "var_adduct": 'mock_adduct',
@@ -68,7 +69,7 @@ def mock_extract_data():
 
 @pytest.fixture
 def mock_format_data():
-    """Mock the formatted data (DataFrame)."""
+    """Mocks the formatted data (DataFrame) used in process workflows."""
     data = {
         "dummy_i": ['mock_dummy'],
         "form_err_flag": [False],
@@ -78,22 +79,8 @@ def mock_format_data():
 
 
 @pytest.fixture
-def mock_format_data_match():
-    """Mock the formatted and matched data (DataFrame)."""
-    data = {
-        'dummy_i': ['mock_dummy'],
-        'form_err_flag': [False],
-        'form_warn_flag': [False],
-        'csl_dupl_flag': [False],
-        'csl_err_flag': [False],
-        'csl_add_flag': [True]
-    }
-    return pd.DataFrame(data)
-
-
-@pytest.fixture
 def mock_entry_df():
-    """Mock the data entry (that includes the formatted data) used in process workflows."""
+    """Mocks the data entry (that includes the formatted data) used in csl queries in process workflows."""
     data = {
         "var_comp": 'mock_compound',
         "var_mz": '900',
@@ -142,24 +129,8 @@ def mock_entry_df():
 
 
 @pytest.fixture
-def mock_df_envi():
-    """Mock a DataFrame returned by the CSL query used in the envimass export workflow."""
-    return pd.DataFrame({
-        'name': ['compound1', 'compound2'],
-        'formula': ['H2O', 'CO2'],
-        'rt': [1.23, 2.34],
-        'adduct': ['M+', 'M-H'],
-        'polarity': ['positive', 'negative'],
-        'experiment_id': [1, 2],
-        'CAS': ['123-45-6', '789-01-2'],
-        'inchi': ['InChI=1S/H2O/h1H2', 'InChI=1S/CO2/c2-1-3'],
-        'SMILES': ['O', 'O=C=O']
-    })
-
-
-@pytest.fixture
 def mock_inst_method_pairs():
-    """Mock the mapping of institutions to chromatographic methods"""
+    """Mocks the mapping of institutions to chromatographic methods."""
     return {
         'inst_a': 'method_a',
         'inst_b': 'method_b',
@@ -170,7 +141,7 @@ def mock_inst_method_pairs():
 
 @pytest.fixture
 def mock_models_to_bfg():
-    """Mock the models for predicting BfG RTs from other RTs."""
+    """Mocks the models for predicting BfG RTs from other RTs."""
     return {
         'inst_b': MagicMock(return_value=22.5),
         'inst_c': MagicMock(return_value=7.0)
@@ -179,7 +150,7 @@ def mock_models_to_bfg():
 
 @pytest.fixture
 def mock_models_from_bfg():
-    """Mock the models for predicting RTs from BfG RTs."""
+    """Mocks the models for predicting RTs from BfG RTs."""
     return {
         'inst_b': MagicMock(return_value=12.5),
         'inst_c': MagicMock(return_value=15.0)
@@ -188,7 +159,7 @@ def mock_models_from_bfg():
 
 @pytest.fixture
 def mock_formatted_data_mbank():
-    """Mock a FormattedData dataclass required for building final text chunks in the MassBank export workflow."""
+    """Mocks a FormattedData dataclass required for building final text chunks in the MassBank export workflow."""
     mock_f_data = MagicMock()
     mock_f_data.accession = 'MSBNK-BAFG-CSL250109103'
     mock_f_data.title = 'Compound; Instr; MS2; 140 V'
@@ -228,7 +199,7 @@ def mock_formatted_data_mbank():
 
 @pytest.fixture
 def mock_formatted_data_thermo():
-    """Mock a FormattedData dataclass required for building final text chunks in the thermo export workflow."""
+    """Mocks a FormattedData dataclass required for building final text chunks in the thermo export workflow."""
     mock_f_data = MagicMock()
     mock_f_data.compound_name = 'Compound'
     mock_f_data.accession = 'BAFG-CSL2501225'

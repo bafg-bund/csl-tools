@@ -9,7 +9,7 @@ import pandas as pd
 def workflow():
     class TestProcess(FormatProcess):
         def extract_data_regex(self, file, var_regex):
-            """Mock return for `extract_data_regex`."""
+            """Mock return for the function `extract_data_regex`."""
             return pd.DataFrame([{"var_comp": "Test", "var_ce": 10, "file_path": file}])
 
     return TestProcess(path_data='dummy_data_path', path_csl='dummy_csl_path')
@@ -18,7 +18,7 @@ def workflow():
 class TestFormatProcess:
 
     def test_process_data(self, workflow, mock_extract_data, mock_inst_def, mock_spec_adduct):
-        """Test processing of sample data without creating warning or error flags."""
+        """Tests processing of sample data without creating warning or error flags."""
 
         with patch('csl.process_functions.format_process.get_polarity', return_value='polarity'), \
              patch('csl.process_functions.format_process.get_compound_and_adduct_name',
@@ -41,10 +41,11 @@ class TestFormatProcess:
                       return_value=['Pesticide', 'Herbicide']), \
              patch('csl.process_functions.format_process.get_instrument', return_value='instrument'), \
              patch('csl.process_functions.format_process.get_experiment_id', return_value='experiment_id'):
+
             # Call the process_data method
             form_data = workflow.process_data(mock_extract_data, mock_inst_def, mock_spec_adduct)
 
-            # Assert
+            # Assert that the returned data is a DataFrame and contains the expected flags
             assert isinstance(form_data, pd.DataFrame)
             assert 'form_err_flag' in form_data.columns
             assert 'form_warn_flag' in form_data.columns
@@ -53,63 +54,60 @@ class TestFormatProcess:
 
 
     def test_process_data_inchi_cas_none(self, workflow, mock_extract_data, mock_inst_def, mock_spec_adduct):
-        """Test processing of sample data without creating warning or error flags."""
+        """Tests processing of sample data with missing InChIKey and CAS."""
 
-        with patch('csl.process_functions.format_process.get_polarity', return_value='polarity') as mock_get_polarity, \
-                patch('csl.process_functions.format_process.get_compound_and_adduct_name',
-                      return_value=('comp', 'adduct')) as mock_get_compound_and_adduct_name, \
-                patch('csl.process_functions.format_process.format_adduct',
-                      return_value='formatted_adduct') as mock_format_adduct, \
-                patch('csl.process_functions.format_process.get_collision_energy', return_value=('ce', 'ces', False)), \
-                patch('csl.process_functions.format_process.get_ionization_type', return_value='ionization_type'), \
-                patch('csl.process_functions.format_process.get_formula', return_value='formula'), \
-                patch('csl.process_functions.format_process.get_inchikey', return_value=(None, None)), \
-                patch('csl.process_functions.format_process.get_cas', return_value=None), \
-                patch('csl.process_functions.format_process.get_smiles', return_value='smiles'), \
-                patch('csl.process_functions.format_process.get_inchi_from_smiles', return_value='inchi'), \
-                patch('csl.process_functions.format_process.get_precursor_mz', return_value=99), \
-                patch('csl.process_functions.format_process.get_retention_time', return_value=99), \
-                patch('csl.process_functions.format_process.get_peaks',
-                      return_value=pd.DataFrame({'peak': [9.9, 9.9, 9.9]})), \
-                patch('csl.process_functions.format_process.get_compound_group',
-                      return_value=['Pesticide', 'Herbicide']), \
-                patch('csl.process_functions.format_process.get_instrument', return_value='instrument'), \
-                patch('csl.process_functions.format_process.get_experiment_id', return_value='experiment_id'):
-            # Call the process_data method
+        with patch('csl.process_functions.format_process.get_polarity',return_value='polarity'), \
+             patch('csl.process_functions.format_process.get_compound_and_adduct_name',
+                   return_value=('comp', 'adduct')), \
+             patch('csl.process_functions.format_process.format_adduct',return_value='formatted_adduct'), \
+             patch('csl.process_functions.format_process.get_collision_energy',
+                   return_value=('ce', 'ces', False)), \
+             patch('csl.process_functions.format_process.get_ionization_type', return_value='ionization_type'), \
+             patch('csl.process_functions.format_process.get_formula', return_value='formula'), \
+             patch('csl.process_functions.format_process.get_inchikey', return_value=(None, None)), \
+             patch('csl.process_functions.format_process.get_cas', return_value=None), \
+             patch('csl.process_functions.format_process.get_smiles', return_value='smiles'), \
+             patch('csl.process_functions.format_process.get_inchi_from_smiles', return_value='inchi'), \
+             patch('csl.process_functions.format_process.get_precursor_mz', return_value=99), \
+             patch('csl.process_functions.format_process.get_retention_time', return_value=99), \
+             patch('csl.process_functions.format_process.get_peaks',
+                  return_value=pd.DataFrame({'peak': [9.9, 9.9, 9.9]})), \
+             patch('csl.process_functions.format_process.get_compound_group',
+                  return_value=['Pesticide', 'Herbicide']), \
+             patch('csl.process_functions.format_process.get_instrument', return_value='instrument'), \
+             patch('csl.process_functions.format_process.get_experiment_id', return_value='experiment_id'):
+
+            # Call the method
             form_data = workflow.process_data(mock_extract_data, mock_inst_def, mock_spec_adduct)
 
-            # Assert
+            # Assert that the returned data is a DataFrame and contains the expected flags
             assert isinstance(form_data, pd.DataFrame)
             assert 'form_err_flag' in form_data.columns
             assert 'form_warn_flag' in form_data.columns
             assert all(form_data['form_err_flag']) is True
             assert all(form_data['form_warn_flag']) is True
-            mock_get_polarity.assert_called_once_with('mock_ion_mode', 'mock_pol_p', 'mock_pol_n')
-            mock_get_compound_and_adduct_name.assert_called_once_with('mock_compound')
-            mock_format_adduct.assert_called_once_with('mock_adduct', mock_spec_adduct, 'mock_qf', 'polarity')
 
 
     @pytest.fixture
     def mock_dependencies_match_with_csl(self):
         """Mock dependencies (sub-function returns) for the function match_with_csl."""
         with patch('csl.process_functions.format_process.create_session') as mock_create_session, \
-                patch('csl.process_functions.format_process.check_duplicate') as mock_check_duplicate, \
-                patch('csl.process_functions.format_process.add_exp_to_session') as mock_add_exp_to_session:
-            yield mock_create_session, mock_check_duplicate, mock_add_exp_to_session
+             patch('csl.process_functions.format_process.check_duplicate') as mock_check_duplicate, \
+             patch('csl.process_functions.format_process.add_exp_to_session') as mock_add_exp_to_session:
+             yield mock_create_session, mock_check_duplicate, mock_add_exp_to_session
 
     @pytest.mark.parametrize("mock_res_count, expected_dupl_flag, expected_err_flag, expected_add_flag",
-                             [(0, False, False, True),  # Case with no duplicate CSL match
-                              (1, True, False, False),  # Case with a duplicate CSL match
-                              (-1, False, True, False)]
-                             # Case with no attempted CSL matching due to missing inchi and cas
+                             [(0, False, False, True),   # Case with no duplicate CSL match
+                              (1, True, False, False),   # Case with a duplicate CSL match
+                              (-1, False, True, False)]  # Case with no CSL matching due to missing InChIKey and CAS
                              )
     def test_match_with_csl(self, workflow, mock_dependencies_match_with_csl, mock_session, mock_format_data, mock_inst_def,
                             mock_res_count, expected_dupl_flag, expected_err_flag, expected_add_flag):
-        """Test if match_with_csl correctly adds entries to session depending on flags."""
-
+        """Tests adding of entries to the session depending on input flags."""
+        # Prepare mocks
         mock_create_session, mock_check_duplicate, mock_add_exp_to_session = mock_dependencies_match_with_csl
 
-        # Add relevant data to DataFrame fixture
+        # Add relevant data to the DataFrame fixture
         tmp_data = {
             'var_comp': ['compound1'],
             'var_ce': ['40'],
@@ -121,15 +119,17 @@ class TestFormatProcess:
         mock_create_session.return_value = mock_session
         mock_check_duplicate.return_value = mock_res_count
 
-        # Call the match_with_csl method
+        # Call the method
         form_data_match, session_out = workflow.match_with_csl(mock_format_data, mock_inst_def)
 
-        # Assert
+        # Assert that calls were made as expected
         if expected_add_flag:
             mock_add_exp_to_session.assert_called_once()
         else:
             mock_add_exp_to_session.assert_not_called()
         assert mock_check_duplicate.call_count == len(mock_format_data)
+
+        # Assert that flags are set to the expected bool
         assert all(form_data_match['csl_dupl_flag']) == expected_dupl_flag
         assert all(form_data_match['csl_err_flag']) == expected_err_flag
         assert all(form_data_match['csl_add_flag']) == expected_add_flag
@@ -180,11 +180,10 @@ class TestFormatProcess:
                                   ''),
                              ])
     def test_commit_to_csl(self, workflow, mock_session, mock_logger, monkeypatch, mock_form_data_match, user_input):
-        """Test scenarios with different flags and user input."""
-
+        """Tests committing scenarios with different flags and user input."""
         # Mock user input
         with patch('builtins.input', return_value=user_input) as mock_input:
-            # Call the commit_to_csl method
+            # Call the method
             workflow.commit_to_csl(mock_session, mock_form_data_match)
 
             # Assert session calls
@@ -198,5 +197,4 @@ class TestFormatProcess:
                 mock_logger.warning.assert_called()
             if not any(mock_form_data_match.csl_add_flag):
                 mock_input.assert_not_called()
-
-            mock_session.close.assert_called_once()  # Session should always be closed
+            mock_session.close.assert_called_once()

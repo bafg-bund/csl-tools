@@ -11,20 +11,21 @@ from unittest.mock import patch
                           ['inst_b'],  # Predicted RT
                           False),  # Function to predict main RT not called
                          # Case 2: Main RT (a) is not available as experimental RT, but as predicted RT
-                         (['bfg', 'inst_c'],
-                          ['inst_c'],
-                          ['bfg'],
-                          False),
+                         (['bfg', 'inst_c'],  # All
+                          ['inst_c'],  # Experimental
+                          ['bfg'],  # Predicted
+                          False),  # Function to predict main RT not called
                          # Case 3: Main RT (a) is not available and needs to be predicted first
-                         (['inst_b'],
-                          ['inst_b'],
-                          [],
+                         (['inst_b'],  # All
+                          ['inst_b'],  # Experimental
+                          [],  # Predicted
                           True)  # Function to predict main RT called
                          ])
 @patch('tqdm.tqdm', lambda x: x)  # Disable tqdm progress bar
 def test_rtscan(mock_session, mock_inst_method_pairs, mock_inst_rt, mock_inst_exp_rt,
                 mock_inst_pred_rt, mock_predict_bfg_rt_called):
-    with patch('csl.rtscan_functions.check_rtscan.DEFAULT_PAIRS_INST_CHROM', mock_inst_method_pairs), \
+    """Tests function and query calls for rtscan check workflow."""
+    with patch('csl.rtscan_functions.check_rtscan.DEFAULT_PAIRS_INST_CHROM') as mock_inst_method_pairs, \
          patch('csl.rtscan_functions.check_rtscan.check_order_pred_bfg_rt') as mock_check_order_pred_bfg_rt, \
          patch('csl.rtscan_functions.check_rtscan.update_version_filename') as mock_update_version_filename, \
          patch('shutil.copy'), \
@@ -54,8 +55,9 @@ def test_rtscan(mock_session, mock_inst_method_pairs, mock_inst_rt, mock_inst_ex
         # Execute the rtscan method
         mock_check_workflow.rtscan()
 
-        # Assert
-        mock_session.query.assert_called_with(RetentionTime.compound_id)  # Check if query was called
+        # Assert that query was called
+        mock_session.query.assert_called_with(RetentionTime.compound_id)
+        # Assert the function call to predict the main RT
         assert mock_predict_bfg_rt.called == mock_predict_bfg_rt_called
-        # Check the number of time other RTs were predicted
+        # Assert that the number of times other RTs were predicted is as expected
         assert mock_predict_rt.call_count == len(list(set(mock_inst_method_pairs.keys()) - set(mock_inst_rt)))

@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 def test_export_sqlite_bfg():
-    """Tests correct export of CSL subset only with BfG experiments."""
+    """Tests export of CSL subset only with BfG experiments."""
     # Prepare paths
     csl_path = os.path.join(ROOT_DIR,'tests/fixtures/export/CSL_v0_export_sqlite_1bfg_1lfuby_1uba.db')
     out_path = os.path.join(ROOT_DIR,'tests/integration/temp')
@@ -37,9 +37,9 @@ def test_export_sqlite_bfg():
     session = create_session(path_csl=files[0])
 
     # Assert that only one experiments remained in the CSL
-    assert len(session.query(Experiment).all()) == 1  # previously 3 in total, after subsetting 1 from bfg
+    assert len(session.query(Experiment).all()) == 1  # Previously 3 in total; 1 after subsetting for 'bfg'
 
-    # Assert that experiment, compound and parameter id are all 1
+    # Assert that experiment, compound and parameter id are all equal to 1
     exp_id = session.query(Experiment.experiment_id).one_or_none()
     comp_id = session.query(Compound.compound_id).one_or_none()
     par_id = session.query(Parameter.parameter_id).one_or_none()
@@ -53,7 +53,7 @@ def test_export_sqlite_bfg():
     # Assert that there are 4 entries for retention times
     assert len(session.query(RetentionTime.ret_time_id).all()) == 4
 
-    # Assert that there is just one experiment group with the id 1
+    # Assert that there is just one experiment group with the id 1 (bfg)
     exp_group_id = session.query(expGroupExp.c.experimentGroup_id).one_or_none()
     assert exp_group_id[0] == 1
 

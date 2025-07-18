@@ -9,7 +9,7 @@ from unittest import mock
 
 def test_process_thermo():
     """
-    Tests correct processing of ThermoFisher/mzVault-based experiments and import into the CSL.
+    Tests processing of ThermoFisher/mzVault-based experiments and import into the CSL.
         Todo: Currently based on lfuby_workflow. Change later to thermo workflow
     """
     # Prepare paths

@@ -53,8 +53,7 @@ To contribute to the development or to run the project in development mode:
 ## Contribution (source code)
 If you run into issues or have ideas for improvement, feel free to contact us.
 
-If you want to make changes to the code, please do not directly push into the main branch. 
-Instead, create a new branch for your work and open a pull request to the `dev` branch.
+To make changes, please create a new branch and open a pull request to the `dev` branch.
 
 ## Contribution (spectral data)
 To contribute spectral data to the CSL, please follow the linked guidelines for the respective file formats.  

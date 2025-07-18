@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 def test_export_envi():
-    """Tests correct export of CSL entries as enviMass documents."""
+    """Tests export of CSL entries as enviMass documents."""
     # Prepare paths
     csl_path = os.path.join(ROOT_DIR,'tests/fixtures/export/CSL_v0_export_envi.db')
     out_path = os.path.join(ROOT_DIR,'tests/integration/temp')
@@ -25,7 +25,7 @@ def test_export_envi():
         except PermissionError as e:
             print(f"Could not delete {f}: {e}")
 
-    # Export sqlite workflow
+    # Export envi workflow
     export_data(format='envi', path_csl=csl_path, path_out=out_path)
 
     # Assert that the correct number of files were produced

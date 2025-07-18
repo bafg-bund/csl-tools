@@ -8,9 +8,7 @@ from unittest import mock
 
 
 def test_process_mbank():
-    """
-    Tests correct processing of MassBank documents and import into the CSL.
-    """
+    """Tests processing of MassBank documents and import into the CSL."""
     # Prepare paths
     data_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/mbank_testfiles')
     csl_template_path = os.path.join(ROOT_DIR,'tests/fixtures/import/CSL_v0_4entries.db')

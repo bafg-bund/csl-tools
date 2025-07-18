@@ -1,9 +1,9 @@
 from csl.export_functions.utils.envi_export_utils import *
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 
 
 def test_get_fragments_int_cutoff():
-    """Test return of get_fragments_int_cutoff function with different input conditions."""
+    """Tests function return with different input conditions."""
     # Create test data for fragments
     mock_fragment_data = [
                 MagicMock(mz=100.0, int=30),

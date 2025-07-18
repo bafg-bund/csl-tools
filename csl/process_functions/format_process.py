@@ -299,8 +299,6 @@ class FormatProcess(ABC):
                 # Match experimental parameters with the CSL to detect potential duplicate entries
                 res_count = check_duplicate(session, entry)  # Number of duplicate entries
                 if res_count > 0:  # Duplicate found, skip the file
-                    # logger.warning(f'Found {res_count} duplicate(s) in CSL \n Compound: {entry['var_comp']}; '
-                    #                f'CE: {entry['var_ce']}; File path: {entry['file_path']}')
                     entry_dupl = True
                 elif res_count < 0:  # Missing identifiers, skip the file
                     logger.warning('No InChIKey and no CAS registry number found. Provide at least one. Skipping file.')

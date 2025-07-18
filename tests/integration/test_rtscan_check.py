@@ -9,7 +9,7 @@ from unittest import mock
 
 def test_rtscan_check():
     """
-    Tests correct prediction of retention times (RTs) and correction of incorrect or missing "predicted" flags.
+    Tests prediction of retention times (RTs) and correction of incorrect or missing "predicted" flags.
 
     The CSL file at `csl_template_path` contains intentional mistakes and missing data that should be corrected:
     - Some "predicted" flags are incorrectly set or missing
@@ -36,7 +36,7 @@ def test_rtscan_check():
     # Copy the database file
     shutil.copy(csl_template_path, csl_copy_path)
 
-    # Rtscan update workflow
+    # Rtscan check workflow
     with mock.patch('builtins.input', return_value='yes'):  # Mocks user input
         scan_rt(operation='check', path_csl=csl_copy_path)
 
