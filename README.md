@@ -13,7 +13,7 @@ The CSL is a collection of spectral data (standards) that can be used by [ntswor
 
 Our goal is to grow this collection, making the retrospective analysis of historical data in NTSPortal more powerful and valuable for all users <sup>[3]</sup>.
 
-If you wish to contribute spectral data, please see the section [Contribution (spectral data)](#contributing-spectral-data).
+If you wish to contribute spectral data, please see the section [Contribution (spectral data)](#contribution-spectral-data).
 
 Currently, the CSL contains data from the following sources:
 - [BfG](https://www.bafg.de) (Federal Institute of Hydrology, Koblenz, Germany)
