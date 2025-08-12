@@ -124,7 +124,7 @@ PrecursorMz: 328.14312
 ---
 
 ### Collision energy (CE)
-Collision energy used for fragmentation.
+Collision energy used for fragmentation in volts.
 
 - CE can be written as `20` or `20.00`
 - Multiple CEs:
