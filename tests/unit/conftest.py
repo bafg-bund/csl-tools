@@ -21,7 +21,7 @@ def mock_logger():
 
 @pytest.fixture
 def mock_inst_def():
-    """Mocks the institution-specific defaults used in process workflows."""
+    """Mocks the data-source-specific defaults used in process workflows."""
     return {
         'def_pol_p': 'mock_pol_p',
         'def_pol_n': 'mock_pol_n',
@@ -130,7 +130,7 @@ def mock_entry_df():
 
 @pytest.fixture
 def mock_inst_method_pairs():
-    """Mocks the mapping of institutions to chromatographic methods."""
+    """Mocks the mapping of data sources to chromatographic methods."""
     return {
         'inst_a': 'method_a',
         'inst_b': 'method_b',
@@ -166,7 +166,7 @@ def mock_formatted_data_mbank():
     mock_f_data.date = '2025.01.09'
     mock_f_data.authors = 'Person A; Person B; Person C'
     mock_f_data.inst_license = 'dl-de/by-2-0'
-    mock_f_data.inst_copyright = 'Copyright 2025 Institution'
+    mock_f_data.inst_copyright = 'Copyright 2025 Data source'
     mock_f_data.comment_chunk = (f"COMMENT: Information\n"
          f"COMMENT: Additional information\n")
     mock_f_data.compound_name = 'Compound'
@@ -207,7 +207,7 @@ def mock_formatted_data_thermo():
     mock_f_data.date = '2025.01.09'
     mock_f_data.authors = 'Person A; Person B; Person C'
     mock_f_data.inst_license = 'dl-de/by-2-0'
-    mock_f_data.inst_copyright = 'Copyright 2025 Institution'
+    mock_f_data.inst_copyright = 'Copyright 2025 Data source'
     mock_f_data.comment_chunk = (f"COMMENT: Information\n"
          f"COMMENT: Additional information\n")
     mock_f_data.compound_classes = 'Industrial_process; Biocide'

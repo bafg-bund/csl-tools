@@ -12,7 +12,7 @@ def test_build_export_chunk_thermo(mock_formatted_data_thermo):
         "DATE: 2025.01.09\n"
         "AUTHORS: Person A; Person B; Person C\n"
         "LICENSE: dl-de/by-2-0\n"
-        "COPYRIGHT: Copyright 2025 Institution\n"
+        "COPYRIGHT: Copyright 2025 Data source\n"
         "COMMENT: Information\n"
         "COMMENT: Additional information\n"
         "COMPOUNDCLASS: Industrial_process; Biocide\n"

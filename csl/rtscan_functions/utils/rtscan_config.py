@@ -9,12 +9,12 @@ DEFAULT_MODEL_LANUK_TO_BFG_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_function
 
 def check_order_pred_bfg_rt():
     """
-    Provides a list of institutions in order of importance to predict bfg retention times.
+    Provides a list of data sources in order of importance to predict bfg retention times.
     The first entry is used first if available, then the second one, etc.
-    Can be updates when new institution notations are added.
-    Check possible institution codes in config.py.
+    Can be updates when new data source notations are added.
+    Check possible data source codes in config.py.
 
     Returns:
-        list : List of institutions in order of importance to predict bfg retention times.
+        list : List of data sources in order of importance to predict bfg retention times.
     """
     return ['lfuby', 'uba', 'lanuk']

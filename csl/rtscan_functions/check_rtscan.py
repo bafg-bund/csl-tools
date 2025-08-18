@@ -33,7 +33,7 @@ class CheckRtscan(OperationRtscan):
         models_to_bfg = {'uba': pred_rt_uba_bfg, 'lfuby': pred_rt_lfu_bfg,
                          'lanuk': pred_rt_lanuk_bfg}
 
-        # Get list of institutions in order of importance to predict BfG RT
+        # Get list of data sources in order of importance to predict BfG RT
         check_order = check_order_pred_bfg_rt()
 
         # Backup the database file with updated filename
@@ -57,7 +57,7 @@ class CheckRtscan(OperationRtscan):
 
         # Loop through compound IDs to check experimental and predicted RT data
         for uq_comp_id in tqdm(uq_comp_ids):
-            # Get institutions linked to (any or experimental) retention time data in the CSL for each compound ID
+            # Get data sources linked to (any or experimental) retention time data in the CSL for each compound ID
             inst_rt, inst_exp_rt, inst_pred_rt = get_inst_rt_info(uq_comp_id, session, DEFAULT_PAIRS_INST_CHROM)
 
             # Check experimental RT data
@@ -75,13 +75,13 @@ class CheckRtscan(OperationRtscan):
                 # Predict BfG RT if it doesn't exist yet and add entry to session
                 rt_bfg_pred = predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, DEFAULT_PAIRS_INST_CHROM)
                 if rt_bfg_pred:
-                    # Add BfG to the list of institutions with available RTs
+                    # Add BfG to the list of data sources with available RTs
                     inst_rt.append('bfg')
                     pred_to_bfg_all.append(uq_comp_id)
 
-            inst_miss_rt = list(set(DEFAULT_PAIRS_INST_CHROM.keys()) - set(inst_rt))  # Get list of institutions without any RT
+            inst_miss_rt = list(set(DEFAULT_PAIRS_INST_CHROM.keys()) - set(inst_rt))  # Get list of data sources without any RT
             for inst in inst_miss_rt:
-                # Predict the RTs for all other institution without any RT
+                # Predict the RTs for all other data sources without any RT
                 rt_pred = predict_rt(uq_comp_id, session, models_from_bfg, inst, DEFAULT_PAIRS_INST_CHROM)
                 if rt_pred:
                     pred_from_bfg_all.append(uq_comp_id)

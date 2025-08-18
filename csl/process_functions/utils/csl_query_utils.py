@@ -103,7 +103,7 @@ def add_exp_to_session(session, entry, inst_def):
     Args:
         session (obj)         : SQLAlchemy session object (sqlalchemy.orm.session.Session)
         entry (pandas.series) : Data of one entry (pandas.core.series.Series)
-        inst_def (dict)       : Institution-specific defaults used for keeping format, and csl-matching/commits.
+        inst_def (dict)       : Data-source-specific defaults used for keeping format, and csl-matching/commits.
 
     Returns:
         (No return variables, but the session object is updated)

@@ -6,7 +6,7 @@ def extract_data_regex_mbank(file_path, var_regex):
         file_path (str)  : Path of file.
         var_regex (dict) : Regular expressions for data extraction. Input as dictionary with fixed variable
                            names (keys) and the respective regular expression (values), to keep it consistent
-                           across institutional workflows. See <inst>_config.py.
+                           across data source workflows. See <data source>_config.py.
 
     Returns:
         df (DataFrame) : DataFrame with extracted data.

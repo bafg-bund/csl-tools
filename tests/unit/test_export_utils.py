@@ -101,7 +101,7 @@ def test_get_compound_classes_none():
                          [('bfg', '2025', 'Copyright 2025 Federal Institute of Hydrology, Koblenz, Germany'),
                           ('lfuby', '2025', 'Copyright 2025 Bavarian Environment Agency, Augsburg, Germany'),
                           ('uba', '2025', 'Copyright 2025 Federal Environment Agency, Berlin, Germany'),
-                          ('not_an_institution', '2025', None)
+                          ('not_a_data source', '2025', None)
                           ])
 def test_get_contributors_copyright(exp_group, year, expected_inst_copyright):
     """Tests if the function returns the expected copyright statements."""

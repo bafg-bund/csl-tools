@@ -54,7 +54,7 @@ def export_data(format: str, path_csl: str, path_out: str, subset: str or list[s
     validate_file_path(path_csl)
     validate_file_path(path_out)
 
-    # Select and execute the appropriate workflow based on the institution
+    # Select and execute the appropriate workflow based on the data source
     workflow_class = WORKFLOWS[format]
     workflow = workflow_class(path_csl, path_out, subset)
     workflow.export()

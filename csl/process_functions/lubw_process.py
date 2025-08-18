@@ -4,7 +4,7 @@ from csl.process_functions.utils import *
 
 class LubwProcess(FormatProcess):
     def process(self):
-        """Workflow to process MS2 data files from the institution lubw (Landesanstalt für Umwelt Baden-Württemberg)."""
+        """Workflow to process MS2 data files from the data source lubw (Landesanstalt für Umwelt Baden-Württemberg)."""
 
         import logging
         logger = logging.getLogger(__name__)

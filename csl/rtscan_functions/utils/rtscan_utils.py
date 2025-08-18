@@ -3,17 +3,17 @@ from csl.utils.sql_utils import close_session_remove_file, RetentionTime, Experi
 
 def get_inst_rt_info(uq_comp_id, session, inst_method_pairs):
     """
-    Get lists of institutions that are linked to retention time (RT) data in the CSL for a specific compound ID.
+    Get lists of data sources that are linked to retention time (RT) data in the CSL for a specific compound ID.
 
     Args:
         uq_comp_id (int)         : Compound ID used to query the CSL database
         session (obj)            : SQLAlchemy session object connected to the CSL database.
-        inst_method_pairs (dict) : Dictionary mapping CSL institution notation to CSL method notation.
+        inst_method_pairs (dict) : Dictionary mapping CSL data source notation to CSL method notation.
 
     Returns:
-        inst_rt (list os str)      : Institutions with any RT entry for the compound ID.
-        inst_exp_rt (list of str)  : Institution with an experimental RT entry for the compound ID.
-        inst_pred_rt (list of str) : Institution with a predicted RT entry for the compound ID.
+        inst_rt (list os str)      : Data sources with any RT entry for the compound ID.
+        inst_exp_rt (list of str)  : Data sources with an experimental RT entry for the compound ID.
+        inst_pred_rt (list of str) : Data sources with a predicted RT entry for the compound ID.
     """
     from sqlalchemy import select
 
@@ -42,21 +42,21 @@ def get_inst_rt_info(uq_comp_id, session, inst_method_pairs):
 def check_experimental_data(uq_comp_id, inst_exp_rt, session, inst_method_pairs):
     """
     Checks and corrects "predicted" flags for experimental RTs and logs any issues
-    such as missing RTs or duplicate entries for the same institution.
+    such as missing RTs or duplicate entries for the same data source.
 
     Process:
-    1. For each institution with experimental RT data, checks if there is a corresponding RT entry in the database.
+    1. For each data source with experimental RT data, checks if there is a corresponding RT entry in the database.
     2. If the "predicted" flag is incorrectly set to 'TRUE', it is corrected to 'FALSE'.
     3. Logs warnings for duplicate RT entries and errors for missing RT data.
 
     Args:
         uq_comp_id (int)               : Compound ID used to query the CSL database
-        inst_exp_rt (list of str)      : List of institutions with an experimental RT entry for the compound ID.
+        inst_exp_rt (list of str)      : List of data sources with an experimental RT entry for the compound ID.
         session (obj)                  : SQLAlchemy session object connected to the CSL database.
-        inst_method_pairs (dict)       : Dictionary mapping CSL institution notation to CSL method notation.
+        inst_method_pairs (dict)       : Dictionary mapping CSL data source notation to CSL method notation.
 
     Returns:
-        entr_dupl (list of int)          : List of compound IDs with duplicate RT entries for the same institution.
+        entr_dupl (list of int)          : List of compound IDs with duplicate RT entries for the same data source.
         entr_pred_to_false (list of int) : List of compounds IDs where the "predicted" flag was corrected to 'FALSE'.
         entr_no_exp_rt (list of int)     : List of compounds IDs where no RT was found for the experimental data.
     """
@@ -65,7 +65,7 @@ def check_experimental_data(uq_comp_id, inst_exp_rt, session, inst_method_pairs)
 
     entr_dupl, entr_pred_to_false, entr_no_exp_rt = [], [], []
 
-    # Iterate over institutions with experimental RT
+    # Iterate over data sources with experimental RT
     for inst_exp in inst_exp_rt:
         method = inst_method_pairs[inst_exp]
 
@@ -73,7 +73,7 @@ def check_experimental_data(uq_comp_id, inst_exp_rt, session, inst_method_pairs)
         if rt_count <= 1:
             rt_res = session.query(RetentionTime).filter_by(compound_id=uq_comp_id, chrom_method=method).one_or_none()
         else:
-            logger.warning(f'Multiple entries for the same institution ({inst_exp}) detected for '
+            logger.warning(f'Multiple entries for the same data source ({inst_exp}) detected for '
                            f'compound id: {uq_comp_id}. Skipping. Please check.')
             entr_dupl.append(uq_comp_id)
             continue
@@ -98,9 +98,9 @@ def check_predicted_flags_pred_data(uq_comp_id, inst_pred_rt, session, inst_meth
 
     Args:
         uq_comp_id (int)               : Compound ID used to query the CSL database.
-        inst_pred_rt (list of str)     : List of institutions with predicted RT data.
+        inst_pred_rt (list of str)     : List of data sources with predicted RT data.
         session (obj)                  : SQLAlchemy session object connected to the database.
-        inst_method_pairs (dict)       : Mapping of institutions to chromatographic methods.
+        inst_method_pairs (dict)       : Mapping of data sources to chromatographic methods.
 
     Returns:
         pred_to_true (list of int) : List of compounds IDs where the "predicted" flag was corrected to 'TRUE'.
@@ -123,16 +123,16 @@ def check_predicted_flags_pred_data(uq_comp_id, inst_pred_rt, session, inst_meth
 
 def predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, inst_method_pairs):
     """
-    Predicts missing BfG retention time (RT) for a given compound ID based on available data from other institutions
+    Predicts missing BfG retention time (RT) for a given compound ID based on available data from other data sources
     (following an order of importance).
 
     Args:
         uq_comp_id (int)           : Compound ID used to query the CSL database.
         session (obj)              : SQLAlchemy session object connected to the database.
-        models_to_bfg (dict)       : Mapping of institutions to models for predicting BfG RTs.
-        check_order (list of str)  : List of institutions in order of importance to predict BfG RTs.
-        inst_rt (list of str)      : List of institutions with available RT data (both experimental and predicted).
-        inst_method_pairs (dict)   : Mapping of institutions to chromatographic methods.
+        models_to_bfg (dict)       : Mapping of data sources to models for predicting BfG RTs.
+        check_order (list of str)  : List of data sources in order of importance to predict BfG RTs.
+        inst_rt (list of str)      : List of data sources with available RT data (both experimental and predicted).
+        inst_method_pairs (dict)   : Mapping of data sources to chromatographic methods.
 
     Returns:
         float or None: The predicted BfG RT, or None if no prediction could be made.
@@ -141,7 +141,7 @@ def predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, ins
     import logging
     logger = logging.getLogger(__name__)
 
-    bfg_str = 'bfg'  # BfG institution string
+    bfg_str = 'bfg'  # BfG string
     rt_bfg_pred = None  # Initialize predicted BfG RT variable
 
     # Predict missing BfG RT based on available data (in order of importance)
@@ -175,9 +175,9 @@ def predict_rt(uq_comp_id, session, models_from_bfg, inst_str, inst_method_pairs
     Args:
         uq_comp_id (int)           : Compound ID used to query the CSL database.
         session (obj)              : SQLAlchemy session object connected to the database.
-        models_from_bfg (dict)     : Mapping of institutions to models for predicting RTs from BfG data.
-        inst_str (str)             : Institution that needs RT prediction.
-        inst_method_pairs (dict)   : Mapping of institutions to chromatographic methods.
+        models_from_bfg (dict)     : Mapping of data sources to models for predicting RTs from BfG data.
+        inst_str (str)             : Data source that needs RT prediction.
+        inst_method_pairs (dict)   : Mapping of data sources to chromatographic methods.
 
     Returns:
         float or None: The predicted RT, or None if no prediction could be made.
@@ -186,7 +186,7 @@ def predict_rt(uq_comp_id, session, models_from_bfg, inst_str, inst_method_pairs
     import logging
     logger = logging.getLogger(__name__)
 
-    bfg_str = 'bfg'  # BfG institution string
+    bfg_str = 'bfg'  # BfG string
     rt_pred = None
 
     # Predict missing RT based on BfG RT
@@ -214,14 +214,14 @@ def summarize_corrections_and_errors(uq_comp_ids, dupl_all, pred_to_false_all, n
 
     Args:
         uq_comp_ids (list of int)          : All unique compound IDs
-        dupl_all (list of int)             : List of compound IDs with duplicate RT entries for the same institution.
+        dupl_all (list of int)             : List of compound IDs with duplicate RT entries for the same data source.
         pred_to_false_all (list of int)    : List of compounds IDs where the "predicted" flag was corrected to 'FALSE'.
         no_exp_rt_all (list of int)        : List of compounds IDs where no RT was found for the experimental data.
         pred_to_true_all (list of int)     : List of compounds IDs where the "predicted" flag was corrected to 'TRUE'.
         rt_pred_from_bfg_all (list of int) : List of compounds where RT was predicted from BfG.
         rt_pred_to_bfg_all (list of int)   : List of compounds where RT was predicted to BfG.
         no_pred_rt_all (list of int)       : List of compounds IDs where no RT was found for the predicted data of at
-                                             least one institution.
+                                             least one data source.
     """
     import logging
     logger = logging.getLogger(__name__)
@@ -246,7 +246,7 @@ def summarize_corrections_and_errors(uq_comp_ids, dupl_all, pred_to_false_all, n
     if len(no_pred_rt_all) > 0:
         logger.error(f'No RT found for experimental data: {len(no_pred_rt_all)} compound IDs: {no_pred_rt_all}')
     logger.info(f'Predicted RT based on BfG RT: {len(rt_pred_from_bfg_all)}')
-    logger.info(f'Predicted BfG RT from other institutions: {len(rt_pred_to_bfg_all)}')
+    logger.info(f'Predicted BfG RT from other data sources: {len(rt_pred_to_bfg_all)}')
 
 
 def commit_changes_choice(path_csl, session):

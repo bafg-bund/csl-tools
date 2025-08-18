@@ -41,7 +41,7 @@ def scan_rt(operation: str, path_csl: str):
     # Validate the provided file paths
     validate_file_path(path_csl)
 
-    # Select and execute the appropriate workflow based on the institution
+    # Select and execute the appropriate workflow based on the data source
     workflow_class = WORKFLOWS[operation]
     workflow = workflow_class(path_csl)
     workflow.rtscan()

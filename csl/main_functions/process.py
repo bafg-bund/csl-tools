@@ -34,7 +34,7 @@ WORKFLOWS = {
 
 def process_data(format: str, path_csl: str, path_data: str or list[str]):
     """
-    Executes the appropriate workflow for processing MS2 data files based on the institution type.
+    Executes the appropriate workflow for processing MS2 data files based on the data source type.
 
     Args:
         format (str)    : Format of files to be processed. Choose from:

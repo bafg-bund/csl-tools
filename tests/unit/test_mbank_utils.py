@@ -33,7 +33,7 @@ def test_build_export_chunk_mbank(mock_formatted_data_mbank):
         "DATE: 2025.01.09\n"
         "AUTHORS: Person A; Person B; Person C\n"
         "LICENSE: dl-de/by-2-0\n"
-        "COPYRIGHT: Copyright 2025 Institution\n"
+        "COPYRIGHT: Copyright 2025 Data source\n"
         f"COMMENT: Information\n"
         f"COMMENT: Additional information\n"
         "CH$NAME: Compound\n"

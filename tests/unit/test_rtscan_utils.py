@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock
 
 
 def test_get_inst_rt_info(mock_session, mock_inst_method_pairs):
-    """ Tests that the function returns the expected institution strings."""
+    """ Tests that the function returns the expected data source strings."""
     # Prepare function inputs and mocks
     uq_comp_id = 1000
 
@@ -24,7 +24,7 @@ def test_get_inst_rt_info(mock_session, mock_inst_method_pairs):
     # Call the function
     inst_rt, inst_exp_rt, inst_pred_rt = get_inst_rt_info(uq_comp_id, mock_session, mock_inst_method_pairs)
 
-    # Assert that the returned institution strings are in the correct groups
+    # Assert that the returned data source strings are in the correct groups
     assert inst_rt == ['inst_a', 'inst_b']
     assert inst_exp_rt == ['inst_a']
     assert inst_pred_rt == ['inst_b']
@@ -32,9 +32,9 @@ def test_get_inst_rt_info(mock_session, mock_inst_method_pairs):
 
 @pytest.mark.parametrize("mock_inst, mock_entry_count, expected_query_call_count, mock_pred_bool, expected_pred_bool, "
                          "expected_dupl, expected_pred_to_false",
-                         [(['inst_a'], 1, 1, 'FALSE', 'FALSE', [], []),  # One institution
-                          (['inst_a', 'inst_b'], 1, 2, 'FALSE', 'FALSE', [], []),  # Two institutions
-                          (['inst_a'], 2, 0, 'FALSE', 'FALSE', [99], []),  # Duplicate entries for one institution
+                         [(['inst_a'], 1, 1, 'FALSE', 'FALSE', [], []),  # One data source
+                          (['inst_a', 'inst_b'], 1, 2, 'FALSE', 'FALSE', [], []),  # Two data sources
+                          (['inst_a'], 2, 0, 'FALSE', 'FALSE', [99], []),  # Duplicate entries for one data source
                           (['inst_a'], 1, 1, 'TRUE', 'FALSE', [], [99])  # Predicted flag is incorrect
                           ])
 def test_check_experimental_data(mock_session, mock_inst_method_pairs, mock_inst,
@@ -85,7 +85,7 @@ def test_check_predicted_flags_pred_data(mock_session, mock_inst_method_pairs, p
     """Tests correction of "predicted" flags."""
     # Prepare function inputs and return values
     uq_comp_id = 99
-    mock_inst_pred_rt = ['inst_a']  # Institutions with predicted RTs
+    mock_inst_pred_rt = ['inst_a']  # Data sources with predicted RTs
     mock_return = MagicMock()
     mock_return.predicted = predicted_flag
     mock_session.query().filter_by().one_or_none.return_value = mock_return
@@ -101,7 +101,7 @@ def test_predict_bfg_rt(mock_session, mock_models_to_bfg, mock_inst_method_pairs
     """Tests that the BfG retention time (RT) is predicted correctly and the expected model is used."""
     # Prepare function inputs and return values
     mock_check_order = ['inst_c', 'inst_b']  # Order of preference
-    mock_inst_rt = ['inst_b', 'inst_c']  # Available institutions with RTs
+    mock_inst_rt = ['inst_b', 'inst_c']  # Available data sources with RTs
     mock_session.query().filter_by().one_or_none.return_value = [15.0]
     # Add 'bfg' to method pairs
     mock_inst_method_pairs['bfg'] = 'method_a'
@@ -120,7 +120,7 @@ def test_predict_bfg_rt_none(mock_session, mock_models_to_bfg, mock_inst_method_
     """Tests that the BfG retention time (RT) is not predicted due to missing available institutions with RT data."""
     # Prepare function inputs and return values
     mock_check_order = ['inst_c', 'inst_b']  # Order of preference
-    mock_inst_rt = []  # No available institutions with RTs
+    mock_inst_rt = []  # No available data sources with RTs
 
     # Call the function
     predicted_rt = predict_bfg_rt(99, mock_session, mock_models_to_bfg, mock_check_order, mock_inst_rt,
@@ -133,7 +133,7 @@ def test_predict_bfg_rt_none(mock_session, mock_models_to_bfg, mock_inst_method_
 def test_predict_rt(mock_session, mock_models_from_bfg, mock_inst_method_pairs):
     """Tests that the retention time (RT) is predicted correctly and the expected model is used."""
     # Prepare function inputs and return values
-    mock_inst_str = 'inst_b'  # Institute that needs prediction of an RT
+    mock_inst_str = 'inst_b'  # Data source that needs prediction of an RT
     mock_session.query().filter_by().one_or_none.return_value = [7.0]
     # Add 'bfg' to method pairs
     mock_inst_method_pairs['bfg'] = 'method_a'
@@ -150,7 +150,7 @@ def test_predict_rt(mock_session, mock_models_from_bfg, mock_inst_method_pairs):
 def test_predict_rt_none(mock_session, mock_models_from_bfg, mock_inst_method_pairs):
     """Tests that the retention time (RT) is not predicted due to missing available BfG RT data."""
     # Prepare function inputs and return values
-    mock_inst_str = 'inst_b'  # Institute that needs prediction of an RT
+    mock_inst_str = 'inst_b'  # Data source that needs prediction of an RT
     mock_session.query().filter_by().one_or_none.return_value = None
     # Add 'bfg' to method pairs
     mock_inst_method_pairs['bfg'] = 'method_a'

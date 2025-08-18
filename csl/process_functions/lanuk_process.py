@@ -4,7 +4,7 @@ from csl.process_functions.utils import *
 
 class LanukProcess(FormatProcess):
     def process(self):
-        """Workflow to process MS2 data files from the institution lanuk
+        """Workflow to process MS2 data files from the data source lanuk
         (Landesamt für Natur, Umwelt und Klima Nordrhein-Westfalen)."""
 
         import logging

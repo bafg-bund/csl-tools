@@ -50,7 +50,7 @@ class FormatProcess(ABC):
 
     # noinspection PyMethodMayBeStatic
     def add_fixed_variables(self, extract_data, var_fix):
-        """Adds fixed information (specified in <institution>_config.py) to each entry."""
+        """Adds fixed information (specified in <data source>_config.py) to each entry."""
         import logging
         logger = logging.getLogger(__name__)
 
@@ -97,7 +97,7 @@ class FormatProcess(ABC):
 
         Args:
             extract_data (DataFrame) : Extracted and collected data.
-            inst_def (dict)          : Institution-specific defaults.
+            inst_def (dict)          : Data-source-specific defaults.
             spec_adduct (dict)       : Special cases in adduct formatting.
 
         Returns:
@@ -271,7 +271,7 @@ class FormatProcess(ABC):
 
         Args:
             form_data (DataFrame) : All data entries including formatted data.
-            inst_def (dict)       : Institution-specific defaults.
+            inst_def (dict)       : Data-source-specific defaults.
 
         Returns:
             form_data_match (DataFrame) : Data updated with flags from CSL-matching
