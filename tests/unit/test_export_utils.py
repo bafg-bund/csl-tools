@@ -100,7 +100,7 @@ def test_get_compound_classes_none():
 @pytest.mark.parametrize("exp_group, year, expected_inst_copyright",
                          [('bfg', '2025', 'Copyright 2025 Federal Institute of Hydrology, Koblenz, Germany'),
                           ('lfuby', '2025', 'Copyright 2025 Bavarian Environment Agency, Augsburg, Germany'),
-                          ('uba', '2025', 'Copyright 2025 Federal Environment Agency, Berlin, Germany'),
+                          ('uba', '2025', 'Copyright 2025 German Environment Agency, Berlin, Germany'),
                           ('not_a_data source', '2025', None)
                           ])
 def test_get_contributors_copyright(exp_group, year, expected_inst_copyright):

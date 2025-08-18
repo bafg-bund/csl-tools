@@ -54,7 +54,7 @@ def test_build_export_chunk_mbank(mock_formatted_data_mbank):
         f"AC$CHROMATOGRAPHY: RETENTION_TIME 12 min\n"
         "MS$FOCUSED_ION: PRECURSOR_M/Z 123.23\n"
         "MS$FOCUSED_ION: PRECURSOR_TYPE [M]+\n"
-        "MS$DATA_PROCESSING: COMMENT Export with pycsl 1.0.0 and CSL 25.0.0\n"
+        "MS$DATA_PROCESSING: COMMENT Export with csl-tools 1.0.0 and CSL 25.0.0\n"
         "PK$SPLASH: splash10-0i-900-755\n"
         "PK$NUM_PEAK: 2\n"
         "PK$PEAK: m/z int. rel.int.\n"

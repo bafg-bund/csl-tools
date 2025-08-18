@@ -188,7 +188,7 @@ def mock_formatted_data_mbank():
     mock_f_data.precursor_mz = 123.23
     mock_f_data.adduct = '[M]+'
     mock_f_data.splash_code = 'splash10-0i-900-755'
-    mock_f_data.data_proc_chunk = f"MS$DATA_PROCESSING: COMMENT Export with pycsl 1.0.0 and CSL 25.0.0\n"
+    mock_f_data.data_proc_chunk = f"MS$DATA_PROCESSING: COMMENT Export with csl-tools 1.0.0 and CSL 25.0.0\n"
     mock_f_data.nr_peaks = 2
     mock_f_data.spectrum = [
         (100.0, 150.0, 10.0),
