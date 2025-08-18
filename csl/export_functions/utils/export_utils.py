@@ -215,21 +215,21 @@ def get_contributors_copyright(exp_group):
     from datetime import datetime
 
     current_year = datetime.now().strftime('%Y')
-    if 'bfg' == exp_group or 'bfg' == exp_group:
+    if 'bfg' == exp_group:
         authors = 'Ole Lessmann; Kevin S. Jewell; Björn Ehlig; Arne Wick'
         inst_copyright = f'Copyright {current_year} Federal Institute of Hydrology, Koblenz, Germany'
         contrib_prefix = 'BAFG'
-        inst_license = 'dl-de/by-2-0'
-    elif 'lfuby' == exp_group or 'lfuby' == exp_group:
+        inst_license = 'CC BY 4.0'
+    elif 'lfuby' == exp_group:
         authors = 'André Macherius; Uwe Kunkel'
         inst_copyright = f'Copyright {current_year} Bavarian Environment Agency, Augsburg, Germany'
         contrib_prefix = 'LFUBY'
-        inst_license = None  # Todo licence for lfuby?
-    elif 'uba' == exp_group or 'uba' == exp_group:
+        inst_license = 'CC BY 4.0'
+    elif 'uba' == exp_group:
         authors = 'Eric Winter'
         inst_copyright = f'Copyright {current_year} Federal Environment Agency, Berlin, Germany'
         contrib_prefix = 'UBA'
-        inst_license = 'dl-de/by-2-0'
+        inst_license = 'CC BY 4.0'
     else:
         authors = None; inst_copyright = None; contrib_prefix = None; inst_license = None
     return authors, inst_copyright, contrib_prefix, inst_license
