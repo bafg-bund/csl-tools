@@ -54,4 +54,3 @@ __all__ = [
     "get_smiles_envi",
     "deduplicate_fragments_envi",
 ]
-

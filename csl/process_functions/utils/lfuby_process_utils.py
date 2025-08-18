@@ -30,7 +30,7 @@ def extract_data_regex_lfuby(file_path, var_regex):
                 for line in chunk.strip().split('\n'):
                     match = regex.search(line)
                     if match:
-                        delim = ':'  # todo differs: from other workflows
+                        delim = ':'
                         parts = re.split(pattern=delim, string=line, maxsplit=1)
                         if len(parts) > 1:
                             data_extract_dict[var_key] = parts[-1].strip()
@@ -57,7 +57,7 @@ def extract_data_regex_lfuby(file_path, var_regex):
     with open(file_path, 'r') as file:
         content = file.read()
 
-    # Split content into chunks based on the "Name: " identifier
+    # Split content into chunks based on an identifier
     chunk_identifier = 'Name: '
     chunks = content.split(chunk_identifier)[1:]
     # Parse each chunk into a dictionary
@@ -66,6 +66,6 @@ def extract_data_regex_lfuby(file_path, var_regex):
         record = extract_data_in_chunk(chunk_identifier + chunk, var_regex)
         records.append(record)
 
-    # Create a DataFrame
+    # Create DataFrame
     df = pd.DataFrame(records)
     return df

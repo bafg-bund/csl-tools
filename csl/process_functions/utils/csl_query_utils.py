@@ -78,19 +78,25 @@ def add_exp_to_session(session, entry, inst_def):
     Adds the new experimental information to the following tables in the CSL:
     Experiment group
     - Checks if the experiment group exists in the CSL and adds it if necessary.
+
     Compound group(s)
     - Matches compound groups with existing ones in the CSL. Collects the matches.
     - If no matches are found, uses the default compound group.
+
     Compound
     - Checks if the compound, and a link to the matched compound group(s), exists in the CSL.
     - Missing compounds and links to compound group(s) are added.
+
     Retention time
-    - Checks for an existing retention time and uses the retention time from the file if it doesn't exist.
-        Todo: RT from file and from query can be different. What should be preferred?
+    - Checks for an existing retention time (RT) and uses the RT from the file if it doesn't exist.
+    Otherwise, prefers existing RT. Also checks for RT inconsistency (warning at a difference of >10 s).
+
     Experimental parameters
     - Searches for experimental parameters and add them from the file if they do not exist.
+
     Experiment
     - Creates a new experiment entry in the CSL at the current time.
+
     Fragments
     - Adds all fragment information from the file.
 
@@ -202,7 +208,6 @@ def add_exp_to_session(session, entry, inst_def):
     para_res = session.query(Parameter).filter_by(instrument=instrument, polarity=pol_i, CE=ce_i, CES=ces_i,
                                                   ce_unit=ce_unit, col_type=col_type_i, ionisation=ionization_i
                                                   ).one_or_none()
-
     if not para_res:
         logger.info('Experimental parameters not found in CSL. Adding parameters from data entry.')
         para_res = Parameter(instrument=instrument, polarity=pol_i, CE=ce_i, CES=ces_i, ce_unit=ce_unit,

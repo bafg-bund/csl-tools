@@ -32,7 +32,9 @@ def scan_rt(operation: str, path_csl: str):
     Executes the appropriate workflow for exporting CSL data as various formats.
 
     Args:
-        operation (str) : Type of operation. todo explain here? do same for other main functions
+        operation (str) : Type of operation. Choose from:
+            - 'check'   : Checks for mistakes in RT entries and adds missing RT values in the CSL.
+            - 'update'  : Recalculates all RT entries in the CSL.
         path_csl (str)  : Path to the CSL file.
     """
 

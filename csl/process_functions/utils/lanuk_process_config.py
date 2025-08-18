@@ -1,8 +1,7 @@
 # Set configurations and constant for the lanuk process workflow in this file
 
-# NOISE_THRESHOLD = 5000  # Todo: Add noise filtering for files in the future
-
 # How to define institution-specific settings:
+# Todo: Note: Will be updated to software-specific processing in the future
 # Due to varying data formats we use institutional workflows. Each workflow involves reading data files and extracting
 # relevant information. In addition to the extracted data, we need to provide supplemental information that is crucial
 # for querying the Collective Spectral Library (CSL) but may not be directly available from the data file.

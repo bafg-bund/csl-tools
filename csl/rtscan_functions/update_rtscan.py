@@ -5,11 +5,10 @@ class UpdateRtscan(OperationRtscan):
     def rtscan(self):
         """Workflow for recalculating all retention time entries in the CSL."""
 
-        import os.path
         import logging
         logger = logging.getLogger(__name__)
         logger.info('Executing update rtscan workflow')
 
-        logger.info('Not implemented yet')
+        logger.warning('Not implemented yet')
 
         logger.info('End of update rtscan workflow')

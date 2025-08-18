@@ -112,7 +112,7 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_V
     compound_classes = get_compound_classes(sql_data.compound_groups)
 
     # Retention time
-    rt = sql_data.retention_time.rt  # Todo: what happens if rt does not exist?
+    rt = sql_data.retention_time.rt
 
     # Parameter related
     ce = int(sql_data.parameter.CE)

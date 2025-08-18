@@ -142,7 +142,7 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VE
     compound_classes = get_compound_classes(sql_data.compound_groups)
 
     # Retention time
-    rt = sql_data.retention_time.rt  # Todo: Currently: error and skip if no RT exists. How is it handled in RMassBank?
+    rt = sql_data.retention_time.rt
 
     # Parameter related
     ce = int(sql_data.parameter.CE)

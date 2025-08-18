@@ -18,7 +18,7 @@ If you wish to contribute spectral data, please see the section [Contribution (s
 Currently, the CSL contains data from the following sources:
 - [BfG](https://www.bafg.de) (Federal Institute of Hydrology, Koblenz, Germany)
 - [LfU Bayern](https://www.lfu.bayern.de) (Bavarian Environment Agency, Augsburg, Germany)
-- [UBA](https://www.umweltbundesamt.de) (Federal Environment Agency, Berlin, Germany)
+- [UBA](https://www.umweltbundesamt.de) (German Environment Agency, Berlin, Germany)
 
 The most recent CSL file is available at **(will be uploaded to an open repository soon)** and will be regularly updated there.
 
@@ -132,7 +132,7 @@ csl export <format> <path_csl> <path_out> <subset>
 - `subset`: (Optional) Data source(s) for subsetting the CSL data before exporting. Choose one or more from:
   - `bfg`: BfG (Federal Institute of Hydrology)
   - `lfuby`: LfU Bayern (Bavarian Environment Agency)
-  - `uba`: UBA (Federal Environment Agency)
+  - `uba`: UBA (German Environment Agency)
   - `all`: No subsetting (Default)
 
 #### Example

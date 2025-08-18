@@ -51,7 +51,6 @@ class FormatProcess(ABC):
     # noinspection PyMethodMayBeStatic
     def add_fixed_variables(self, extract_data, var_fix):
         """Adds fixed information (specified in <institution>_config.py) to each entry."""
-        # Todo: See if this can be simplified
         import logging
         logger = logging.getLogger(__name__)
 
@@ -87,9 +86,8 @@ class FormatProcess(ABC):
     # noinspection PyMethodMayBeStatic
     def process_data(self, extract_data, inst_def, spec_adduct):
         """
-        Formats the previously extracted and collected data based in institution-specific variables to match the
-        required format for csl-matching/commits. For information on format requirements of txt files see:
-        https://gitlab.lan.bafg.de/nts/ntsportal/-/wikis/Processing-new-files-for-the-CSL
+        Formats the previously extracted and collected data based in data-source-specific variables to match the
+        required format for csl-matching/commits.
 
         Data entries are checked for errors and marked with flags in DataFrame:
             form_err_flag (bool)  : True : Entry has format errors. Will not enter csl-matching process.
@@ -385,7 +383,8 @@ class FormatProcess(ABC):
             logger.info('No data to add to the CSL.')
         else:
             print(
-                'Do you want to proceed committing these changes? \n  - Confirm by typing "yes" and pressing enter. \n'
+                'Do you want to proceed committing these changes? \n'
+                '  - Confirm by typing "yes" and pressing enter. \n'
                 '  - Cancel with any other input.')
             choice = input()
             if choice == 'yes':

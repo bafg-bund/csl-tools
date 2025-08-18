@@ -227,7 +227,7 @@ def get_contributors_copyright(exp_group):
         inst_license = 'CC BY 4.0'
     elif 'uba' == exp_group:
         authors = 'Eric Winter'
-        inst_copyright = f'Copyright {current_year} Federal Environment Agency, Berlin, Germany'
+        inst_copyright = f'Copyright {current_year} German Environment Agency, Berlin, Germany'
         contrib_prefix = 'UBA'
         inst_license = 'CC BY 4.0'
     else:

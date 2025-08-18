@@ -147,7 +147,6 @@ def format_adduct(adduct_name, spec_adduct, qf_def, pol_i):
     - If the adduct name corresponds to a precursor ion number (identified by `qf_def`), the notation is:
       `[QF{qfno}]+` or `[QF{qfno}]-`, where `qfno` is the numeric part of the adduct name.
     - Special adduct notations defined in `spec_adduct` override the standard format.
-    Todo: Add whitelist of all pairs of adduct name + adduct notations
 
     Args:
         adduct_name (str)  : Adduct name determined by `get_compound_and_adduct_name`.

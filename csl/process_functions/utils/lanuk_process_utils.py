@@ -48,8 +48,8 @@ def extract_data_regex_lanuk(file_path, var_regex):
     with open(file_path, 'r') as file:
         content = file.read()
 
-    # Split content into chunks based on the "Name: " identifier
-    chunk_identifier = '>  <NAME>'  # todo: differs from other workflows
+    # Split content into chunks based on an identifier
+    chunk_identifier = '>  <NAME>'
     chunks = content.split(chunk_identifier)[1:]
     # Parse each chunk into a dictionary
     records = []
@@ -57,6 +57,6 @@ def extract_data_regex_lanuk(file_path, var_regex):
         record = extract_data_in_chunk(chunk_identifier + chunk, var_regex)
         records.append(record)
 
-    # Create a DataFrame
+    # Create DataFrame
     df = pd.DataFrame(records)
     return df

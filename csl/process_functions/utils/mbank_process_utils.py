@@ -61,6 +61,6 @@ def extract_data_regex_mbank(file_path, var_regex):
         record = extract_data_in_chunk(chunk_identifier + chunk, var_regex)
         records.append(record)
 
-    # Create a DataFrame
+    # Create DataFrame
     df = pd.DataFrame(records)
     return df
