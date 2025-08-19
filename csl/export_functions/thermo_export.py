@@ -25,11 +25,11 @@ class ThermoExport(FormatExport):
 
         # Generate the output file name based on the CSL version and the current date
         csl_version = get_csl_version(self.path_csl)
-        date_code = datetime.now().strftime("%y%m%d")
+        date_code = datetime.now().strftime("%Y%m%d")
         if 'all' in self.subset:
-            fname = f"THERMO-CSLv{csl_version}-{date_code}.msp"
+            fname = f"thermo-CSLv{csl_version}-{date_code}.msp"
         else:
-            fname = f"THERMO-{'-'.join(self.subset)}-CSLv{csl_version}-{date_code}.msp"
+            fname = f"thermo-{'-'.join(self.subset)}-CSLv{csl_version}-{date_code}.msp"
         fpath_out = os.path.join(self.path_out, fname)
 
         # Initialize a list to accumulate data for batch writing
