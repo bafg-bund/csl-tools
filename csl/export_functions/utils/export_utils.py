@@ -10,10 +10,10 @@ class SqlQueryResult:
     experiment: Experiment
     compound: Compound
     parameter: Parameter
-    fragments: Fragment
-    exp_groups: expGroupExp
-    compound_groups: CompoundGroup
-    retention_time: RetentionTime
+    fragments: list[Fragment]
+    exp_groups: list[str]
+    compound_groups: list[str]
+    retention_time: RetentionTime | None
 
 
 def get_chrom_methods(data_source):
@@ -142,6 +142,86 @@ def sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method):
     return SqlQueryResult(experiment, compound, parameter, fragments, exp_groups, compound_groups, retention_time)
 
 
+def sql_bulk_queries_by_exp_ids_chrom_method(session, exp_ids, chrom_method):
+    """
+    Queries the CSL for experiment data and related metadata based on all experiment IDs of on chromatographic method.
+
+    Args:
+        session (obj)       : SQLAlchemy session object connected to the CSL database.
+        exp_ids (list[int]) : List of experiment IDs.
+        chrom_method (str)  : Chromatographic method identifier.
+
+    Returns:
+        sql_data_dict (dict[int, SqlQueryResult(dataclass)]) : Mapping of exp_id -> SqlQueryResult
+    """
+    from collections import defaultdict
+    from sqlalchemy.orm import joinedload
+
+    # Get all experiments with compound/parameter/fragments
+    experiments = session.query(Experiment).filter(
+        Experiment.experiment_id.in_(exp_ids)
+    ).options(
+        joinedload(Experiment.compound),
+        joinedload(Experiment.parameter),
+        joinedload(Experiment.fragments)
+    ).all()
+
+    # Get experiment groups
+    exp_group_map = defaultdict(list)
+    rows = (
+        session.query(expGroupExp.c.experiment_id, ExperimentGroup.name)
+        .join(ExperimentGroup)
+        .filter(expGroupExp.c.experiment_id.in_(exp_ids))
+        .all()
+    )
+    for eid, group_name in rows:
+        exp_group_map[eid].append(group_name)
+
+    # Get compound IDs
+    compound_ids = [exp.compound.compound_id for exp in experiments]
+
+    # Get compound groups
+    compound_group_map = defaultdict(list)
+    rows = (
+        session.query(compGroupComp.c.compound_id, CompoundGroup.name)
+        .join(CompoundGroup)
+        .filter(compGroupComp.c.compound_id.in_(compound_ids))
+        .all()
+    )
+    for cid, group_name in rows:
+        compound_group_map[cid].append(group_name)
+
+    # Get retention times
+    retention_time_map = {}
+    rows = (
+        session.query(RetentionTime)
+        .filter(
+            RetentionTime.compound_id.in_(compound_ids),
+            RetentionTime.chrom_method == chrom_method
+        ).all()
+    )
+    for rt in rows:
+        retention_time_map[rt.compound_id] = rt
+
+    # Assemble dictionary
+    sql_data_dict = {}
+    for exp in experiments:
+        compound = exp.compound
+        cid = compound.compound_id
+        # Mapping experiment ID to sql data
+        sql_data_dict[exp.experiment_id] = SqlQueryResult(
+            experiment=exp,
+            compound=compound,
+            parameter=exp.parameter,
+            fragments=exp.fragments,
+            exp_groups=exp_group_map.get(exp.experiment_id, []),
+            compound_groups=compound_group_map.get(cid, []),
+            retention_time=retention_time_map.get(cid)
+        )
+
+    return sql_data_dict
+
+
 def get_precursor_charge(adduct_form):
     """
     Extract the precursor charge number from a formatted adduct name.
@@ -189,7 +269,9 @@ def get_splash_code(spectrum):
 
 def get_compound_classes(compound_groups):
     """Extracts the non-institute compound classes from a list of compound groups."""
-    compound_groups = [group.name for group in compound_groups]
+    if not isinstance(compound_groups[0], str):
+        compound_groups = [group.name for group in compound_groups]  # normalize to list of str
+
     compound_groups_filtered = [cg for cg in compound_groups if cg not in DEFAULT_PAIRS_INST_CHROM.keys()]
 
     if compound_groups_filtered:

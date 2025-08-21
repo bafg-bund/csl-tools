@@ -4,21 +4,30 @@
 csl-tools
 
 ## Description
-Import, export and curation of spectral data for the Collective Spectral Library (CSL).
+Import, export, and curate spectral data for the Collective Spectral Library (CSL).
 
 ![Image](https://github.com/user-attachments/assets/0e511e6c-89d6-4f8c-9f45-81a549f0bdb5)
 
 ## Background
-The CSL is a collection of spectral data (standards) that can be used by [ntsworkflow](https://github.com/bafg-bund/ntsworkflow) <sup>[1]</sup> to screen environmental data retrospectively and is integrated with [NTSPortal](https://ntsportal.bafg.de) <sup>[2]</sup>. 
+The Collective Spectral Library (CSL) is a database containing a collection of reference spectra generated using tandem 
+mass spectrometry (MS²). 
 
-Our goal is to grow this collection, making the retrospective analysis of historical data in NTSPortal more powerful and valuable for all users <sup>[3]</sup>.
+The CSL is built collaboratively and currently includes reference spectra provided by:
+- [Federal Institute of Hydrology](https://www.bafg.de) (Bundesanstalt für Gewässerkunde, BfG), Koblenz, Germany
+- [Bavarian Environment Agency](https://www.lfu.bayern.de) (Bayerisches Landesamt für Umwelt, LfU Bayern), Augsburg, Germany
+- [German Environment Agency](https://www.umweltbundesamt.de) (Umweltbundesamt, UBA), Berlin, Germany
 
-If you wish to contribute spectral data, please see the section [Contribution (spectral data)](#contribution-spectral-data).
+The CSL enables retrospective screening of environmental samples as part of Non-Target Screening (NTS) efforts. 
+It is integrated into the open analysis workflow [ntsworkflow](https://github.com/bafg-bund/ntsworkflow) <sup>[1]</sup>, 
+which supports matching of experimental MS² data with verified reference spectra. It is also connected to 
+[NTSPortal](https://ntsportal.bafg.de) <sup>[2]</sup>, a platform for processing, archiving and visualizing NTS data to 
+support the identification and assessment of trace contaminants in surface waters.
 
-Currently, the CSL contains data from the following sources:
-- [BfG](https://www.bafg.de) (Federal Institute of Hydrology, Koblenz, Germany)
-- [LfU Bayern](https://www.lfu.bayern.de) (Bavarian Environment Agency, Augsburg, Germany)
-- [UBA](https://www.umweltbundesamt.de) (German Environment Agency, Berlin, Germany)
+We continuously expand the CSL to improve its utility, for instance in the retrospective analysis 
+of historical data in NTSPortal <sup>[3]</sup>.
+
+For more information or to contribute spectral reference data, check out the section [Contribution (spectral data)](#contribution-spectral-data)
+and feel free to contact us at `ntsportal@bafg.de`.
 
 The most recent CSL file is available at **(will be uploaded to an open repository soon)** and will be regularly updated there.
 
@@ -195,6 +204,6 @@ Björn Ehlig, BfG, ehlig@bafg.de
 Kevin S. Jewell, BfG, jewell@bafg.de  
 
 ## License
-Copyright 2025 Bundesanstalt für Gewässerkunde (Federal Institute of Hydrology).
+Copyright 2025 Federal Institute of Hydrology (Bundesanstalt für Gewässerkunde).
 
 This package is licensed under the [GNU General Public License v3.0](LICENSE).
