@@ -10,6 +10,7 @@ class ThermoExport(FormatExport):
         """Workflow to export CSL data to a text file."""
 
         import os.path
+        from collections import defaultdict
         from datetime import datetime
         from tqdm import tqdm
         import logging
@@ -39,7 +40,7 @@ class ThermoExport(FormatExport):
         with open(fpath_out, 'a', encoding='utf-8') as f:
 
             # Create a mapping of experiment_id -> method
-            exp_method_pairs = []
+            exp_method_pairs = defaultdict(list)
 
             if 'all' in self.subset:
                 data_sources = DEFAULT_PAIRS_INST_CHROM.keys()
@@ -51,30 +52,38 @@ class ThermoExport(FormatExport):
                 experiment_ids = get_experiment_ids_by_exp_group(session, data_source)
                 logger.info(f"Found {len(experiment_ids)} experiment IDs for data source: {data_source}")
                 # Apply mapping
+                chrom_method = DEFAULT_PAIRS_INST_CHROM.get(data_source)
                 for exp_id in experiment_ids:
-                    exp_method_pairs.append((exp_id, DEFAULT_PAIRS_INST_CHROM.get(data_source)))
+                    exp_method_pairs[chrom_method].append(exp_id)
 
-            # Process each experiment IDs
-            for i, (exp_id, chrom_method) in tqdm(enumerate(exp_method_pairs), total=len(exp_method_pairs), ncols=77):
-                try:
-                    # Extract the text chunk for the current experiment
-                    export_data = extract_experiment_chunk_thermo(session, exp_id, chrom_method, csl_version, CSLTOOLS_VERSION)
-                    if not export_data:
-                        logger.info(f'Skipping {exp_id}')
-                        continue
-                    export_data_list.append(export_data + "\n\n")  # Append new line after each chunk
+            # Process experiment IDs by chromatographic method
+            for chrom_method, exp_ids in exp_method_pairs.items():
+                logger.info(f"Bulk loading {len(exp_ids)} experiments for chrom_method={chrom_method}")
 
-                    # Every 100 iterations, write to the file and clear the list
-                    if (i + 1) % 100 == 0 or (i + 1) == len(experiment_ids):
-                        f.writelines(export_data_list)
-                        export_data_list.clear()  # Clear the list after writing
+                # Bulk load sql data for all experiment IDs by method
+                sql_data_dict = sql_bulk_queries_by_exp_ids_chrom_method(session, exp_ids, chrom_method)
 
-                except Exception as e:
-                    logger.error(f"There was an error processing experiment ID {exp_id}: {str(e)}")
+                # Process each experiment ID
+                for i, exp_id in tqdm(enumerate(exp_ids), total=len(exp_ids), ncols=77):
+                    try:
+                        export_data = extract_experiment_chunk_thermo(
+                            exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, sql_data_dict
+                        )
+                        if not export_data:
+                            logger.info(f'Skipping {exp_id}')
+                            continue
+                        export_data_list.append(export_data + "\n\n")
 
-            # Write any remaining data to the file after the loop
-            if export_data_list:
-                f.writelines(export_data_list)
+                        if (i + 1) % 100 == 0 or (i + 1) == len(exp_ids):
+                            f.writelines(export_data_list)
+                            export_data_list.clear()  # Clear the list after writing
+
+                    except Exception as e:
+                        logger.error(f"There was an error processing experiment ID {exp_id}: {str(e)}")
+
+                # Write any remaining data to the file
+                if export_data_list:
+                    f.writelines(export_data_list)
 
         # Close the session after processing all experiments
         session.close()

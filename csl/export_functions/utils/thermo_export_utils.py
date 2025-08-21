@@ -3,23 +3,25 @@ from dataclasses import dataclass
 from typing import Optional, Union, List
 
 
-def extract_experiment_chunk_thermo(session, exp_id, chrom_method, csl_version, CSLTOOLS_VERSION):
+def extract_experiment_chunk_thermo(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, sql_data_dict):
     """
     Extracts data for a specific experiment id and formats data for MSP/NIST documents (mzVault/ThermoFisher).
 
     Args:
-        session (obj)               : SQLAlchemy session object connected to the CSL database.
         exp_id (int)                : Experiment ID used to query the database.
         chrom_method (str)          : Chromatographic method identifier.
         csl_version (str)           : Current version of the CSL database.
         CSLTOOLS_VERSION (str)      : Current version of the python package.
+        sql_data_dict (dict[int, SqlQueryResult(dataclass)]) : Mapping of exp_id -> SqlQueryResult
 
     Returns:
         export_chunk (str) : Text chunk formatted for a single MSP/NIST document.
     """
 
     # SQL queries based on experiment ID and chromatographic method
-    SqlQueryResult = sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method)
+    SqlQueryResult = sql_data_dict.get(exp_id)
+    if not SqlQueryResult:
+        return None
 
     # Format data to meet MSP/NIST format requirements
     FormattedDataThermo = extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, SqlQueryResult)
@@ -124,13 +126,12 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_V
     frag_mode = sql_data.parameter.col_type
 
     # Experiment groups
-    exp_groups = [group.name for group in sql_data.exp_groups]
-    if len(exp_groups) > 1:
+    if len(sql_data.exp_groups) > 1:
         raise ValueError(
             f"Experiment groups > 1 not allowed. Check experiment ID {exp_id}")
 
     # Legal stuff
-    authors, inst_copyright, contrib_prefix, inst_license = get_contributors_copyright(exp_groups[0])
+    authors, inst_copyright, contrib_prefix, inst_license = get_contributors_copyright(sql_data.exp_groups[0])
     if not authors:
         raise ValueError(f"Unknown contributor for experiment ID {exp_id}")
 
