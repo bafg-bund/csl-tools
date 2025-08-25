@@ -29,7 +29,7 @@ of historical data in NTSPortal <sup>[3]</sup>.
 For more information or to contribute spectral reference data, check out the section [Contribution (spectral data)](#contribution-spectral-data)
 and feel free to contact us at `ntsportal@bafg.de`.
 
-The most recent CSL file is available at **(will be uploaded to an open repository soon)** and will be regularly updated there.
+The latest CSL file is available at: https://doi.org/10.5281/zenodo.16901589.
 
 ><sup>**[1]** Jewell, K. S., et al. (2020). Rapid Commun. Mass Spectrom., 34, e8541. [https://doi.org/10.1002/rcm.8541](https://doi.org/10.1002/rcm.8541)  
 **[2]** Jewell, K. S., et al. (2025). Online-Portal „Non-Target Screening für die Umweltüberwachung der Zukunft“, Umweltbundesamt, Dessau-Roßlau. [https://www.umweltbundesamt.de/sites/default/files/medien/11850/publikationen/21_2025_texte.pdf](https://www.umweltbundesamt.de/sites/default/files/medien/11850/publikationen/21_2025_texte.pdf)  
