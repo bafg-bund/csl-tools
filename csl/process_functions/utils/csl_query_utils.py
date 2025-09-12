@@ -169,15 +169,38 @@ def add_exp_to_session(session, entry, inst_def):
             comp_group = [comp_group]
 
     # Check if the compound, and a link to the matched compound group(s), exists in the CSL. Missing entries are added.
+    def get_single_compound_entry(base_query, refine_query):
+        """
+        Runs base_query, unwraps if exactly one result. If multiple, runs refine_query.
+        Returns either a single compound entry or None.
+        """
+        comp_list = base_query.all()
+
+        if len(comp_list) == 1:  # If there is one match, return query result.
+            return comp_list[0]
+        elif len(comp_list) > 1:  # If there are multiple matches, give warning and refine query.
+            logger.warning(f"Multiple entries for the same InChIkey (main layer) or CAS in the CSL: {comp_list}")
+            return refine_query.one_or_none()
+        else:
+            return None
+
     if inchikey_main_i:  # InChIKey is preferred
-        # Query compound by using the main layer of the InChIKey
-        comp_res = session.query(Compound).filter(
-            func.substr(Compound.inchikey, 1, func.length(inchikey_main_i)) == inchikey_main_i).one_or_none()
+        # Prepare base query (main layer of the InChIKey) and refine query (compound name)
+        base_query = session.query(Compound).filter(
+            func.substr(Compound.inchikey, 1, func.length(inchikey_main_i)) == inchikey_main_i
+        )
+        refine_query = base_query.filter(Compound.name == comp_i)
+        # Run query
+        comp_res = get_single_compound_entry(base_query, refine_query)
     elif cas_i:
-        # Query compound by using the CAS RN
-        comp_res = session.query(Compound).filter_by(CAS=cas_i).one_or_none()
+        # Prepare base query (CAS RN) and refine query (compound name)
+        base_query = session.query(Compound).filter(Compound.CAS == cas_i)
+        refine_query = base_query.filter(Compound.name == comp_i)
+        # Run query
+        comp_res = get_single_compound_entry(base_query, refine_query)
     else:
-        comp_res = []
+        comp_res = None
+
     if comp_res:  # If the compound exists in the CSL
         # Add compound groups that do not exist yet for this compound
         for cg in comp_group:
