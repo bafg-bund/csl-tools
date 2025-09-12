@@ -152,7 +152,7 @@ def sql_bulk_queries_by_exp_ids_chrom_method(session, exp_ids, chrom_method):
         chrom_method (str)  : Chromatographic method identifier.
 
     Returns:
-        sql_data_dict (dict[int, SqlQueryResult(dataclass)]) : Mapping of exp_id -> SqlQueryResult
+        sql_data_dict (dict[int, SqlQueryResult(dataclass)]) : Mapping of exp_id to SqlQueryResult
     """
     from collections import defaultdict
     from sqlalchemy.orm import joinedload

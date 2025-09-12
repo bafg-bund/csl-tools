@@ -12,13 +12,13 @@ def extract_experiment_chunk_thermo(exp_id, chrom_method, csl_version, CSLTOOLS_
         chrom_method (str)          : Chromatographic method identifier.
         csl_version (str)           : Current version of the CSL database.
         CSLTOOLS_VERSION (str)      : Current version of the python package.
-        sql_data_dict (dict[int, SqlQueryResult(dataclass)]) : Mapping of exp_id -> SqlQueryResult
+        sql_data_dict (dict[int, SqlQueryResult(dataclass)]) : Mapping of exp_id to SqlQueryResult
 
     Returns:
         export_chunk (str) : Text chunk formatted for a single MSP/NIST document.
     """
 
-    # SQL queries based on experiment ID and chromatographic method
+    # SQL queries based on experiment ID
     SqlQueryResult = sql_data_dict.get(exp_id)
     if not SqlQueryResult:
         return None

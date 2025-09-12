@@ -32,24 +32,26 @@ def get_exp_ids_mbank(path_mbank_files):
     }
     return dict_mbank_exp_id_fn
 
-def extract_experiment_chunk_mbank(session, exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, dict_mbank_exp_id_fn):
+def extract_experiment_chunk_mbank(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, sql_data_dict, dict_mbank_exp_id_fn):
     """
     Extracts data for a specific experiment id and formats data for MassBank requirements.
 
     Args:
-        session (obj)               : SQLAlchemy session object connected to the CSL database.
         exp_id (int)                : Experiment ID used to query the database.
         chrom_method (str)          : Chromatographic method identifier.
         csl_version (str)           : Current version of the CSL database.
         CSLTOOLS_VERSION (str)      : Current version of the python package.
+        sql_data_dict (dict[int, SqlQueryResult(dataclass)]) : Mapping of exp_id to SqlQueryResult
         dict_mbank_exp_id_fn (dict) : Pairs of existing of accession strings and experiment IDs.
 
     Returns:
         export_chunk (str) : Text chunk formatted to MassBank requirements for a single txt file.
     """
 
-    # SQL queries based on experiment ID and chromatographic method
-    SqlQueryResult = sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method)
+    # SQL queries based on experiment ID
+    SqlQueryResult = sql_data_dict.get(exp_id)
+    if not SqlQueryResult:
+        return None
 
     # Skip internal standards
     skip_comp = skip_compounds_mbank()
@@ -154,13 +156,12 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VE
     frag_mode = get_fragmentation_mode_mbank(sql_data.parameter.col_type)
 
     # Experiment groups
-    exp_groups = [group.name for group in sql_data.exp_groups]
-    if len(exp_groups) > 1:
+    if len(sql_data.exp_groups) > 1:
         raise ValueError(
             f"Experiment groups > 1 not allowed. Check experiment ID {exp_id}")
 
     # Legal stuff
-    authors, inst_copyright, contrib_prefix, inst_license = get_contributors_copyright(exp_groups[0])
+    authors, inst_copyright, contrib_prefix, inst_license = get_contributors_copyright(sql_data.exp_groups[0])
     if not authors:
         raise ValueError(f"Unknown contributor for experiment ID {exp_id}")
 

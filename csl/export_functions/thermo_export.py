@@ -39,7 +39,7 @@ class ThermoExport(FormatExport):
         # Extract text chunks from the CSL data and append them to the export file
         with open(fpath_out, 'a', encoding='utf-8') as f:
 
-            # Create a mapping of experiment_id -> method
+            # Create a mapping of experiment_id to chromatographic method
             exp_method_pairs = defaultdict(list)
 
             if 'all' in self.subset:
