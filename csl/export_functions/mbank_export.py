@@ -79,7 +79,7 @@ class MbankExport(FormatExport):
         session.close()
 
         # Check for deprecated files
-        exp_ids = [em_pair[0] for em_pair in exp_method_pairs]
+        exp_ids = [exp_id for exp_ids_list in exp_method_pairs.values() for exp_id in exp_ids_list]
         keys_not_in_exp_ids = set(dict_mbank_exp_id_fn.keys()) - set(exp_ids)
         if keys_not_in_exp_ids:
             entries_not_in_exp_ids = [dict_mbank_exp_id_fn[key] for key in keys_not_in_exp_ids]
