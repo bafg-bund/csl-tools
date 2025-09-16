@@ -64,7 +64,7 @@ export_parser.add_argument('subset', type=str, nargs='*', choices=['lfuby', 'bfg
 
 # Define 'rtscan' command and its arguments
 rtscan_parser = subparsers.add_parser('rtscan', help='Operates on retention time data in the CSL')
-rtscan_parser.add_argument('operation', type=str, choices=['check', 'update'],
+rtscan_parser.add_argument('operation', type=str, choices=['update', 'recalc'],
                            help='Specify operation type',)
 rtscan_parser.add_argument('path_csl', type=str,
                            help='Path to CSL file')

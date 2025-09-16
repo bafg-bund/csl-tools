@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest import mock
 
 
-def test_rtscan_check():
+def test_rtscan_update():
     """
     Tests prediction of retention times (RTs) and correction of incorrect or missing "predicted" flags.
 
@@ -36,9 +36,9 @@ def test_rtscan_check():
     # Copy the database file
     shutil.copy(csl_template_path, csl_copy_path)
 
-    # Rtscan check workflow
+    # Rtscan update workflow
     with mock.patch('builtins.input', return_value='yes'):  # Mocks user input
-        scan_rt(operation='check', path_csl=csl_copy_path)
+        scan_rt(operation='update', path_csl=csl_copy_path)
 
     # Assert that new CSL file was created
     name, ext = os.path.splitext(os.path.basename(csl_copy_path))

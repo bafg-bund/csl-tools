@@ -174,15 +174,15 @@ export_data(format='mbank', path_csl='path/to/CSL.db', path_out='path/to/output_
 
 
 ### `rtscan`
- Operates on retention-time data stored in the CSL.  
+Operates on retention-time data stored in the CSL.  
 ```
 csl rtscan <operation> <path_csl>
 ```
 
 #### Arguments
 - `operation`: Specify the operation. Choose from:
-  - `check`: Calculates missing non-experimental retention times based on available experimental data.
-  - `update`: Re-calculates all non-experimental retention times based on available experimental data (not implemented yet).
+  - `update`: Adds missing non-experimental retention times using available experimental data and corrects errors in associated entries in the CSL.
+  - `recalc`: Recalculates and replaces all non-experimental retention times using available experimental data in the CSL (not yet implemented).
 - `path_csl`: Path to CSL file.
 
 #### Example
@@ -191,7 +191,7 @@ csl rtscan check path/to/CSL.db
 ```
 ```python
 from csl import scan_rt
-scan_rt(operation='check', path_csl='path/to/CSL.db')
+scan_rt(operation='update', path_csl='path/to/CSL.db')
 ```
 
 ### Notes
