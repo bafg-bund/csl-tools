@@ -9,7 +9,6 @@ class UpdateRtscan(OperationRtscan):
     def rtscan(self):
         """Workflow for adding missing non-experimental retention times (RT) and correcting errors in associated entries in the CSL."""
         import logging
-        import joblib
         import os
         import shutil
         from tqdm import tqdm
@@ -18,20 +17,8 @@ class UpdateRtscan(OperationRtscan):
         logger = logging.getLogger(__name__)
         logger.info('Executing update rtscan workflow')
 
-        # Functions for predicting RTs between data sources
-        # Models need to be updated when other data sources are added, or when existing notations are modified.
-        model_bl = joblib.load(DEFAULT_MODEL_BFG_TO_LANUK_PATH)  # Model for predicting LANUK RTs from BfG RTs
-        model_lb = joblib.load(DEFAULT_MODEL_LANUK_TO_BFG_PATH)  # Model for predicting BfG RTs from LANUK RTs
-        def pred_rt_bfg_uba(rt_bfg): return round((rt_bfg - 0.75) / 1.12, 3)
-        def pred_rt_uba_bfg(rt_uba): return round(1.12 * rt_uba + 0.75, 3)
-        def pred_rt_bfg_lanuk(rt_bfg): return round(float(model_bl(rt_bfg)), 3)
-        def pred_rt_lanuk_bfg(rt_lanuk): return round(float(model_lb(rt_lanuk)), 3)
-        def pred_rt_bfg_lfu(rt_bfg): return rt_bfg
-        def pred_rt_lfu_bfg(rt_lfu): return rt_lfu
-        models_from_bfg = {'uba': pred_rt_bfg_uba, 'lfuby': pred_rt_bfg_lfu,
-                           'lanuk': pred_rt_bfg_lanuk}
-        models_to_bfg = {'uba': pred_rt_uba_bfg, 'lfuby': pred_rt_lfu_bfg,
-                         'lanuk': pred_rt_lanuk_bfg}
+        # Load RT models
+        models_from_bfg_to_x, models_from_x_to_bfg = load_rt_models()
 
         # Get list of data sources in order of importance to predict BfG RT
         check_order = check_order_pred_bfg_rt()
@@ -73,7 +60,7 @@ class UpdateRtscan(OperationRtscan):
             # Check predicted RT data and predict missing RTs
             if not 'bfg' in inst_rt:
                 # Predict BfG RT if it doesn't exist yet and add entry to session
-                rt_bfg_pred = predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, DEFAULT_PAIRS_INST_CHROM)
+                rt_bfg_pred = predict_bfg_rt(uq_comp_id, session, models_from_x_to_bfg, check_order, inst_rt, DEFAULT_PAIRS_INST_CHROM)
                 if rt_bfg_pred:
                     # Add BfG to the list of data sources with available RTs
                     inst_rt.append('bfg')
@@ -82,7 +69,7 @@ class UpdateRtscan(OperationRtscan):
             inst_miss_rt = list(set(DEFAULT_PAIRS_INST_CHROM.keys()) - set(inst_rt))  # Get list of data sources without any RT
             for inst in inst_miss_rt:
                 # Predict the RTs for all other data sources without any RT
-                rt_pred = predict_rt(uq_comp_id, session, models_from_bfg, inst, DEFAULT_PAIRS_INST_CHROM)
+                rt_pred = predict_rt(uq_comp_id, session, models_from_bfg_to_x, inst, DEFAULT_PAIRS_INST_CHROM)
                 if rt_pred:
                     pred_from_bfg_all.append(uq_comp_id)
                 else:

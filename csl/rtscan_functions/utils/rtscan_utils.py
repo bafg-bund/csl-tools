@@ -1,4 +1,39 @@
 from csl.utils.sql_utils import close_session_remove_file, RetentionTime, ExperimentGroup, expGroupExp, Experiment
+from csl.rtscan_functions.utils.rtscan_config import *
+
+def load_rt_models():
+    """
+    Load and define retention time (RT) transformation models between data sources.
+
+    Each data source in the CSL needs a model for the RT relationship between the external method and the BfG method.
+    After updating models, run `csl rtscan recalc path/to/CSL.db` to recalculate predicted RTs.
+
+    Returns:
+        models_from_bfg_to_x (dict) : Functions that predict RT values in each external data source given an RT from BfG.
+        models_from_x_to_bfg (dict) : Functions that predict BfG RT values given an RT from each external data source.
+    """
+    import joblib
+
+    # UBA (linear regression)
+    def pred_rt_bfg_uba(rt_bfg): return round((rt_bfg - 0.75) / 1.12, 3)
+    def pred_rt_uba_bfg(rt_uba): return round(1.12 * rt_uba + 0.75, 3)
+
+    # LANUK (spline regression)
+    model_bl = joblib.load(DEFAULT_MODEL_BFG_TO_LANUK_PATH)  # Model for predicting LANUK RTs from BfG RTs
+    model_lb = joblib.load(DEFAULT_MODEL_LANUK_TO_BFG_PATH)  # Model for predicting BfG RTs from LANUK RTs
+    def pred_rt_bfg_lanuk(rt_bfg): return round(float(model_bl(rt_bfg)), 3)
+    def pred_rt_lanuk_bfg(rt_lanuk): return round(float(model_lb(rt_lanuk)), 3)
+
+    # LfU (same method)
+    def pred_rt_bfg_lfu(rt_bfg): return rt_bfg
+    def pred_rt_lfu_bfg(rt_lfu): return rt_lfu
+
+    models_from_bfg_to_x = {'uba': pred_rt_bfg_uba, 'lfuby': pred_rt_bfg_lfu,
+                       'lanuk': pred_rt_bfg_lanuk}
+    models_from_x_to_bfg = {'uba': pred_rt_uba_bfg, 'lfuby': pred_rt_lfu_bfg,
+                     'lanuk': pred_rt_lanuk_bfg}
+
+    return models_from_bfg_to_x, models_from_x_to_bfg
 
 
 def get_inst_rt_info(uq_comp_id, session, inst_method_pairs):
@@ -11,7 +46,7 @@ def get_inst_rt_info(uq_comp_id, session, inst_method_pairs):
         inst_method_pairs (dict) : Dictionary mapping CSL data source notation to CSL method notation.
 
     Returns:
-        inst_rt (list os str)      : Data sources with any RT entry for the compound ID.
+        inst_rt (list of str)      : Data sources with any RT entry for the compound ID.
         inst_exp_rt (list of str)  : Data sources with an experimental RT entry for the compound ID.
         inst_pred_rt (list of str) : Data sources with a predicted RT entry for the compound ID.
     """
@@ -204,6 +239,97 @@ def predict_rt(uq_comp_id, session, models_from_bfg, inst_str, inst_method_pairs
         session.add(rt_db)
 
     return rt_pred
+
+
+def recalculate_pred_rt(uq_comp_id, session, inst_pred_rt, inst_method_pairs):
+    """
+    Predicts missing retention time (RT) for a given compound ID based on an available experimental or predicted BfG RT.
+
+    Args:
+        uq_comp_id (int)         : Compound ID used to query the CSL database.
+        session (obj)            : SQLAlchemy session object connected to the database.
+        inst_pred_rt (str)       : Data sources with predicted RT entry.
+        inst_method_pairs (dict) : Mapping of data sources to chromatographic methods.
+
+    Returns:
+        recalc_comp_id (list of int): List of uq_comp_id that were recalculated.
+    """
+    from sqlalchemy import func
+
+    # Load RT models
+    models_from_bfg_to_x, models_from_x_to_bfg = load_rt_models()
+
+    # Get list of data sources in order of importance to predict BfG RT
+    check_order = check_order_pred_bfg_rt()
+
+    bfg_str = 'bfg'  # BfG string
+    rt_bfg_pred = None
+    recalc_comp_id = []
+
+    if bfg_str in inst_pred_rt:
+        # Recalculate bfg RT first based on available data (in order of importance), then predict all other predicted RTs.
+        for check_inst in check_order:
+                rt_inst = session.query(RetentionTime.rt).filter_by(
+                    compound_id=uq_comp_id, chrom_method=inst_method_pairs[check_inst]).one_or_none()
+                if rt_inst:
+                    rt_bfg_pred = models_from_x_to_bfg[check_inst](rt_inst[0])
+                    break
+
+        # Replace predicted bfg RT in session by overwriting at RT ID
+        if rt_bfg_pred:
+            rt_id = session.query(RetentionTime.ret_time_id).filter_by(
+                compound_id=uq_comp_id, chrom_method=inst_method_pairs[bfg_str]).one_or_none()[0]
+
+            # Check if the new predicted RT is different from the current one
+            current_rt = session.query(RetentionTime.rt).filter_by(ret_time_id=rt_id).scalar()
+            if current_rt != rt_bfg_pred:
+                # session.query(RetentionTime).filter_by(ret_time_id=rt_id).update({"rt": rt_bfg_pred})
+                rt_obj = session.query(RetentionTime).filter_by(ret_time_id=rt_id).one()
+                rt_obj.rt = rt_bfg_pred
+                recalc_comp_id.append(uq_comp_id)
+
+        else:
+            raise ValueError(f'No experimental RT found to predict BfG RT. '
+                             f'Try to run <csl rtscan check path/to/CSL.db> first.')
+
+        # Then recalculate all other predicted RTs
+        for inst in list(set(inst_pred_rt) - {bfg_str}):
+            # Predict missing RT based on bfg RT
+            rt_pred = models_from_bfg_to_x[inst](rt_bfg_pred)
+            # Replace predicted RT in session by overwriting at RT ID
+            rt_id = session.query(RetentionTime.ret_time_id).filter_by(
+                compound_id=uq_comp_id, chrom_method=inst_method_pairs[inst]).one_or_none()[0]
+
+            # Check if the new predicted RT is different from the current one
+            current_rt = session.query(RetentionTime.rt).filter_by(ret_time_id=rt_id).scalar()
+            if current_rt != rt_pred:
+                # session.query(RetentionTime).filter_by(ret_time_id=rt_id).update({"rt": rt_pred})
+                rt_obj = session.query(RetentionTime).filter_by(ret_time_id=rt_id).one()
+                rt_obj.rt = rt_pred
+                recalc_comp_id.append(uq_comp_id)
+
+    else:
+        # Predict all existing predicted RTs using the existing experimental bfg RT (We assume it exists).
+        for inst in inst_pred_rt:
+            # Get bfg RT
+            rt_bfg = session.query(RetentionTime.rt).filter_by(
+                compound_id=uq_comp_id, chrom_method=inst_method_pairs[bfg_str]).one_or_none()
+            if rt_bfg:
+                # Predict missing RT based on bfg RT
+                rt_pred = models_from_bfg_to_x[inst](rt_bfg[0])
+                # Replace predicted RT in session by overwriting at RT ID
+                rt_id = session.query(RetentionTime.ret_time_id).filter_by(
+                    compound_id=uq_comp_id, chrom_method=inst_method_pairs[inst]).one_or_none()[0]
+
+                # Check if the new predicted RT is different from the current one
+                current_rt = session.query(RetentionTime.rt).filter_by(ret_time_id=rt_id).scalar()
+                if current_rt != rt_pred:
+                    # session.query(RetentionTime).filter_by(ret_time_id=rt_id).update({"rt": rt_pred})
+                    rt_obj = session.query(RetentionTime).filter_by(ret_time_id=rt_id).one()
+                    rt_obj.rt = rt_pred
+                    recalc_comp_id.append(uq_comp_id)
+
+    return recalc_comp_id
 
 
 def summarize_corrections_and_errors(uq_comp_ids, dupl_all, pred_to_false_all, no_exp_rt_all,

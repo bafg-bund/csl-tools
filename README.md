@@ -182,12 +182,12 @@ csl rtscan <operation> <path_csl>
 #### Arguments
 - `operation`: Specify the operation. Choose from:
   - `update`: Adds missing non-experimental retention times using available experimental data and corrects errors in associated entries in the CSL.
-  - `recalc`: Recalculates and replaces all non-experimental retention times using available experimental data in the CSL (not yet implemented).
+  - `recalc`: Recalculates and replaces all non-experimental retention times using available experimental data in the CSL.
 - `path_csl`: Path to CSL file.
 
 #### Example
 ```
-csl rtscan check path/to/CSL.db
+csl rtscan update path/to/CSL.db
 ```
 ```python
 from csl import scan_rt
