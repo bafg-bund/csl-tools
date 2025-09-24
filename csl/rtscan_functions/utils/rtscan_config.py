@@ -5,6 +5,8 @@ import os
 # Path to retention time models
 DEFAULT_MODEL_BFG_TO_LANUK_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'spline_bfg_to_lanuk.pkl')
 DEFAULT_MODEL_LANUK_TO_BFG_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'spline_lanuk_to_bfg.pkl')
+DEFAULT_MODEL_BFG_TO_BFGMONDE_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'spline_bfg_to_bfgmonde.pkl')  # Todo: Temporary
+DEFAULT_MODEL_BFGMONDE_TO_BFG_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'spline_bfgmonde_to_bfg.pkl')  # Todo: Temporary
 
 
 def check_order_pred_bfg_rt():

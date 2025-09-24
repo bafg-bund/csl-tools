@@ -28,10 +28,16 @@ def load_rt_models():
     def pred_rt_bfg_lfu(rt_bfg): return rt_bfg
     def pred_rt_lfu_bfg(rt_lfu): return rt_lfu
 
+    # BfG_monde (spline regression)  # Todo: Temporary
+    model_b_bm = joblib.load(DEFAULT_MODEL_BFG_TO_BFGMONDE_PATH)  # Model for predicting BfG_monde RTs from BfG RTs  # Todo: Temporary
+    model_bm_bb = joblib.load(DEFAULT_MODEL_BFGMONDE_TO_BFG_PATH)  # Model for predicting BfG RTs from BfG_monde RTs  # Todo: Temporary
+    def pred_rt_bfg_bfgmonde(rt_bfg): return round(float(model_b_bm(rt_bfg)), 3)  # Todo: Temporary
+    def pred_rt_bfgmonde_bfg(rt_bfgmonde): return round(float(model_bm_bb(rt_bfgmonde)), 3)  # Todo: Temporary
+
     models_from_bfg_to_x = {'uba': pred_rt_bfg_uba, 'lfuby': pred_rt_bfg_lfu,
-                       'lanuk': pred_rt_bfg_lanuk}
+                       'lanuk': pred_rt_bfg_lanuk, 'bfgmonde': pred_rt_bfg_bfgmonde}
     models_from_x_to_bfg = {'uba': pred_rt_uba_bfg, 'lfuby': pred_rt_lfu_bfg,
-                     'lanuk': pred_rt_lanuk_bfg}
+                     'lanuk': pred_rt_lanuk_bfg, 'bfgmonde': pred_rt_bfgmonde_bfg}
 
     return models_from_bfg_to_x, models_from_x_to_bfg
 
