@@ -39,11 +39,11 @@ def var_fix_mbank():
     The information is currently fixed for this format or does not appear in the data files (can't be extracted).
     """
     mbank_var_fix = {
-        'var_chrom_method': None,      # Chromatographic method
-        'var_isotope': 'monoisotopic', # Type of molecular mass
-        'var_ce_unit': 'V',            # Unit for collision energy
-        'var_expg_csl': None,          # Default label for experimentGroup.name in CSL
-        'var_compg_csl': None,         # Default label for compoundGroup.name in CSL
+        'var_chrom_method': None,       # Chromatographic method
+        'var_isotope': 'monoisotopic',  # Type of molecular mass
+        'var_ce_unit': 'V',             # Unit for collision energy
+        'var_expg_csl': None,           # Default label for experimentGroup.name in CSL
+        'var_compg_csl': None,          # Default label for compoundGroup.name in CSL
     }
     return mbank_var_fix
 
@@ -54,17 +54,15 @@ def defaults_mbank():
     These settings are expected to never have more than one state within each process workflow.
     """
     mbank_defaults = {
-        'def_pol_p': 'POSITIVE', # Default identifier for positive ion mode
-        'def_pol_n': 'NEGATIVE', # Default identifier for positive ion mode
-        'def_qf': None,          # Default identifier for "Quellfragmente" (precursor ions)
+        'def_pol_p': 'POSITIVE',  # Default identifier for positive ion mode
+        'def_pol_n': 'NEGATIVE',  # Default identifier for positive ion mode
+        'def_qf': None,           # Default identifier for precursor ions ("Quellfragmente")
     }
     return mbank_defaults
 
 
 def adduct_notation_mbank():
-    """
-    Special cases for adduct notation
-    """
+    """Special cases for adduct notation."""
     mbank_spec_adduct = {
     }
     return mbank_spec_adduct

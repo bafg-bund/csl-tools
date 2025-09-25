@@ -52,6 +52,7 @@ class FormatProcess(ABC):
     def add_fixed_variables(self, extract_data, var_fix):
         """Adds fixed information (specified in <data source>_config.py) to each entry."""
         import logging
+
         logger = logging.getLogger(__name__)
 
         extract_data_add = extract_data
@@ -105,6 +106,7 @@ class FormatProcess(ABC):
         """
         import pandas as pd
         import logging
+
         logger = logging.getLogger(__name__)
 
         form_data_entry_all = []  # List of dictionaries with formatted data
@@ -279,6 +281,7 @@ class FormatProcess(ABC):
         """
         import pandas as pd
         import logging
+
         logger = logging.getLogger(__name__)
 
         # Create a session for CSL connection
@@ -333,6 +336,7 @@ class FormatProcess(ABC):
             form_data_match (DataFrame) : Data including relevant flags
         """
         import logging
+
         logger = logging.getLogger(__name__)
 
         form_err_data = form_data_match[form_data_match['form_err_flag']]

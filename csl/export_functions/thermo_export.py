@@ -8,7 +8,6 @@ from csl.config import CSLTOOLS_VERSION
 class ThermoExport(FormatExport):
     def export(self):
         """Workflow to export CSL data to a text file."""
-
         import os.path
         from collections import defaultdict
         from datetime import datetime

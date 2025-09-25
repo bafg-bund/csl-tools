@@ -8,7 +8,6 @@ Process Classes:
     mbank : Workflow for MassBank documents.
     Todo: In the future import/processing will be changed to software-specific workflows only
 """
-
 from csl.utils import validate_file_path, setup_logger
 from csl.process_functions import *
 from csl.config import ROOT_DIR
@@ -45,7 +44,6 @@ def process_data(format: str, path_csl: str, path_data: str or list[str]):
         path_csl (str)  : Path to the CSL file.
         path_data (str or list[str]) : File path(s) or directory path containing the MS2 data files to process.
     """
-
     # Validate the provided file path(s)
     if isinstance(path_data, (list, tuple)):  # If user selected multiple files
         for fpath in path_data:

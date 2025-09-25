@@ -96,11 +96,11 @@ def check_experimental_data(uq_comp_id, inst_exp_rt, session, inst_method_pairs)
         entr_no_exp_rt (list of int)     : List of compounds IDs where no RT was found for the experimental data.
     """
     import logging
+
     logger = logging.getLogger(__name__)
 
-    entr_dupl, entr_pred_to_false, entr_no_exp_rt = [], [], []
-
     # Iterate over data sources with experimental RT
+    entr_dupl, entr_pred_to_false, entr_no_exp_rt = [], [], []
     for inst_exp in inst_exp_rt:
         method = inst_method_pairs[inst_exp]
 
@@ -141,6 +141,7 @@ def check_predicted_flags_pred_data(uq_comp_id, inst_pred_rt, session, inst_meth
         pred_to_true (list of int) : List of compounds IDs where the "predicted" flag was corrected to 'TRUE'.
     """
     import logging
+
     logger = logging.getLogger(__name__)
 
     pred_to_true = []
@@ -174,6 +175,7 @@ def predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, ins
     """
     from sqlalchemy import func
     import logging
+
     logger = logging.getLogger(__name__)
 
     bfg_str = 'bfg'  # BfG string
@@ -219,6 +221,7 @@ def predict_rt(uq_comp_id, session, models_from_bfg, inst_str, inst_method_pairs
     """
     from sqlalchemy import func
     import logging
+
     logger = logging.getLogger(__name__)
 
     bfg_str = 'bfg'  # BfG string
@@ -350,6 +353,7 @@ def summarize_corrections_and_errors(uq_comp_ids, dupl_all, pred_to_false_all, n
                                              least one data source.
     """
     import logging
+
     logger = logging.getLogger(__name__)
 
     # Flatten some lists
@@ -386,6 +390,7 @@ def commit_changes_choice(path_csl, session):
         session (obj)  : SQLAlchemy session object connected to the database.
     """
     import logging
+
     logger = logging.getLogger(__name__)
 
     # Check if session was modified

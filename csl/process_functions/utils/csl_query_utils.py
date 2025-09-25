@@ -76,28 +76,22 @@ def check_duplicate(session, entry):
 def add_exp_to_session(session, entry, inst_def):
     """
     Adds the new experimental information to the following tables in the CSL:
-    Experiment group
+    # Experiment group
     - Checks if the experiment group exists in the CSL and adds it if necessary.
-
-    Compound group(s)
+    # Compound group(s)
     - Matches compound groups with existing ones in the CSL. Collects the matches.
     - If no matches are found, uses the default compound group.
-
-    Compound
+    # Compound
     - Checks if the compound, and a link to the matched compound group(s), exists in the CSL.
     - Missing compounds and links to compound group(s) are added.
-
-    Retention time
+    # Retention time
     - Checks for an existing retention time (RT) and uses the RT from the file if it doesn't exist.
     Otherwise, prefers existing RT. Also checks for RT inconsistency (warning at a difference of >10 s).
-
-    Experimental parameters
+    # Experimental parameters
     - Searches for experimental parameters and add them from the file if they do not exist.
-
-    Experiment
+    # Experiment
     - Creates a new experiment entry in the CSL at the current time.
-
-    Fragments
+    # Fragments
     - Adds all fragment information from the file.
 
     Args:
@@ -111,6 +105,7 @@ def add_exp_to_session(session, entry, inst_def):
     from datetime import datetime
     from sqlalchemy import func
     import logging
+
     logger = logging.getLogger(__name__)
 
     # Prepare all variables

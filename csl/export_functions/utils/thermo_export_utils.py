@@ -8,16 +8,15 @@ def extract_experiment_chunk_thermo(exp_id, chrom_method, csl_version, CSLTOOLS_
     Extracts data for a specific experiment id and formats data for MSP/NIST documents (mzVault/ThermoFisher).
 
     Args:
-        exp_id (int)                : Experiment ID used to query the database.
-        chrom_method (str)          : Chromatographic method identifier.
-        csl_version (str)           : Current version of the CSL database.
-        CSLTOOLS_VERSION (str)      : Current version of the python package.
+        exp_id (int)           : Experiment ID used to query the database.
+        chrom_method (str)     : Chromatographic method identifier.
+        csl_version (str)      : Current version of the CSL database.
+        CSLTOOLS_VERSION (str) : Current version of the python package.
         sql_data_dict (dict[int, SqlQueryResult(dataclass)]) : Mapping of exp_id to SqlQueryResult
 
     Returns:
         export_chunk (str) : Text chunk formatted for a single MSP/NIST document.
     """
-
     # SQL queries based on experiment ID
     SqlQueryResult = sql_data_dict.get(exp_id)
     if not SqlQueryResult:
@@ -168,7 +167,6 @@ def build_export_chunk_thermo(f_data: FormattedDataThermo):
     Returns:
         export_chunk (str) : Formatted text chunk for the MSP/NIST document.
     """
-
     # Creating export text chunk
     export_chunk = "".join(filter(None, [
          f"NAME: {f_data.compound_name}\n",

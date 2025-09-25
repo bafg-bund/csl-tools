@@ -7,7 +7,6 @@ Export classes:
     mbank  : Workflow for exporting the CSL as Massbank documents (.txt).
     sqlite : Workflow for exporting a subset of the CSL as SQLite file (.db).
 """
-
 from csl.utils import validate_file_path, setup_logger
 from csl.export_functions import *
 from csl.config import ROOT_DIR
@@ -44,12 +43,11 @@ def export_data(format: str, path_csl: str, path_out: str, subset: str or list[s
         path_csl (str) : Path to the CSL file.
         path_out (str) : Path to export directory.
         subset (str or list[str]) : Data source(s), used to subset the CSL data before exporting. Choose from:
-            - 'bfg'   : Files from data source 'bfg' (Federal Institute of Hydrology, Koblenz, Germany).
-            - 'lfuby' : Files from data source 'lfuby' (Bavarian Environment Agency, Augsburg, Germany).
-            - 'uba'   : Files from data source 'uba' (German Environment Agency, Berlin, Germany).
-            - 'all'   : No subsetting (Default).
+            - 'bfg'    : Files from data source 'bfg' (Federal Institute of Hydrology, Koblenz, Germany).
+            - 'lfuby'  : Files from data source 'lfuby' (Bavarian Environment Agency, Augsburg, Germany).
+            - 'uba'    : Files from data source 'uba' (German Environment Agency, Berlin, Germany).
+            - 'all'    : No subsetting (Default).
     """
-
     # Validate the provided file paths
     validate_file_path(path_csl)
     validate_file_path(path_out)

@@ -12,7 +12,6 @@
 # Usage:
 #     python main.py <command> [options]
 # """
-
 from argparse import ArgumentParser, Namespace
 from csl.main_functions.process import process_data
 from csl.main_functions.export import export_data

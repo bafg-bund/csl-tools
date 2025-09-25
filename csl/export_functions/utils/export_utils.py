@@ -39,7 +39,7 @@ def get_experiment_ids_by_exp_group(session, data_source):
                                          Corresponds to ExperimentGroup in CSL.
 
     Returns:
-        experiment_ids (list of int) :  Experiment IDs of the data entries (experiments) in the CSL.
+        experiment_ids (list of int) : Experiment IDs of the data entries (experiments) in the CSL.
     """
     from sqlalchemy import select
 
@@ -77,7 +77,7 @@ def get_experiment_ids_by_chrom_method(session, chrom_method, predicted=None):
                                     Use "TRUE"/True, "FALSE"/False, or None (default) to not filter on prediction.
 
     Returns:
-        experiment_ids (list of int) :  Experiment IDs of the data entries (experiments) in the CSL.
+        experiment_ids (list of int) : Experiment IDs of the data entries (experiments) in the CSL.
     """
     from sqlalchemy import select
 
@@ -108,9 +108,9 @@ def sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method):
     Queries the CSL database for experiment data and related metadata based on the experiment ID and method.
 
     Args:
-        session (obj)       : SQLAlchemy session object connected to the CSL database.
-        exp_id (int)        : Experiment ID used to query the database.
-        chrom_method (str)  : Chromatographic method identifier.
+        session (obj)      : SQLAlchemy session object connected to the CSL database.
+        exp_id (int)       : Experiment ID used to query the database.
+        chrom_method (str) : Chromatographic method identifier.
 
     Returns:
         SqlQueryResult (dataclass) : Dataclass containing the queried experiment data and metadata.
@@ -144,7 +144,7 @@ def sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method):
 
 def sql_bulk_queries_by_exp_ids_chrom_method(session, exp_ids, chrom_method):
     """
-    Queries the CSL for experiment data and related metadata based on all experiment IDs of on chromatographic method.
+    Queries the CSL for experiment data and related metadata based on all experiment IDs for a chromatographic method.
 
     Args:
         session (obj)       : SQLAlchemy session object connected to the CSL database.
@@ -223,10 +223,7 @@ def sql_bulk_queries_by_exp_ids_chrom_method(session, exp_ids, chrom_method):
 
 
 def get_precursor_charge(adduct_form):
-    """
-    Extract the precursor charge number from a formatted adduct name.
-    E.g.: [M+H]+ returns 1; [M-2H]2- returns 2.
-    """
+    """Extract the precursor charge number from a formatted adduct name, e.g., [M+H]+ returns 1; [M-2H]2- returns 2."""
     import re
 
     # Check if string ends with a digit and either `-` or `+`

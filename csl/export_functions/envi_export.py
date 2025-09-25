@@ -7,7 +7,6 @@ from csl.utils.file_utils import get_csl_version
 class EnviExport(FormatExport):
     def export(self):
         """Workflow to export CSL data as a target list usable for enviMass."""
-
         import os.path
         from datetime import datetime
         from tqdm import tqdm

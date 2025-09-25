@@ -5,7 +5,6 @@ Rtscan Classes:
     update : Workflow for adding missing non-experimental retention times (RT) and correcting errors in associated entries in the CSL.
     recalc : Workflow for recalculating and replacing all non-experimental RTs in the CSL.
 """
-
 from csl.utils import validate_file_path, setup_logger
 from csl.rtscan_functions import *
 from csl.config import ROOT_DIR
@@ -37,7 +36,6 @@ def scan_rt(operation: str, path_csl: str):
             - 'recalc'  : Recalculates and replaces all non-experimental retention times using available experimental data in the CSL.
         path_csl (str)  : Path to the CSL file.
     """
-
     # Validate the provided file paths
     validate_file_path(path_csl)
 

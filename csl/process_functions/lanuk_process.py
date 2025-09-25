@@ -6,8 +6,8 @@ class LanukProcess(FormatProcess):
     def process(self):
         """Workflow to process MS2 data files from the data source lanuk
         (Landesamt für Natur, Umwelt und Klima Nordrhein-Westfalen)."""
-
         import logging
+
         logger = logging.getLogger(__name__)
         logger.info('Executing lanuk workflow to process MS2 data files')
         logger.warning('LANUK workflow currently implemented for testing only.')
@@ -38,7 +38,7 @@ class LanukProcess(FormatProcess):
             #   - InChiKey (Not needed if CAS exists)
             #   - SMILES
             #   - Compound Group (Default is added: LANUK)
-            #  Furthermore, assumptinos were made: ionization type 'ESI', collision type 'Q' (from existing csl data), and
+            #  Furthermore, assumptions were made: ionization type 'ESI', collision type 'Q' (from existing csl data), and
             #  type of molecular mass 'monoisotopic'. They all need confirmation.
 
             # Match extracted data with CSL
