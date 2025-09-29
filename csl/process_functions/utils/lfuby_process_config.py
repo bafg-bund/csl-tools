@@ -14,7 +14,6 @@
 # 2) Fixed variable for non-extractable data:
 # Use this when necessary information cannot be extracted from the data files or is fixed (e.g. one instrument name).
 #   → Define in var_fix_<institution>.
-
 from csl.config import DEFAULT_PAIRS_INST_CHROM
 
 def var_regex_lfuby():
@@ -49,17 +48,17 @@ def var_fix_lfuby():
     all_methods = DEFAULT_PAIRS_INST_CHROM
 
     lfuby_var_fix = {
-        'var_chrom_method': all_methods['lfuby'],      # Chromatographic method
-        'var_instrument': 'QExactive',                 # Instrument name
-        'var_isotope': 'monoisotopic',                 # Type of molecular mass
-        'var_col_type': 'HCD',                         # Collision type
-        'var_ce_unit': 'V',                            # Unit for collision energy
-        'var_adduct': None,                            # Adduct
-        'var_inchi': None,                             # InChI
-        'var_expg_csl': 'lfuby',                       # Default label for experimentGroup.name in CSL
-        'var_compg_csl': 'lfuby',                      # Default label for compoundGroup.name in CSL
-        'var_instrument_type': 'LC-ESI-Orbitrap',      # Instrument type
-        'var_accession': None,                         # Accession string (used in MassBank)
+        'var_chrom_method': all_methods['lfuby'],  # Chromatographic method
+        'var_instrument': 'QExactive',             # Instrument name
+        'var_isotope': 'monoisotopic',             # Type of molecular mass
+        'var_col_type': 'HCD',                     # Collision type
+        'var_ce_unit': 'V',                        # Unit for collision energy
+        'var_adduct': None,                        # Adduct
+        'var_inchi': None,                         # InChI
+        'var_expg_csl': 'lfuby',                   # Default label for experimentGroup.name in CSL
+        'var_compg_csl': 'lfuby',                  # Default label for compoundGroup.name in CSL
+        'var_instrument_type': 'LC-ESI-Orbitrap',  # Instrument type
+        'var_accession': None,                     # Accession string (used in MassBank)
     }
     return lfuby_var_fix
 
@@ -70,16 +69,16 @@ def defaults_lfuby():
     These settings are expected to never have more than one state within each process workflow.
     """
     lfuby_defaults = {
-        'def_pol_p': 'positive',                        # Default identifier for positive ion mode
-        'def_pol_n': 'negative',                        # Default identifier for positive ion mode
-        'def_qf': 'QF',                                 # Default identifier for "Quellfragmente" (precursor ions)
+        'def_pol_p': 'positive',  # Default identifier for positive ion mode
+        'def_pol_n': 'negative',  # Default identifier for positive ion mode
+        'def_qf': 'QF',           # Default identifier for precursor ions ("Quellfragmente")
     }
     return lfuby_defaults
 
 
 def adduct_notation_lfuby():
     """
-    Special cases for adduct notation
+    Special cases for adduct notation.
     Define special cases in the below dictionary if they deviate from standard adduct notation convention
     Standard adduct notation convention is: "[M+{adduct_name}]+" for positive ion mode
     and "[M-{adduct_name}]-" for negative ion mode. E.g.: "[M+NH4]+" for Desmedipham_NH4 for positive polarity.
@@ -91,6 +90,3 @@ def adduct_notation_lfuby():
         'NaFA': '[M+NaCOO-]-',
     }
     return lfuby_spec_adduct
-
-
-# Todo: Whitelist for adducts

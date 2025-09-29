@@ -5,8 +5,8 @@ from csl.process_functions.utils import *
 class MbankProcess(FormatProcess):
     def process(self):
         """Workflow to process MS2 data files from MassBank documents."""
-
         import logging
+
         logger = logging.getLogger(__name__)
         logger.info('Executing mbank workflow to process MS2 data files')
 

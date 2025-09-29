@@ -134,9 +134,9 @@ def get_fragments_int_cutoff(csl_fragments, cutoff_percent):
         csl_fragments (utils.sql_utils.Fragment) : List of Fragments with the following attributes:
                                                    - mz (float): The mass-to-charge ratio of the fragment.
                                                    - intensity (float): The intensity of the fragment.
-        cutoff_percent (int or float)            : The intensity cutoff as a percentage of the maximum intensity.
-                                                   Only fragments with an intensity above this percentage of the maximum
-                                                   intensity will be included in the result.
+        cutoff_percent (int or float) : The intensity cutoff as a percentage of the maximum intensity.
+                                        Only fragments with an intensity above this percentage of the maximum intensity
+                                        will be included in the result.
 
     Returns:
         fragments_cutoff (list[tuple[float, float]]) : List of fragments as tuples (mz, intensity) that meet or exceed
@@ -172,7 +172,7 @@ def deduplicate_fragments_envi(frags):
     Removes duplicates of fragments by comparing mz values within a tolerance (specified in envi_export_config).
 
     Args:
-        frags (list[tuple[float, float]]): Fragments (list of tuples with mz and intensity values).
+        frags (list[tuple[float, float]]) : Fragments (list of tuples with mz and intensity values).
 
     Returns:
         frag_str_deduped (str) : Formatted fragments (comma-separated mz-values) without duplicates.

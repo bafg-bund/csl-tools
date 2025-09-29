@@ -16,9 +16,7 @@ def extract_data_regex_lanuk(file_path, var_regex):
     import pandas as pd
 
     def extract_data_in_chunk(chunk, var_regex):
-        """
-        Extract data of a single chunk based on regular expressions.
-        """
+        """Extract data of a single chunk based on regular expressions."""
         data_extract_dict = {}
         for variable in var_regex.items():
             start = False  # Reset start variable

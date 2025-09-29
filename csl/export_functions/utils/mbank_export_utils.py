@@ -7,7 +7,7 @@ from typing import Optional, Union, List
 
 def get_exp_ids_mbank(path_mbank_files):
     """
-    Retrieve current MassBank experiment IDs (=accession numbers).
+    Retrieve current MassBank experiment IDs (= accession numbers).
 
     Args:
         path_mbank_files (str) : Path to directory with existing MassBank files.
@@ -47,7 +47,6 @@ def extract_experiment_chunk_mbank(exp_id, chrom_method, csl_version, CSLTOOLS_V
     Returns:
         export_chunk (str) : Text chunk formatted to MassBank requirements for a single txt file.
     """
-
     # SQL queries based on experiment ID
     SqlQueryResult = sql_data_dict.get(exp_id)
     if not SqlQueryResult:
@@ -216,7 +215,6 @@ def build_export_chunk_mbank(f_data: FormattedDataMbank):
     Returns:
         export_chunk (str) : Formatted text chunk for the MassBank document.
     """
-
     # Format export chunk in the correct order
     export_chunk = "".join(filter(None, [
         f"ACCESSION: {f_data.accession}\n",
@@ -262,7 +260,6 @@ def build_export_chunk_mbank(f_data: FormattedDataMbank):
 
 def format_spectrum_mbank(spectrum):
     """Removes entries with intensity-values of zero and rounding values for m/z and intensity."""
-
     # Remove zeros in intensity
     spectrum_nozero = [entry for entry in spectrum if entry[1] != 0]
 
@@ -279,8 +276,8 @@ def format_spectrum_mbank(spectrum):
 
 def format_formula_mbank(adduct, formula):
     """
-    Returns MassBank-specific format for formula in case of permanent cations / anions
-    based on CSL-specific adduct format.
+    Returns MassBank-specific format for formula in case of permanent cations / anions based on CSL-specific adduct
+    format.
     """
     if adduct == '[M]+':
         formula = f'[{formula}]+'

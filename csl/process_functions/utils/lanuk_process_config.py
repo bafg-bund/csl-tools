@@ -14,7 +14,6 @@
 # 2) Fixed variable for non-extractable data:
 # Use this when necessary information cannot be extracted from the data files or is fixed (e.g. one instrument name).
 #   → Define in var_fix_<institution>.
-
 from csl.config import DEFAULT_PAIRS_INST_CHROM
 
 def var_regex_lanuk():
@@ -76,16 +75,16 @@ def defaults_lanuk():
     These settings are expected to never have more than one state within each process workflow.
     """
     lanuk_defaults = {
-        'def_pol_p': 'P',                               # Default identifier for positive ion mode
-        'def_pol_n': 'N',                               # Default identifier for positive ion mode
-        'def_qf': 'QF',                                 # Default identifier for "Quellfragmente" (precursor ions)
+        'def_pol_p': 'P',  # Default identifier for positive ion mode
+        'def_pol_n': 'N',  # Default identifier for positive ion mode
+        'def_qf': 'QF',    # Default identifier for precursor ions ("Quellfragmente")
     }
     return lanuk_defaults
 
 
 def adduct_notation_lanuk():
     """
-    Special cases for adduct notation
+    Special cases for adduct notation.
     Todo: No special adduct notation for lanuk.
     """
     lanuk_spec_adduct = {
