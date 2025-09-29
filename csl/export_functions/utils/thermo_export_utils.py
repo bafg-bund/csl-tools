@@ -59,6 +59,7 @@ class FormattedDataThermo:
     precursor_charge: int
     precursor_mz: float
     rt: float
+    pred: str
     spectrum: list
     splash_code: str
     smiles: str
@@ -113,7 +114,12 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_V
     compound_classes = get_compound_classes(sql_data.compound_groups)
 
     # Retention time
-    rt = sql_data.retention_time.rt
+    rt_entry = next(
+        (entry for entry in sql_data.retention_time if entry.chrom_method == chrom_method),
+        None
+    )
+    rt = rt_entry.rt
+    pred = rt_entry.predicted
 
     # Parameter related
     ce = int(sql_data.parameter.CE)
@@ -154,7 +160,7 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_V
     return FormattedDataThermo(accession, adduct, authors, cas, ce, comment_chunk, compound_classes, compound_name,
                                date, def_centroided, def_mslevel, exact_mass, formula, frag_mode, inchi, inchikey,
                                inst_copyright, inst_license, instrument_name, instrument_type, ion_mode, ionization,
-                               nr_peaks, precursor_charge, precursor_mz, rt, spectrum, splash_code, smiles, title)
+                               nr_peaks, precursor_charge, precursor_mz, rt, pred, spectrum, splash_code, smiles, title)
 
 
 def build_export_chunk_thermo(f_data: FormattedDataThermo):
@@ -194,6 +200,7 @@ def build_export_chunk_thermo(f_data: FormattedDataThermo):
          f"FRAGMENTATION_MODE: {f_data.frag_mode}\n",
          f"IONIZATION: {f_data.ionization}\n",
          f"RETENTIONTIME: {f_data.rt}\n",
+         f"PREDICTED_RT: {f_data.pred}\n",
          f"PRECURSORMZ: {f_data.precursor_mz}\n",
          f"PRECURSORTYPE: {f_data.adduct}\n",
          f"PRECURSOR_CHARGE: {f_data.precursor_charge}\n",

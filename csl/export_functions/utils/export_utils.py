@@ -13,7 +13,7 @@ class SqlQueryResult:
     fragments: list[Fragment]
     exp_groups: list[str]
     compound_groups: list[str]
-    retention_time: RetentionTime | None
+    retention_time: RetentionTime | list[RetentionTime] | None
 
 
 def get_chrom_methods(data_source):
@@ -144,7 +144,8 @@ def sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method):
 
 def sql_bulk_queries_by_exp_ids_chrom_method(session, exp_ids, chrom_method):
     """
-    Queries the CSL for experiment data and related metadata based on all experiment IDs for a chromatographic method.
+    Queries the CSL for experiment data and related metadata based on experiment IDs. Includes retention times only for
+    the specified chromatographic method.
 
     Args:
         session (obj)       : SQLAlchemy session object connected to the CSL database.
@@ -217,6 +218,99 @@ def sql_bulk_queries_by_exp_ids_chrom_method(session, exp_ids, chrom_method):
             exp_groups=exp_group_map.get(exp.experiment_id, []),
             compound_groups=compound_group_map.get(cid, []),
             retention_time=retention_time_map.get(cid)
+        )
+
+    return sql_data_dict
+
+
+def sql_bulk_queries_by_exp_ids(session, exp_ids, chunk_size=5000):
+    """
+    Queries the CSL for experiment data and related metadata based on experiment IDs. Includes retention times for all
+    chromatographic methods.
+
+    Args:
+        session (obj)       : SQLAlchemy session object connected to the CSL database.
+        exp_ids (list[int]) : List of experiment IDs.
+        chunk_size (int)    : Maximum number of experiment IDs per query chunk.
+
+    Returns:
+        sql_data_dict (dict[int, SqlQueryResult(dataclass)]) : Mapping of exp_id to SqlQueryResult
+    """
+    from collections import defaultdict
+    from sqlalchemy.orm import joinedload
+
+    # Get all experiments with compound/parameter/fragments
+    experiments = []
+    for i in range(0, len(exp_ids), chunk_size):
+        chunk = exp_ids[i:i + chunk_size]
+        experiments.extend(
+            session.query(Experiment)
+            .filter(Experiment.experiment_id.in_(chunk))
+            .options(
+                joinedload(Experiment.compound),
+                joinedload(Experiment.parameter),
+                joinedload(Experiment.fragments),
+            )
+            .all()
+        )
+
+    def chunked_in_query(query, column, values, chunk_size=5000):
+        """Helper for running queries in chunks."""
+        results = []
+        for i in range(0, len(values), chunk_size):
+            chunk = values[i:i + chunk_size]
+            results.extend(query.filter(column.in_(chunk)).all())
+        return results
+
+    # Experiment groups
+    exp_group_map = defaultdict(list)
+    rows = chunked_in_query(
+        session.query(expGroupExp.c.experiment_id, ExperimentGroup.name).join(ExperimentGroup),
+        expGroupExp.c.experiment_id,
+        exp_ids,
+        chunk_size
+    )
+    for eid, group_name in rows:
+        exp_group_map[eid].append(group_name)
+
+    # Compound IDs
+    compound_ids = [exp.compound.compound_id for exp in experiments]
+
+    # Compounds groups
+    compound_group_map = defaultdict(list)
+    rows = chunked_in_query(
+        session.query(compGroupComp.c.compound_id, CompoundGroup.name).join(CompoundGroup),
+        compGroupComp.c.compound_id,
+        compound_ids,
+        chunk_size
+    )
+    for cid, group_name in rows:
+        compound_group_map[cid].append(group_name)
+
+    # Retention times
+    retention_time_map = defaultdict(list)
+    rows = chunked_in_query(
+        session.query(RetentionTime),
+        RetentionTime.compound_id,
+        compound_ids,
+        chunk_size
+    )
+    for rt in rows:
+        retention_time_map[rt.compound_id].append(rt)
+
+    # Assemble dictionary
+    sql_data_dict = {}
+    for exp in experiments:
+        compound = exp.compound
+        cid = compound.compound_id
+        sql_data_dict[exp.experiment_id] = SqlQueryResult(
+            experiment=exp,
+            compound=compound,
+            parameter=exp.parameter,
+            fragments=exp.fragments,
+            exp_groups=exp_group_map.get(exp.experiment_id, []),
+            compound_groups=compound_group_map.get(cid, []),
+            retention_time=retention_time_map.get(cid, [])
         )
 
     return sql_data_dict

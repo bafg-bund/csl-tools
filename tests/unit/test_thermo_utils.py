@@ -31,6 +31,7 @@ def test_build_export_chunk_thermo(mock_formatted_data_thermo):
         "FRAGMENTATION_MODE: Q\n"
         "IONIZATION: ESI\n"
         "RETENTIONTIME: 12.11\n"
+        "PREDICTED_RT: FALSE\n"
         "PRECURSORMZ: 123.23\n"
         "PRECURSORTYPE: [M]+\n"
         "PRECURSOR_CHARGE: 1\n"

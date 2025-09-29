@@ -228,6 +228,7 @@ def mock_formatted_data_thermo():
     mock_f_data.precursor_mz = 123.23
     mock_f_data.adduct = '[M]+'
     mock_f_data.rt = 12.11
+    mock_f_data.pred = 'FALSE'
     mock_f_data.precursor_charge = 1
     mock_f_data.splash_code = 'splash10-0i-900-755'
     mock_f_data.nr_peaks = 2
