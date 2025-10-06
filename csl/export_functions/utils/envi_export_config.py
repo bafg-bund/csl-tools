@@ -55,15 +55,20 @@ def additional_columns_with_def_values_envi():
         'tag1': 'none',
         'tag2': 'none',
         'tag3': 'none',
-        'from': 'FALSE',
-        'to': 'FALSE',
+        'from_date': '1900-01-01',
+        'from_time': '12:00:01',
+        'to_date': '2100-01-01',
+        'to_time': '12:00:00',
         'warn_1': 'FALSE',
         'warn_2': 'FALSE',
         'Quant_adduct': 'FALSE',
         'Quant_peak': 1,
         'Quant_rule': 'most intense peak',
         'homol_units': 'FALSE',
-        'NIST': 'FALSE'
+        'NIST': 'FALSE',
+        'identified_by': 'FALSE',
+        'identified_when': 'FALSE',
+        'CL': 'none'
     }
     return envi_add_col_def_value
 
@@ -78,8 +83,10 @@ def column_names_order_envi():
     envi_column_names_order = [
         'ID', 'Name', 'Formula', 'RT', 'RTI', 'RT_tolerance', 'ID_internal_standard',
         'main_adduct', 'ion_mode', 'use_for_recalibration', 'use_for_screening',
-        'restrict_adduct', 'Fragments', 'Remark', 'tag1', 'tag2', 'tag3', 'from', 'to',
+        'restrict_adduct', 'Fragments', 'Remark', 'tag1', 'tag2', 'tag3',
+        'from_date', 'from_time', 'to_date', 'to_time',
         'warn_1', 'warn_2', 'Quant_adduct', 'Quant_peak', 'Quant_rule', 'homol_units',
-        'CAS', 'InChI', 'SMILES', 'NIST'
+        'CAS', 'InChI', 'SMILES', 'NIST', 'identified_by', 'identified_when', 'CL'
     ]
+
     return envi_column_names_order
