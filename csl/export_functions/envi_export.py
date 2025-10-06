@@ -55,17 +55,19 @@ class EnviExport(FormatExport):
             column_names = column_names_order_envi()  # Column structure target list
             df =  pd.DataFrame(export_list, columns=column_names[1:])
             df = df.sort_values(by="Name").reset_index(drop=True)
-            df.rename_axis(column_names[0], inplace=True)
 
             # Group by the key columns and merge Fragments
             merged_df = df.groupby(['Name', 'main_adduct', 'ion_mode'], as_index=False).agg(
                 lambda x: [t for sublist in x for t in sublist] if x.name == 'Fragments' else x.iloc[0]
             )
-
             merged_df['Fragments'] = merged_df['Fragments'].apply(deduplicate_fragments_envi)
 
+            # Reorder columns and insert "ID" column
+            merged_df = merged_df[column_names[1:]]
+            merged_df.insert(0, "ID", range(len(merged_df)))
+
             # Export the DataFrame as text file
-            merged_df.to_csv(fpath_out, sep='\t', index=True, quoting=3)
+            merged_df.to_csv(fpath_out, sep='\t', index=False, quoting=3)
 
         # Close the session after processing all experiments
         session.close()

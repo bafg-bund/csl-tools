@@ -76,8 +76,9 @@ def process_data_entry_envi(csl_data, chrom_method):
     dv = additional_columns_with_def_values_envi()  # Additional columns with default values
     processed_entry = list([compound_name, formula, rt, dv['RTI'], dv['RT_tolerance'], dv['ID_internal_standard'], adduct, ion_mode,
          dv['use_for_recalibration'], dv['use_for_screening'], restrict_adduct, fragments, dv['Remark'], dv['tag1'],
-         dv['tag2'], dv['tag3'], dv['from'], dv['to'], dv['warn_1'], dv['warn_2'], dv['Quant_adduct'], dv['Quant_peak'],
-         dv['Quant_rule'], dv['homol_units'], cas, inchi, smiles, dv['NIST'] ])
+         dv['tag2'], dv['tag3'], dv['from_date'], dv['from_time'], dv['to_date'], dv['to_time'], dv['warn_1'],
+         dv['warn_2'], dv['Quant_adduct'], dv['Quant_peak'], dv['Quant_rule'], dv['homol_units'], cas, inchi, smiles,
+         dv['NIST'], dv['identified_by'], dv['identified_when'], dv['CL'] ])
 
     return processed_entry
 
