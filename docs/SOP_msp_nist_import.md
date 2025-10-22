@@ -1,8 +1,8 @@
-# MSP/NIST-files format for contributors
+# Requirements for mzVault-based export files for contributors
 
 **Table of Contents**
 * [Default information](#default-information)
-* [Parameter Reference Table](#parameter-reference-table)
+* [Parameter reference table](#parameter-reference-table)
   * [Compound name](#compound-name)
   * [Special adduct / Source fragment](#special-adduct--source-fragment)
   * [Precursor m/z](#precursor-mz)
@@ -34,7 +34,7 @@ Default information that needs to be provided by the contributors separately:
 		- `37Cl2` - two Cl atoms replaced with <sup>37</sup>Cl
 		- `37Cl81Br` - One Cl atom replaced with <sup>37</sup>Cl and one Br atom replaced with <sup>81</sup>Br
 
-## Parameter Reference Table
+## Parameter reference table
 - Based on mzVault™ (_Thermo Fisher Scientific; Version 2.3 SP1; Build 2.3.64.0; July 8, 2021_)
 
 | Parameter description             | Line identifier in file          | Required | Subsection                                                      |
