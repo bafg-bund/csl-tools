@@ -17,7 +17,7 @@ def workflow():
 
 class TestFormatProcess:
 
-    def test_process_data(self, workflow, mock_extract_data, mock_inst_def, mock_spec_adduct):
+    def test_process_data(self, workflow, mock_extract_data, mock_dsrc_def, mock_spec_adduct):
         """Tests processing of sample data without creating warning or error flags."""
 
         with patch('csl.process_functions.format_process.get_polarity', return_value='polarity'), \
@@ -43,7 +43,7 @@ class TestFormatProcess:
              patch('csl.process_functions.format_process.get_experiment_id', return_value='experiment_id'):
 
             # Call the process_data method
-            form_data = workflow.process_data(mock_extract_data, mock_inst_def, mock_spec_adduct)
+            form_data = workflow.process_data(mock_extract_data, mock_dsrc_def, mock_spec_adduct)
 
             # Assert that the returned data is a DataFrame and contains the expected flags
             assert isinstance(form_data, pd.DataFrame)
@@ -53,7 +53,7 @@ class TestFormatProcess:
             assert all(form_data['form_warn_flag']) is False
 
 
-    def test_process_data_inchi_cas_none(self, workflow, mock_extract_data, mock_inst_def, mock_spec_adduct):
+    def test_process_data_inchi_cas_none(self, workflow, mock_extract_data, mock_dsrc_def, mock_spec_adduct):
         """Tests processing of sample data with missing InChIKey and CAS."""
 
         with patch('csl.process_functions.format_process.get_polarity',return_value='polarity'), \
@@ -78,7 +78,7 @@ class TestFormatProcess:
              patch('csl.process_functions.format_process.get_experiment_id', return_value='experiment_id'):
 
             # Call the method
-            form_data = workflow.process_data(mock_extract_data, mock_inst_def, mock_spec_adduct)
+            form_data = workflow.process_data(mock_extract_data, mock_dsrc_def, mock_spec_adduct)
 
             # Assert that the returned data is a DataFrame and contains the expected flags
             assert isinstance(form_data, pd.DataFrame)
@@ -101,7 +101,7 @@ class TestFormatProcess:
                               (1, True, False, False),   # Case with a duplicate CSL match
                               (-1, False, True, False)]  # Case with no CSL matching due to missing InChIKey and CAS
                              )
-    def test_match_with_csl(self, workflow, mock_dependencies_match_with_csl, mock_session, mock_format_data, mock_inst_def,
+    def test_match_with_csl(self, workflow, mock_dependencies_match_with_csl, mock_session, mock_format_data,
                             mock_res_count, expected_dupl_flag, expected_err_flag, expected_add_flag):
         """Tests adding of entries to the session depending on input flags."""
         # Prepare mocks
@@ -120,7 +120,7 @@ class TestFormatProcess:
         mock_check_duplicate.return_value = mock_res_count
 
         # Call the method
-        form_data_match, session_out = workflow.match_with_csl(mock_format_data, mock_inst_def)
+        form_data_match, session_out = workflow.match_with_csl(mock_format_data)
 
         # Assert that calls were made as expected
         if expected_add_flag:

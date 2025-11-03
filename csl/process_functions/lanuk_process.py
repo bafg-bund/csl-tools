@@ -15,7 +15,7 @@ class LanukProcess(FormatProcess):
         # Load defaults and settings
         var_regex = var_regex_lanuk()
         var_fix = var_fix_lanuk()
-        inst_def = defaults_lanuk()
+        dsrc_def = defaults_lanuk()
         spec_adduct = adduct_notation_lanuk()
 
         # Read files
@@ -28,7 +28,7 @@ class LanukProcess(FormatProcess):
 
             # Processing files
             logger.info('Processing data')
-            form_data = self.process_data(extract_data_add, inst_def, spec_adduct)
+            form_data = self.process_data(extract_data_add, dsrc_def, spec_adduct)
 
             # Todo: Lanuk workflow works until here for sure. The reading was modified (only extract_var_regex_lanuk)
             #  the processing runs perfectly without modification.
@@ -43,7 +43,7 @@ class LanukProcess(FormatProcess):
 
             # Match extracted data with CSL
             logger.info('Matching extracted experiments with CSL')
-            form_data_match, session = self.match_with_csl(form_data, inst_def)
+            form_data_match, session = self.match_with_csl(form_data)
 
             # Commit session to CSL
             logger.info('Preparing to commit session changes to CSL')

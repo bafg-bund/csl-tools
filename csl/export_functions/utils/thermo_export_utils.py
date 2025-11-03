@@ -49,8 +49,8 @@ class FormattedDataThermo:
     frag_mode: str
     inchi: str
     inchikey: str
-    inst_copyright: str
-    inst_license: Optional[str]
+    dsrc_copyright: str
+    dsrc_license: Optional[str]
     instrument_name: str
     instrument_type: str
     ion_mode: str
@@ -101,13 +101,13 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_V
     precursor_charge = get_precursor_charge(sql_data.experiment.adduct)
 
     # Compute exact mass using RDKit
-    mol = Chem.MolFromSmiles(sql_data.compound.SMILES)
+    mol = Chem.MolFromSmiles(sql_data.compound.smiles)
     exact_mass = round(Descriptors.ExactMolWt(mol), 4)
 
     # Compound related
     compound_name = sql_data.compound.name
-    cas = sql_data.compound.CAS
-    smiles = sql_data.compound.SMILES
+    cas = sql_data.compound.cas
+    smiles = sql_data.compound.smiles
     inchi = sql_data.compound.inchi
     inchikey = sql_data.compound.inchikey
     formula = sql_data.compound.formula
@@ -122,23 +122,18 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_V
     pred = rt_entry.predicted
 
     # Parameter related
-    ce = int(sql_data.parameter.CE)
+    ce = int(sql_data.parameter.ce)
     instrument_type = sql_data.parameter.instrument.split()[0]
     instrument_name = " ".join(sql_data.parameter.instrument.split()[1:])
     ionization = sql_data.parameter.ionisation
     ce_unit = sql_data.parameter.ce_unit
     ion_mode = get_ion_mode_thermo(sql_data.parameter.polarity)
-    frag_mode = sql_data.parameter.col_type
-
-    # Experiment groups
-    if len(sql_data.exp_groups) > 1:
-        raise ValueError(
-            f"Experiment groups > 1 not allowed. Check experiment ID {exp_id}")
+    frag_mode = sql_data.parameter.collision_type
 
     # Legal stuff
-    authors, inst_copyright, contrib_prefix, inst_license = get_contributors_copyright(sql_data.exp_groups[0])
+    authors, dsrc_copyright, contrib_prefix, dsrc_license = get_contributors_copyright(sql_data.data_src)
     if not authors:
-        raise ValueError(f"Unknown contributor for experiment ID {exp_id}")
+        raise ValueError(f"Unknown contributor for experiment ID {exp_id}. Check link to table data_source in CSL.")
 
     # Construct title
     title = f"{sql_data.compound.name}; {sql_data.parameter.instrument.split()[0]}; {def_mslevel}; {ce} {ce_unit}"
@@ -153,13 +148,13 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_V
     comment_chunk = "".join(filter(None, [
         f"COMMENT: CONFIDENCE Reference Standard (Level 1)\n",
         f"COMMENT: Chromatography method: {chrom_method}\n",
-        f"COMMENT: Acquisition method: 10.1002/rcm.8541\n" if 'bfg' in sql_data.exp_groups else None,
+        f"COMMENT: Acquisition method: 10.1002/rcm.8541\n" if sql_data.data_src.name == 'bfg' else None,
         f"COMMENT: Export with csl-tools {CSLTOOLS_VERSION} and CSL_v{csl_version}\n"
         ]))
 
     return FormattedDataThermo(accession, adduct, authors, cas, ce, comment_chunk, compound_classes, compound_name,
                                date, def_centroided, def_mslevel, exact_mass, formula, frag_mode, inchi, inchikey,
-                               inst_copyright, inst_license, instrument_name, instrument_type, ion_mode, ionization,
+                               dsrc_copyright, dsrc_license, instrument_name, instrument_type, ion_mode, ionization,
                                nr_peaks, precursor_charge, precursor_mz, rt, pred, spectrum, splash_code, smiles, title)
 
 
@@ -180,8 +175,8 @@ def build_export_chunk_thermo(f_data: FormattedDataThermo):
          f"RECORD_TITLE: {f_data.title}\n",
          f"DATE: {f_data.date}\n",
          f"AUTHORS: {f_data.authors}\n",
-         f"LICENSE: {f_data.inst_license}\n",
-         f"COPYRIGHT: {f_data.inst_copyright}\n",
+         f"LICENSE: {f_data.dsrc_license}\n",
+         f"COPYRIGHT: {f_data.dsrc_copyright}\n",
          f"{f_data.comment_chunk}" if f_data.comment_chunk else None,
          f"COMPOUNDCLASS: {f_data.compound_classes}\n"
          if f_data.compound_classes else None,

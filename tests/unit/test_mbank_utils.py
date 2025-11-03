@@ -32,7 +32,7 @@ def test_build_export_chunk_mbank(mock_formatted_data_mbank):
         "RECORD_TITLE: Compound; Instr; MS2; 140 V\n"
         "DATE: 2025.01.09\n"
         "AUTHORS: Person A; Person B; Person C\n"
-        "LICENSE: dl-de/by-2-0\n"
+        "LICENSE: CC BY 4.0\n"
         "COPYRIGHT: Copyright 2025 Data source\n"
         f"COMMENT: Information\n"
         f"COMMENT: Additional information\n"
@@ -105,17 +105,17 @@ def test_get_ion_mode_mbank_error():
         get_ion_mode_mbank(pol)
 
 
-@pytest.mark.parametrize("col_type, expected_frag_mode",[('Q','CID'),('HCD','HCD')])
-def test_get_fragmentation_mode_mbank(col_type, expected_frag_mode):
+@pytest.mark.parametrize("collision_type, expected_frag_mode",[('Q','CID'),('HCD','HCD')])
+def test_get_fragmentation_mode_mbank(collision_type, expected_frag_mode):
     """Tests if the function returns the expected MassBank-specific fragmentation mode strings."""
-    frag_mode = get_fragmentation_mode_mbank(col_type)
+    frag_mode = get_fragmentation_mode_mbank(collision_type)
     assert frag_mode == expected_frag_mode
 
 def test_get_fragmentation_mode_mbank_error():
     """Tests if the function returns an error when input is not valid."""
-    col_type = 'non_valid_input'
-    with pytest.raises(ValueError, match=f"Unknown fragmentation mode {col_type}"):
-        get_fragmentation_mode_mbank(col_type)
+    collision_type = 'non_valid_input'
+    with pytest.raises(ValueError, match=f"Unknown fragmentation mode {collision_type}"):
+        get_fragmentation_mode_mbank(collision_type)
 
 
 @pytest.mark.parametrize("exp_id, expected_accession",

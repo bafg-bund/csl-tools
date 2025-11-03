@@ -1,4 +1,4 @@
-from csl.config import DEFAULT_PAIRS_INST_CHROM, CSLTOOLS_VERSION
+from csl.config import DEFAULT_PAIRS_DSOURCE_CHROM, CSLTOOLS_VERSION
 from csl.export_functions.format_export import FormatExport
 from csl.export_functions.utils import *
 from csl.utils.sql_utils import create_session
@@ -29,16 +29,16 @@ class MbankExport(FormatExport):
         exp_method_pairs = defaultdict(list)
 
         if 'all' in self.subset:
-            data_sources = DEFAULT_PAIRS_INST_CHROM.keys()
+            data_sources = DEFAULT_PAIRS_DSOURCE_CHROM.keys()
         else:
             data_sources = self.subset
 
         for data_source in data_sources:
-            # Get all experiment IDs based on data source in experiment group
-            experiment_ids = get_experiment_ids_by_exp_group(session, data_source)
+            # Get all experiment IDs based on the data source
+            experiment_ids = get_experiment_ids_by_data_src(session, data_source)
             logger.info(f"Found {len(experiment_ids)} experiment IDs for data source: {data_source}")
             # Apply mapping
-            chrom_method = DEFAULT_PAIRS_INST_CHROM.get(data_source)
+            chrom_method = DEFAULT_PAIRS_DSOURCE_CHROM.get(data_source)
             for exp_id in experiment_ids:
                 exp_method_pairs[chrom_method].append(exp_id)
 

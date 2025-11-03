@@ -1,4 +1,4 @@
-from csl.utils.sql_utils import close_session_remove_file, RetentionTime, ExperimentGroup, expGroupExp, Experiment
+from csl.utils.sql_utils import close_session_remove_file, RetentionTime, DataSource, Experiment
 from csl.rtscan_functions.utils.rtscan_config import *
 
 def load_rt_models():
@@ -36,19 +36,19 @@ def load_rt_models():
     return models_from_bfg_to_x, models_from_x_to_bfg
 
 
-def get_inst_rt_info(uq_comp_id, session, inst_method_pairs):
+def get_dsrc_rt_info(uq_comp_id, session, dsrc_method_pairs):
     """
     Get lists of data sources that are linked to retention time (RT) data in the CSL for a specific compound ID.
 
     Args:
         uq_comp_id (int)         : Compound ID used to query the CSL database
         session (obj)            : SQLAlchemy session object connected to the CSL database.
-        inst_method_pairs (dict) : Dictionary mapping CSL data source notation to CSL method notation.
+        dsrc_method_pairs (dict) : Dictionary mapping CSL data source notation to CSL method notation.
 
     Returns:
-        inst_rt (list of str)      : Data sources with any RT entry for the compound ID.
-        inst_exp_rt (list of str)  : Data sources with an experimental RT entry for the compound ID.
-        inst_pred_rt (list of str) : Data sources with a predicted RT entry for the compound ID.
+        dsrc_rt (list of str)      : Data sources with any RT entry for the compound ID.
+        dsrc_exp_rt (list of str)  : Data sources with an experimental RT entry for the compound ID.
+        dsrc_pred_rt (list of str) : Data sources with a predicted RT entry for the compound ID.
     """
     from sqlalchemy import select
 
@@ -57,24 +57,23 @@ def get_inst_rt_info(uq_comp_id, session, inst_method_pairs):
         select(RetentionTime.chrom_method).where(RetentionTime.compound_id == uq_comp_id)
     ).scalars().all()
 
-    inst_rt = [inst for inst, method in inst_method_pairs.items() if method in methods]
+    dsrc_rt = [dsrc for dsrc, method in dsrc_method_pairs.items() if method in methods]
 
     # Query data sources with experimental RT entry for the compound
-    exp_insts = session.execute(
-        select(ExperimentGroup.name)
-        .join(expGroupExp, ExperimentGroup.experimentGroup_id == expGroupExp.c.experimentGroup_id)
-        .join(Experiment, Experiment.experiment_id == expGroupExp.c.experiment_id)
+    exp_data_sources = session.execute(
+        select(DataSource.name)
+        .join(Experiment, DataSource.data_source_id == Experiment.data_source_id)
         .where(Experiment.compound_id == uq_comp_id)
     ).scalars().all()
 
     # Sort data sources of experimental and predicted RT entries
-    inst_exp_rt = [inst for inst in inst_method_pairs if inst in exp_insts]
-    inst_pred_rt = list(set(inst_rt).difference(inst_exp_rt))
+    dsrc_exp_rt = [dsrc for dsrc in dsrc_method_pairs if dsrc in exp_data_sources]
+    dsrc_pred_rt = list(set(dsrc_rt).difference(dsrc_exp_rt))
 
-    return inst_rt, inst_exp_rt, inst_pred_rt
+    return dsrc_rt, dsrc_exp_rt, dsrc_pred_rt
 
 
-def check_experimental_data(uq_comp_id, inst_exp_rt, session, inst_method_pairs):
+def check_experimental_data(uq_comp_id, dsrc_exp_rt, session, dsrc_method_pairs):
     """
     Checks and corrects "predicted" flags for experimental RTs and logs any issues
     such as missing RTs or duplicate entries for the same data source.
@@ -86,9 +85,9 @@ def check_experimental_data(uq_comp_id, inst_exp_rt, session, inst_method_pairs)
 
     Args:
         uq_comp_id (int)               : Compound ID used to query the CSL database
-        inst_exp_rt (list of str)      : List of data sources with an experimental RT entry for the compound ID.
+        dsrc_exp_rt (list of str)      : List of data sources with an experimental RT entry for the compound ID.
         session (obj)                  : SQLAlchemy session object connected to the CSL database.
-        inst_method_pairs (dict)       : Dictionary mapping CSL data source notation to CSL method notation.
+        dsrc_method_pairs (dict)       : Dictionary mapping CSL data source notation to CSL method notation.
 
     Returns:
         entr_dupl (list of int)          : List of compound IDs with duplicate RT entries for the same data source.
@@ -101,14 +100,14 @@ def check_experimental_data(uq_comp_id, inst_exp_rt, session, inst_method_pairs)
 
     # Iterate over data sources with experimental RT
     entr_dupl, entr_pred_to_false, entr_no_exp_rt = [], [], []
-    for inst_exp in inst_exp_rt:
-        method = inst_method_pairs[inst_exp]
+    for dsrc_exp in dsrc_exp_rt:
+        method = dsrc_method_pairs[dsrc_exp]
 
         rt_count = session.query(RetentionTime).filter_by(compound_id=uq_comp_id, chrom_method=method).count()
         if rt_count <= 1:
             rt_res = session.query(RetentionTime).filter_by(compound_id=uq_comp_id, chrom_method=method).one_or_none()
         else:
-            logger.warning(f'Multiple entries for the same data source ({inst_exp}) detected for '
+            logger.warning(f'Multiple entries for the same data source ({dsrc_exp}) detected for '
                            f'compound id: {uq_comp_id}. Skipping. Please check.')
             entr_dupl.append(uq_comp_id)
             continue
@@ -117,25 +116,25 @@ def check_experimental_data(uq_comp_id, inst_exp_rt, session, inst_method_pairs)
             if not rt_res.predicted or rt_res.predicted == 'TRUE':
                 rt_res.predicted = 'FALSE'
                 entr_pred_to_false.append(uq_comp_id)
-                logger.debug(f'Corrected predicted flag to FALSE for compound {uq_comp_id} ({inst_exp})')
+                logger.debug(f'Corrected predicted flag to FALSE for compound {uq_comp_id} ({dsrc_exp})')
             else:
-                logger.debug(f'Predicted flag already FALSE for compound {uq_comp_id} ({inst_exp})')
+                logger.debug(f'Predicted flag already FALSE for compound {uq_comp_id} ({dsrc_exp})')
         else:
             entr_no_exp_rt.append(uq_comp_id)
-            logger.error(f'No RT found for experimental data, compound {uq_comp_id} ({inst_exp})')
+            logger.error(f'No RT found for experimental data, compound {uq_comp_id} ({dsrc_exp})')
 
     return entr_dupl, entr_pred_to_false, entr_no_exp_rt
 
 
-def check_predicted_flags_pred_data(uq_comp_id, inst_pred_rt, session, inst_method_pairs):
+def check_predicted_flags_pred_data(uq_comp_id, dsrc_pred_rt, session, dsrc_method_pairs):
     """
     Checks and corrects "predicted" flags for all predicted data entries.
 
     Args:
         uq_comp_id (int)               : Compound ID used to query the CSL database.
-        inst_pred_rt (list of str)     : List of data sources with predicted RT data.
+        dsrc_pred_rt (list of str)     : List of data sources with predicted RT data.
         session (obj)                  : SQLAlchemy session object connected to the database.
-        inst_method_pairs (dict)       : Mapping of data sources to chromatographic methods.
+        dsrc_method_pairs (dict)       : Mapping of data sources to chromatographic methods.
 
     Returns:
         pred_to_true (list of int) : List of compounds IDs where the "predicted" flag was corrected to 'TRUE'.
@@ -145,19 +144,19 @@ def check_predicted_flags_pred_data(uq_comp_id, inst_pred_rt, session, inst_meth
     logger = logging.getLogger(__name__)
 
     pred_to_true = []
-    for inst in inst_pred_rt:
-        method = inst_method_pairs[inst]
+    for dsrc in dsrc_pred_rt:
+        method = dsrc_method_pairs[dsrc]
         rt_res = session.query(RetentionTime).filter_by(compound_id=uq_comp_id, chrom_method=method).one_or_none()
 
         if not rt_res.predicted or rt_res.predicted == 'FALSE':
             rt_res.predicted = 'TRUE'
             pred_to_true.append(uq_comp_id)
-            logger.debug(f'Corrected predicted flag to TRUE for compound {uq_comp_id} ({inst})')
+            logger.debug(f'Corrected predicted flag to TRUE for compound {uq_comp_id} ({dsrc})')
 
     return pred_to_true
 
 
-def predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, inst_method_pairs):
+def predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, dsrc_rt, dsrc_method_pairs):
     """
     Predicts missing BfG retention time (RT) for a given compound ID based on available data from other data sources
     (following an order of importance).
@@ -167,8 +166,8 @@ def predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, ins
         session (obj)              : SQLAlchemy session object connected to the database.
         models_to_bfg (dict)       : Mapping of data sources to models for predicting BfG RTs.
         check_order (list of str)  : List of data sources in order of importance to predict BfG RTs.
-        inst_rt (list of str)      : List of data sources with available RT data (both experimental and predicted).
-        inst_method_pairs (dict)   : Mapping of data sources to chromatographic methods.
+        dsrc_rt (list of str)      : List of data sources with available RT data (both experimental and predicted).
+        dsrc_method_pairs (dict)   : Mapping of data sources to chromatographic methods.
 
     Returns:
         float or None: The predicted BfG RT, or None if no prediction could be made.
@@ -182,21 +181,21 @@ def predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, ins
     rt_bfg_pred = None  # Initialize predicted BfG RT variable
 
     # Predict missing BfG RT based on available data (in order of importance)
-    for check_inst in check_order:
-        inst_str = check_inst
-        if inst_str in inst_rt:
-            rt_inst = session.query(RetentionTime.rt).filter_by(
-                compound_id=uq_comp_id, chrom_method=inst_method_pairs[inst_str]).one_or_none()
-            if rt_inst:
-                rt_bfg_pred = models_to_bfg[inst_str](rt_inst[0])
-                logger.debug(f'Predicted BfG RT using experimental {inst_str} RT for compound {uq_comp_id}')
+    for check_dsrc in check_order:
+        dsrc_str = check_dsrc
+        if dsrc_str in dsrc_rt:
+            rt_dsrc = session.query(RetentionTime.rt).filter_by(
+                compound_id=uq_comp_id, chrom_method=dsrc_method_pairs[dsrc_str]).one_or_none()
+            if rt_dsrc:
+                rt_bfg_pred = models_to_bfg[dsrc_str](rt_dsrc[0])
+                logger.debug(f'Predicted BfG RT using experimental {dsrc_str} RT for compound {uq_comp_id}')
                 break
 
     # Check if BfG RT was successfully predicted
     if rt_bfg_pred:
         # Add predicted BfG RT to the session
-        max_rt_id = session.query(func.max(RetentionTime.ret_time_id)).scalar()
-        rt_db = RetentionTime(ret_time_id=max_rt_id + 1, rt=rt_bfg_pred, chrom_method=inst_method_pairs[bfg_str],
+        max_rt_id = session.query(func.max(RetentionTime.retention_time_id)).scalar()
+        rt_db = RetentionTime(retention_time_id=max_rt_id + 1, rt=rt_bfg_pred, chrom_method=dsrc_method_pairs[bfg_str],
                               compound_id=uq_comp_id, predicted='TRUE')
         session.add(rt_db)
     else:
@@ -205,7 +204,7 @@ def predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, inst_rt, ins
     return rt_bfg_pred
 
 
-def predict_rt(uq_comp_id, session, models_from_bfg, inst_str, inst_method_pairs):
+def predict_rt(uq_comp_id, session, models_from_bfg, dsrc_str, dsrc_method_pairs):
     """
     Predicts missing retention time (RT) for a given compound ID based on an available experimental or predicted BfG RT.
 
@@ -213,8 +212,8 @@ def predict_rt(uq_comp_id, session, models_from_bfg, inst_str, inst_method_pairs
         uq_comp_id (int)           : Compound ID used to query the CSL database.
         session (obj)              : SQLAlchemy session object connected to the database.
         models_from_bfg (dict)     : Mapping of data sources to models for predicting RTs from BfG data.
-        inst_str (str)             : Data source that needs RT prediction.
-        inst_method_pairs (dict)   : Mapping of data sources to chromatographic methods.
+        dsrc_str (str)             : Data source that needs RT prediction.
+        dsrc_method_pairs (dict)   : Mapping of data sources to chromatographic methods.
 
     Returns:
         float or None: The predicted RT, or None if no prediction could be made.
@@ -229,30 +228,30 @@ def predict_rt(uq_comp_id, session, models_from_bfg, inst_str, inst_method_pairs
 
     # Predict missing RT based on BfG RT
     rt_bfg = session.query(RetentionTime.rt).filter_by(
-        compound_id=uq_comp_id, chrom_method=inst_method_pairs[bfg_str]).one_or_none()
+        compound_id=uq_comp_id, chrom_method=dsrc_method_pairs[bfg_str]).one_or_none()
 
     if rt_bfg:
-        rt_pred = models_from_bfg[inst_str](rt_bfg[0])
-        logger.debug(f'Predicted {inst_str} RT using {bfg_str} RT for compound {uq_comp_id}')
+        rt_pred = models_from_bfg[dsrc_str](rt_bfg[0])
+        logger.debug(f'Predicted {dsrc_str} RT using {bfg_str} RT for compound {uq_comp_id}')
 
         # Add predicted BfG RT to the session
-        max_rt_id = session.query(func.max(RetentionTime.ret_time_id)).scalar()
-        rt_db = RetentionTime(ret_time_id=max_rt_id + 1, rt=rt_pred, chrom_method=inst_method_pairs[inst_str],
+        max_rt_id = session.query(func.max(RetentionTime.retention_time_id)).scalar()
+        rt_db = RetentionTime(retention_time_id=max_rt_id + 1, rt=rt_pred, chrom_method=dsrc_method_pairs[dsrc_str],
                               compound_id=uq_comp_id, predicted='TRUE')
         session.add(rt_db)
 
     return rt_pred
 
 
-def recalculate_pred_rt(uq_comp_id, session, inst_pred_rt, inst_method_pairs):
+def recalculate_pred_rt(uq_comp_id, session, dsrc_pred_rt, dsrc_method_pairs):
     """
     Predicts missing retention time (RT) for a given compound ID based on an available experimental or predicted BfG RT.
 
     Args:
         uq_comp_id (int)         : Compound ID used to query the CSL database.
         session (obj)            : SQLAlchemy session object connected to the database.
-        inst_pred_rt (str)       : Data sources with predicted RT entry.
-        inst_method_pairs (dict) : Mapping of data sources to chromatographic methods.
+        dsrc_pred_rt (str)       : Data sources with predicted RT entry.
+        dsrc_method_pairs (dict) : Mapping of data sources to chromatographic methods.
 
     Returns:
         recalc_comp_id (list of int): List of uq_comp_id that were recalculated.
@@ -269,25 +268,24 @@ def recalculate_pred_rt(uq_comp_id, session, inst_pred_rt, inst_method_pairs):
     rt_bfg_pred = None
     recalc_comp_id = []
 
-    if bfg_str in inst_pred_rt:
-        # Recalculate bfg RT first based on available data (in order of importance), then predict all other predicted RTs.
-        for check_inst in check_order:
-                rt_inst = session.query(RetentionTime.rt).filter_by(
-                    compound_id=uq_comp_id, chrom_method=inst_method_pairs[check_inst]).one_or_none()
-                if rt_inst:
-                    rt_bfg_pred = models_from_x_to_bfg[check_inst](rt_inst[0])
+    if bfg_str in dsrc_pred_rt:
+        # Recalculate bfg RT first based on available data (in order of importance), then predict all other non-experimental RTs.
+        for check_dsrc in check_order:
+                rt_dsrc = session.query(RetentionTime.rt).filter_by(
+                    compound_id=uq_comp_id, chrom_method=dsrc_method_pairs[check_dsrc]).one_or_none()
+                if rt_dsrc:
+                    rt_bfg_pred = models_from_x_to_bfg[check_dsrc](rt_dsrc[0])
                     break
 
         # Replace predicted bfg RT in session by overwriting at RT ID
         if rt_bfg_pred:
-            rt_id = session.query(RetentionTime.ret_time_id).filter_by(
-                compound_id=uq_comp_id, chrom_method=inst_method_pairs[bfg_str]).one_or_none()[0]
+            rt_id = session.query(RetentionTime.retention_time_id).filter_by(
+                compound_id=uq_comp_id, chrom_method=dsrc_method_pairs[bfg_str]).one_or_none()[0]
 
             # Check if the new predicted RT is different from the current one
-            current_rt = session.query(RetentionTime.rt).filter_by(ret_time_id=rt_id).scalar()
+            current_rt = session.query(RetentionTime.rt).filter_by(retention_time_id=rt_id).scalar()
             if current_rt != rt_bfg_pred:
-                # session.query(RetentionTime).filter_by(ret_time_id=rt_id).update({"rt": rt_bfg_pred})
-                rt_obj = session.query(RetentionTime).filter_by(ret_time_id=rt_id).one()
+                rt_obj = session.query(RetentionTime).filter_by(retention_time_id=rt_id).one()
                 rt_obj.rt = rt_bfg_pred
                 recalc_comp_id.append(uq_comp_id)
 
@@ -296,39 +294,37 @@ def recalculate_pred_rt(uq_comp_id, session, inst_pred_rt, inst_method_pairs):
                              f'Try to run <csl rtscan check path/to/CSL.db> first.')
 
         # Then recalculate all other predicted RTs
-        for inst in list(set(inst_pred_rt) - {bfg_str}):
+        for dsrc in list(set(dsrc_pred_rt) - {bfg_str}):
             # Predict missing RT based on bfg RT
-            rt_pred = models_from_bfg_to_x[inst](rt_bfg_pred)
+            rt_pred = models_from_bfg_to_x[dsrc](rt_bfg_pred)
             # Replace predicted RT in session by overwriting at RT ID
-            rt_id = session.query(RetentionTime.ret_time_id).filter_by(
-                compound_id=uq_comp_id, chrom_method=inst_method_pairs[inst]).one_or_none()[0]
+            rt_id = session.query(RetentionTime.retention_time_id).filter_by(
+                compound_id=uq_comp_id, chrom_method=dsrc_method_pairs[dsrc]).one_or_none()[0]
 
             # Check if the new predicted RT is different from the current one
-            current_rt = session.query(RetentionTime.rt).filter_by(ret_time_id=rt_id).scalar()
+            current_rt = session.query(RetentionTime.rt).filter_by(retention_time_id=rt_id).scalar()
             if current_rt != rt_pred:
-                # session.query(RetentionTime).filter_by(ret_time_id=rt_id).update({"rt": rt_pred})
-                rt_obj = session.query(RetentionTime).filter_by(ret_time_id=rt_id).one()
+                rt_obj = session.query(RetentionTime).filter_by(retention_time_id=rt_id).one()
                 rt_obj.rt = rt_pred
                 recalc_comp_id.append(uq_comp_id)
 
     else:
         # Predict all existing predicted RTs using the existing experimental bfg RT (We assume it exists).
-        for inst in inst_pred_rt:
+        for dsrc in dsrc_pred_rt:
             # Get bfg RT
             rt_bfg = session.query(RetentionTime.rt).filter_by(
-                compound_id=uq_comp_id, chrom_method=inst_method_pairs[bfg_str]).one_or_none()
+                compound_id=uq_comp_id, chrom_method=dsrc_method_pairs[bfg_str]).one_or_none()
             if rt_bfg:
                 # Predict missing RT based on bfg RT
-                rt_pred = models_from_bfg_to_x[inst](rt_bfg[0])
+                rt_pred = models_from_bfg_to_x[dsrc](rt_bfg[0])
                 # Replace predicted RT in session by overwriting at RT ID
-                rt_id = session.query(RetentionTime.ret_time_id).filter_by(
-                    compound_id=uq_comp_id, chrom_method=inst_method_pairs[inst]).one_or_none()[0]
+                rt_id = session.query(RetentionTime.retention_time_id).filter_by(
+                    compound_id=uq_comp_id, chrom_method=dsrc_method_pairs[dsrc]).one_or_none()[0]
 
                 # Check if the new predicted RT is different from the current one
-                current_rt = session.query(RetentionTime.rt).filter_by(ret_time_id=rt_id).scalar()
+                current_rt = session.query(RetentionTime.rt).filter_by(retention_time_id=rt_id).scalar()
                 if current_rt != rt_pred:
-                    # session.query(RetentionTime).filter_by(ret_time_id=rt_id).update({"rt": rt_pred})
-                    rt_obj = session.query(RetentionTime).filter_by(ret_time_id=rt_id).one()
+                    rt_obj = session.query(RetentionTime).filter_by(retention_time_id=rt_id).one()
                     rt_obj.rt = rt_pred
                     recalc_comp_id.append(uq_comp_id)
 
@@ -393,20 +389,13 @@ def commit_changes_choice(path_csl, session):
 
     logger = logging.getLogger(__name__)
 
-    # Check if session was modified
-    session_change = session.new or session.dirty
-    if not session_change:
-        close_session_remove_file(path_csl, session)
-        logger.info('No changes in current session detected.')
-    # Ask for user input for committing session changes
+    print('Commit changes to the CSL? \n  - Confirm by typing "yes" and press enter '
+          '\n  - Cancel with any other input')
+    choice = input()
+    if choice == 'yes':
+        session.commit()
+        session.close()
+        logger.info('Changes committed to the CSL.\nCSL path: {}'.format(path_csl))
     else:
-        print('Commit changes to the CSL? \n  - Confirm by typing "yes" and press enter '
-              '\n  - Cancel with any other input')
-        choice = input()
-        if choice == 'yes':
-            session.commit()
-            session.close()
-            logger.info('Changes committed to the CSL.\nCSL path: {}'.format(path_csl))
-        else:
-            close_session_remove_file(path_csl, session)
-            logger.info('Canceled by user. No changes to the CSL committed.')
+        close_session_remove_file(path_csl, session)
+        logger.info('Canceled by user. No changes to the CSL committed.')

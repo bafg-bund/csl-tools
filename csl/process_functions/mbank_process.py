@@ -13,7 +13,7 @@ class MbankProcess(FormatProcess):
         # Load defaults and settings
         var_regex = var_regex_mbank()
         var_fix = var_fix_mbank()
-        inst_def = defaults_mbank()
+        dsrc_def = defaults_mbank()
         spec_adduct = adduct_notation_mbank()
 
         # Read files
@@ -26,11 +26,11 @@ class MbankProcess(FormatProcess):
 
             # Processing files
             logger.info('Processing data')
-            form_data = self.process_data(extract_data_add, inst_def, spec_adduct)
+            form_data = self.process_data(extract_data_add, dsrc_def, spec_adduct)
 
             # Match extracted data with CSL
             logger.info('Matching extracted experiments with CSL')
-            form_data_match, session = self.match_with_csl(form_data, inst_def)
+            form_data_match, session = self.match_with_csl(form_data)
 
             # Commit session to CSL
             logger.info('Preparing to commit session changes to CSL')

@@ -1,6 +1,6 @@
 from csl.main_functions.rtscan import scan_rt
 from csl.utils.sql_utils import create_session, RetentionTime
-from csl.config import ROOT_DIR, DEFAULT_PAIRS_INST_CHROM
+from csl.config import ROOT_DIR, DEFAULT_PAIRS_DSOURCE_CHROM
 import os
 import shutil
 from pathlib import Path
@@ -49,21 +49,21 @@ def test_rtscan_update():
     session = create_session(path_csl=csl_new_path)
 
     # Assert that there is one RT-entry for each method per compound (4 compounds in this database)
-    assert len(session.query(RetentionTime).all()) == 4*len(DEFAULT_PAIRS_INST_CHROM), \
-        (f"Expected {4*len(DEFAULT_PAIRS_INST_CHROM)} entries, but found {len(session.query(RetentionTime).all())}. "
+    assert len(session.query(RetentionTime).all()) == 4*len(DEFAULT_PAIRS_DSOURCE_CHROM), \
+        (f"Expected {4*len(DEFAULT_PAIRS_DSOURCE_CHROM)} entries, but found {len(session.query(RetentionTime).all())}. "
          f"Check methods in config.py")
 
     # Assert that for the compound id 1443 the experimental lfuby-RT is now FALSE (was empty)
     assert session.query(RetentionTime.predicted).filter_by(
-        compound_id=1443, chrom_method=DEFAULT_PAIRS_INST_CHROM['lfuby']).one_or_none()[0] == 'FALSE'
+        compound_id=1443, chrom_method=DEFAULT_PAIRS_DSOURCE_CHROM['lfuby']).one_or_none()[0] == 'FALSE'
 
     # Assert that for the compound id 1672 the experimental uba-RT is now 'FALSE' (was 'TRUE')
     assert session.query(RetentionTime.predicted).filter_by(
-        compound_id=1672, chrom_method=DEFAULT_PAIRS_INST_CHROM['uba']).one_or_none()[0] == 'FALSE'
+        compound_id=1672, chrom_method=DEFAULT_PAIRS_DSOURCE_CHROM['uba']).one_or_none()[0] == 'FALSE'
 
     # Assert that for the compound id 1670 the predicted bfg-RT is now 'TRUE' (was 'FALSE')
     assert session.query(RetentionTime.predicted).filter_by(
-        compound_id=1670, chrom_method=DEFAULT_PAIRS_INST_CHROM['bfg']).one_or_none()[0] == 'TRUE'
+        compound_id=1670, chrom_method=DEFAULT_PAIRS_DSOURCE_CHROM['bfg']).one_or_none()[0] == 'TRUE'
 
     # Cleanup
     session.close()

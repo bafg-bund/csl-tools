@@ -1,5 +1,4 @@
-from csl.utils.sql_utils import (Experiment, Fragment, Parameter, Compound, RetentionTime, CompoundGroup,
-                                 ExperimentGroup)
+from csl.utils.sql_utils import (Experiment, Fragment, Parameter, Compound, RetentionTime, CompoundGroup, DataSource)
 
 def check_duplicate(session, entry):
     """
@@ -24,8 +23,8 @@ def check_duplicate(session, entry):
 
     # Prepare query
     qry = session.query(
-        Compound.CAS, Experiment.isotope, Parameter.instrument, Parameter.ionisation,
-        Parameter.CE, Parameter.CES, Parameter.col_type, Parameter.ce_unit,
+        Compound.cas, Experiment.isotope, Parameter.instrument, Parameter.ionisation,
+        Parameter.ce, Parameter.ces, Parameter.collision_type, Parameter.ce_unit,
         Parameter.polarity, Experiment.adduct
     ). \
         join(Experiment, Compound.compound_id == Experiment.compound_id). \
@@ -36,9 +35,9 @@ def check_duplicate(session, entry):
                      Parameter.instrument == entry['instrument_i'],
                      Parameter.ionisation == entry['ionization_i'],
                      Parameter.polarity == entry['pol_i'],
-                     Parameter.CE == entry['ce_i'],
-                     Parameter.CES == entry['ces_i'],
-                     Parameter.col_type == entry['col_type_i'],
+                     Parameter.ce == entry['ce_i'],
+                     Parameter.ces == entry['ces_i'],
+                     Parameter.collision_type == entry['col_type_i'],
                      Parameter.ce_unit == entry['var_ce_unit'])
 
     inchikey_main_i = entry['inchikey_main_i']
@@ -51,12 +50,12 @@ def check_duplicate(session, entry):
         res_count = qry.count()
     elif not inchikey_main_i and cas_i:
         # Add query filter using the CAS RN
-        qry = qry.filter(Compound.CAS == cas_i)
+        qry = qry.filter(Compound.cas == cas_i)
         res_count = qry.count()
     elif inchikey_main_i and cas_i:
         # Do the query once using the main layer of the InChIkey and the CAS RN
         qry1 = qry.filter(func.substr(Compound.inchikey, 1, func.length(inchikey_main_i)) == inchikey_main_i)
-        qry2 = qry.filter(Compound.CAS == cas_i)
+        qry2 = qry.filter(Compound.cas == cas_i)
         # Combine results
         combined_results = qry1.all() + qry2.all()
         unique_results = list(set(combined_results))
@@ -73,11 +72,11 @@ def check_duplicate(session, entry):
     return res_count
 
 
-def add_exp_to_session(session, entry, inst_def):
+def add_exp_to_session(session, entry):
     """
     Adds the new experimental information to the following tables in the CSL:
-    # Experiment group
-    - Checks if the experiment group exists in the CSL and adds it if necessary.
+    # Data source
+    - Checks if the data source exists in the CSL and adds it if necessary.
     # Compound group(s)
     - Matches compound groups with existing ones in the CSL. Collects the matches.
     - If no matches are found, uses the default compound group.
@@ -97,7 +96,6 @@ def add_exp_to_session(session, entry, inst_def):
     Args:
         session (obj)         : SQLAlchemy session object (sqlalchemy.orm.session.Session)
         entry (pandas.series) : Data of one entry (pandas.core.series.Series)
-        inst_def (dict)       : Data-source-specific defaults used for keeping format, and csl-matching/commits.
 
     Returns:
         (No return variables, but the session object is updated)
@@ -109,8 +107,8 @@ def add_exp_to_session(session, entry, inst_def):
     logger = logging.getLogger(__name__)
 
     # Prepare all variables
-    expg_def = entry['var_expg_csl']
-    compg_def = entry['var_compg_csl']
+    dsrc_csl_def = entry['var_dsrc_csl']
+    compg_csl_def = entry['var_compg_csl']
     comp_i = entry['comp_i']
     formula_i = entry['formula_i']
     smiles_i = entry['smiles_i']
@@ -137,12 +135,12 @@ def add_exp_to_session(session, entry, inst_def):
     # Log compound name, adduct and file path for reference
     logger.info(f"Compound: {comp_i}; CE: {ce_i}; File path: {file_path}")
 
-    # Check if the experiment group exists (e.g., 'UBA', 'BfG') in the CSL and add it if necessary.
-    exp_group = session.query(ExperimentGroup).filter_by(name=expg_def).one_or_none()
-    if not exp_group:
-        logger.info(f'Adding missing default experiment group: "{expg_def}"')
-        exp_group = ExperimentGroup(name=expg_def)
-        session.add(exp_group)
+    # Check if the data source exists (e.g., 'UBA', 'BfG') in the CSL and add it if necessary.
+    data_src = session.query(DataSource).filter_by(name=dsrc_csl_def).one_or_none()
+    if not data_src:
+        logger.info(f'Adding missing default data source: "{dsrc_csl_def}"')
+        data_src = DataSource(name=dsrc_csl_def)
+        session.add(data_src)
 
     # Match compound groups with existing ones in the CSL. Collect the matches. If no matches are found, use the default.
     comp_group = []
@@ -153,13 +151,13 @@ def add_exp_to_session(session, entry, inst_def):
                 comp_group.append(cg_db)
 
     if not comp_group:
-        existing_cg = session.query(CompoundGroup).filter_by(name=compg_def).one_or_none()
+        existing_cg = session.query(CompoundGroup).filter_by(name=compg_csl_def).one_or_none()
         # Create the default compound group if necessary.
         if not existing_cg:
-            logger.info(f'Adding missing default compound group: "{compg_def}"')
-            new_cg = CompoundGroup(name=compg_def)
+            logger.info(f'Adding missing default compound group: "{compg_csl_def}"')
+            new_cg = CompoundGroup(name=compg_csl_def)
             session.add(new_cg)
-        comp_group = session.query(CompoundGroup).filter_by(name=compg_def).one_or_none()
+        comp_group = session.query(CompoundGroup).filter_by(name=compg_csl_def).one_or_none()
         if not isinstance(comp_group, list):
             comp_group = [comp_group]
 
@@ -189,7 +187,7 @@ def add_exp_to_session(session, entry, inst_def):
         comp_res = get_single_compound_entry(base_query, refine_query)
     elif cas_i:
         # Prepare base query (CAS RN) and refine query (compound name)
-        base_query = session.query(Compound).filter(Compound.CAS == cas_i)
+        base_query = session.query(Compound).filter(Compound.cas == cas_i)
         refine_query = base_query.filter(Compound.name == comp_i)
         # Run query
         comp_res = get_single_compound_entry(base_query, refine_query)
@@ -199,13 +197,13 @@ def add_exp_to_session(session, entry, inst_def):
     if comp_res:  # If the compound exists in the CSL
         # Add compound groups that do not exist yet for this compound
         for cg in comp_group:
-            if cg.name not in [group.name for group in comp_res.groups]:
+            if cg.name not in [group.name for group in comp_res.compound_groups]:
                 logger.info(f'Adding compound group "{cg.name}" to the compound "{comp_i}"')
-                comp_res.groups.append(cg)
+                comp_res.compound_groups.append(cg)
     else:  # If the compound was not found in the CSL
         logger.info(f'Compound "{comp_i}" not found in CSL. Adding entry.')
-        comp_res = Compound(formula=formula_i, CAS=cas_i, SMILES=smiles_i, name=comp_i,
-                            groups=comp_group, inchikey=inchikey_i, inchi=inchi_i)
+        comp_res = Compound(formula=formula_i, cas=cas_i, smiles=smiles_i, name=comp_i,
+                            compound_groups=comp_group, inchikey=inchikey_i, inchi=inchi_i)
         # Add compound entry to session
         session.add(comp_res)
 
@@ -223,17 +221,17 @@ def add_exp_to_session(session, entry, inst_def):
             logger.warning(f'Retention times from file ({rt_i}) and CSL ({rt_res.rt}) differ by more than 10 s.')
 
     # Search experimental parameters and add them from the file if they don't exist
-    para_res = session.query(Parameter).filter_by(instrument=instrument, polarity=pol_i, CE=ce_i, CES=ces_i,
-                                                  ce_unit=ce_unit, col_type=col_type_i, ionisation=ionization_i
+    para_res = session.query(Parameter).filter_by(instrument=instrument, polarity=pol_i, ce=ce_i, ces=ces_i,
+                                                  ce_unit=ce_unit, collision_type=col_type_i, ionisation=ionization_i
                                                   ).one_or_none()
     if not para_res:
         logger.info('Experimental parameters not found in CSL. Adding parameters from data entry.')
-        para_res = Parameter(instrument=instrument, polarity=pol_i, CE=ce_i, CES=ces_i, ce_unit=ce_unit,
-                             col_type=col_type_i, ionisation=ionization_i)
+        para_res = Parameter(instrument=instrument, polarity=pol_i, ce=ce_i, ces=ces_i, ce_unit=ce_unit,
+                             collision_type=col_type_i, ionisation=ionization_i)
         session.add(para_res)
 
     # Create a new experiment entry in the CSL at the current time
-    exp = Experiment(mz=mz_i, compound=comp_res, parameter=para_res, adduct=adduct_i, groups=[exp_group],
+    exp = Experiment(mz=mz_i, compound=comp_res, parameter=para_res, adduct=adduct_i, data_source=data_src,
                      time_added=datetime.today(), isotope=isotope)
     session.add(exp)
 

@@ -1,6 +1,6 @@
-from csl.config import DEFAULT_PAIRS_INST_CHROM
-from csl.utils.sql_utils import (Experiment, Compound, Parameter, Fragment, expGroupExp,
-                             ExperimentGroup, CompoundGroup, RetentionTime, compGroupComp)
+from csl.config import DEFAULT_PAIRS_DSOURCE_CHROM
+from csl.utils.sql_utils import (Experiment, Compound, Parameter, Fragment, DataSource, CompoundGroup,
+                                 RetentionTime, CompoundGroupMap)
 
 from dataclasses import dataclass
 from splash import Spectrum, SpectrumType, Splash
@@ -11,14 +11,14 @@ class SqlQueryResult:
     compound: Compound
     parameter: Parameter
     fragments: list[Fragment]
-    exp_groups: list[str]
+    data_src: DataSource
     compound_groups: list[str]
     retention_time: RetentionTime | list[RetentionTime] | None
 
 
 def get_chrom_methods(data_source):
     """Get chromatographic methods by data source(s)."""
-    all_methods = DEFAULT_PAIRS_INST_CHROM
+    all_methods = DEFAULT_PAIRS_DSOURCE_CHROM
     if 'all' in data_source:
         chrom_methods = list(all_methods.values())
     else:
@@ -29,14 +29,14 @@ def get_chrom_methods(data_source):
     return chrom_methods
 
 
-def get_experiment_ids_by_exp_group(session, data_source):
+def get_experiment_ids_by_data_src(session, data_source):
     """
     Get experiment IDs from the CSL. Can be subset by data source.
 
     Args:
         session (obj)                  : SQLAlchemy session object connected to the CSL database.
         data_source (str or list[str]) : One or more data sources (e.g., ['bfg', 'uba'] or 'all').
-                                         Corresponds to ExperimentGroup in CSL.
+                                         Corresponds to DataSource in CSL.
 
     Returns:
         experiment_ids (list of int) : Experiment IDs of the data entries (experiments) in the CSL.
@@ -46,18 +46,17 @@ def get_experiment_ids_by_exp_group(session, data_source):
     if 'all' in data_source:
         # Get all experiment IDs
         experiment_ids = session.query(Experiment.experiment_id).all()
-        experiment_ids = [exp_id[0] for exp_id in experiment_ids]  # Convert to a flat list
+        experiment_ids = [exp_id[0] for exp_id in experiment_ids]  # flatten list
     else:
         # Normalize to list
         if isinstance(data_source, str):
             data_source = [data_source]
 
-        # Get experiment IDs based on subset (query at specific ExperimentGroup name)
+        # Get experiment IDs based on subset (query at specific data_source name)
         stmt = (
             select(Experiment.experiment_id)
-            .join(expGroupExp, Experiment.experiment_id == expGroupExp.c.experiment_id)
-            .join(ExperimentGroup, expGroupExp.c.experimentGroup_id == ExperimentGroup.experimentGroup_id)
-            .where(ExperimentGroup.name.in_(data_source))
+            .join(DataSource, Experiment.data_source_id == DataSource.data_source_id)
+            .where(DataSource.name.in_(data_source))
         )
 
         # Execute the query
@@ -72,8 +71,8 @@ def get_experiment_ids_by_chrom_method(session, chrom_method, predicted=None):
     Args:
         session (obj)             : SQLAlchemy session object connected to the CSL database.
         chrom_method (str)        : Chromatographic method (e.g., 'uba_nts_rp1').
-                                    Corresponds to chrom_method in retentionTime table in CSL.
-        predicted (str|bool|None) : Filter for predicted column in retentionTime table in CSL.
+                                    Corresponds to chrom_method in retention_time table in CSL.
+        predicted (str|bool|None) : Filter for predicted column in retention_time table in CSL.
                                     Use "TRUE"/True, "FALSE"/False, or None (default) to not filter on prediction.
 
     Returns:
@@ -121,25 +120,23 @@ def sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method):
     experiment = session.query(Experiment).filter_by(experiment_id=exp_id) \
         .options(joinedload(Experiment.compound),
                  joinedload(Experiment.parameter),
-                 joinedload(Experiment.fragments)) \
+                 joinedload(Experiment.fragments),
+                 joinedload(Experiment.data_source)) \
         .one()
     compound = experiment.compound
     parameter = experiment.parameter
     fragments = experiment.fragments
-
-    # Get experiment groups
-    exp_groups = session.query(ExperimentGroup.name).join(expGroupExp) \
-        .filter(expGroupExp.c.experiment_id == exp_id).all()
+    data_source = experiment.data_source
 
     # Get compound groups
-    compound_groups = session.query(CompoundGroup.name).join(compGroupComp) \
-        .filter(compGroupComp.c.compound_id == compound.compound_id).all()
+    compound_groups = session.query(CompoundGroup.name).join(CompoundGroupMap) \
+        .filter(CompoundGroupMap.c.compound_id == compound.compound_id).all()
 
     # Get retention times
     retention_time = session.query(RetentionTime).filter_by(compound_id=compound.compound_id,
                                                             chrom_method=chrom_method).first()
 
-    return SqlQueryResult(experiment, compound, parameter, fragments, exp_groups, compound_groups, retention_time)
+    return SqlQueryResult(experiment, compound, parameter, fragments, data_source, compound_groups, retention_time)
 
 
 def sql_bulk_queries_by_exp_ids_chrom_method(session, exp_ids, chrom_method):
@@ -167,30 +164,19 @@ def sql_bulk_queries_by_exp_ids_chrom_method(session, exp_ids, chrom_method):
         joinedload(Experiment.fragments)
     ).all()
 
-    # Get experiment groups
-    exp_group_map = defaultdict(list)
-    rows = (
-        session.query(expGroupExp.c.experiment_id, ExperimentGroup.name)
-        .join(ExperimentGroup)
-        .filter(expGroupExp.c.experiment_id.in_(exp_ids))
-        .all()
-    )
-    for eid, group_name in rows:
-        exp_group_map[eid].append(group_name)
-
     # Get compound IDs
     compound_ids = [exp.compound.compound_id for exp in experiments]
 
     # Get compound groups
-    compound_group_map = defaultdict(list)
+    compound_group_mapping = defaultdict(list)
     rows = (
-        session.query(compGroupComp.c.compound_id, CompoundGroup.name)
+        session.query(CompoundGroupMap.c.compound_id, CompoundGroup.name)
         .join(CompoundGroup)
-        .filter(compGroupComp.c.compound_id.in_(compound_ids))
+        .filter(CompoundGroupMap.c.compound_id.in_(compound_ids))
         .all()
     )
     for cid, group_name in rows:
-        compound_group_map[cid].append(group_name)
+        compound_group_mapping[cid].append(group_name)
 
     # Get retention times
     retention_time_map = {}
@@ -215,8 +201,8 @@ def sql_bulk_queries_by_exp_ids_chrom_method(session, exp_ids, chrom_method):
             compound=compound,
             parameter=exp.parameter,
             fragments=exp.fragments,
-            exp_groups=exp_group_map.get(exp.experiment_id, []),
-            compound_groups=compound_group_map.get(cid, []),
+            data_src=exp.data_source,
+            compound_groups=compound_group_mapping.get(cid, []),
             retention_time=retention_time_map.get(cid)
         )
 
@@ -262,30 +248,19 @@ def sql_bulk_queries_by_exp_ids(session, exp_ids, chunk_size=5000):
             results.extend(query.filter(column.in_(chunk)).all())
         return results
 
-    # Experiment groups
-    exp_group_map = defaultdict(list)
-    rows = chunked_in_query(
-        session.query(expGroupExp.c.experiment_id, ExperimentGroup.name).join(ExperimentGroup),
-        expGroupExp.c.experiment_id,
-        exp_ids,
-        chunk_size
-    )
-    for eid, group_name in rows:
-        exp_group_map[eid].append(group_name)
-
     # Compound IDs
     compound_ids = [exp.compound.compound_id for exp in experiments]
 
     # Compounds groups
-    compound_group_map = defaultdict(list)
+    compound_group_mapping = defaultdict(list)
     rows = chunked_in_query(
-        session.query(compGroupComp.c.compound_id, CompoundGroup.name).join(CompoundGroup),
-        compGroupComp.c.compound_id,
+        session.query(CompoundGroupMap.c.compound_id, CompoundGroup.name).join(CompoundGroup),
+        CompoundGroupMap.c.compound_id,
         compound_ids,
         chunk_size
     )
     for cid, group_name in rows:
-        compound_group_map[cid].append(group_name)
+        compound_group_mapping[cid].append(group_name)
 
     # Retention times
     retention_time_map = defaultdict(list)
@@ -308,8 +283,8 @@ def sql_bulk_queries_by_exp_ids(session, exp_ids, chunk_size=5000):
             compound=compound,
             parameter=exp.parameter,
             fragments=exp.fragments,
-            exp_groups=exp_group_map.get(exp.experiment_id, []),
-            compound_groups=compound_group_map.get(cid, []),
+            data_src=exp.data_source,
+            compound_groups=compound_group_mapping.get(cid, []),
             retention_time=retention_time_map.get(cid, [])
         )
 
@@ -363,7 +338,7 @@ def get_compound_classes(compound_groups):
     if not isinstance(compound_groups[0], str):
         compound_groups = [group.name for group in compound_groups]  # normalize to list of str
 
-    compound_groups_filtered = [cg for cg in compound_groups if cg not in DEFAULT_PAIRS_INST_CHROM.keys()]
+    compound_groups_filtered = [cg for cg in compound_groups if cg not in DEFAULT_PAIRS_DSOURCE_CHROM.keys()]
 
     if compound_groups_filtered:
         compound_classes = "; ".join(compound_groups_filtered)
@@ -372,37 +347,29 @@ def get_compound_classes(compound_groups):
     return compound_classes
 
 
-def get_contributors_copyright(exp_group):
+def get_contributors_copyright(data_src):
     """
-    Returns legal information based on experiment group.
+    Returns legal information based on data source.
 
     Args:
-        exp_group (str) : Experiment group.
+        data_src (DataSource) : Data source class.
 
     Returns:
-        authors (str) : Contributors.
-        inst_copyright (str) : Copyright statement.
+        authors (str)        : Names of authors/contributors.
+        dsrc_copyright (str) : Copyright statement.
         contrib_prefix (str) : Contributor prefix in MassBank format.
-        inst_license (str) : Type of licence for the institute's data.
+        dsrc_license (str)   : Type of licence for the data.
     """
     from datetime import datetime
 
     current_year = datetime.now().strftime('%Y')
-    if 'bfg' == exp_group:
-        authors = 'Ole Lessmann; Kevin S. Jewell; Björn Ehlig; Arne Wick'
-        inst_copyright = f'Copyright {current_year} Federal Institute of Hydrology, Koblenz, Germany'
+    authors = data_src.authors
+    dsrc_copyright = f'Copyright {current_year} {data_src.long_name}'
+    dsrc_license = 'CC BY 4.0'
+
+    if data_src.name == 'bfg':
         contrib_prefix = 'BAFG'
-        inst_license = 'CC BY 4.0'
-    elif 'lfuby' == exp_group:
-        authors = 'André Macherius; Uwe Kunkel'
-        inst_copyright = f'Copyright {current_year} Bavarian Environment Agency, Augsburg, Germany'
-        contrib_prefix = 'LFUBY'
-        inst_license = 'CC BY 4.0'
-    elif 'uba' == exp_group:
-        authors = 'Eric Winter'
-        inst_copyright = f'Copyright {current_year} German Environment Agency, Berlin, Germany'
-        contrib_prefix = 'UBA'
-        inst_license = 'CC BY 4.0'
     else:
-        authors = None; inst_copyright = None; contrib_prefix = None; inst_license = None
-    return authors, inst_copyright, contrib_prefix, inst_license
+        contrib_prefix = data_src.name.upper()
+
+    return authors, dsrc_copyright, contrib_prefix, dsrc_license
