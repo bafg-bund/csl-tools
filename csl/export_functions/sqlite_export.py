@@ -23,7 +23,7 @@ class SqliteExport(FormatExport):
         session_source = create_session(self.path_csl)
 
         # Get experiment IDs
-        experiment_ids = get_experiment_ids_by_exp_group(session=session_source, data_source=self.subset)
+        experiment_ids = get_experiment_ids_by_data_src(session=session_source, data_source=self.subset)
         logger.info(f"Found {len(experiment_ids)} experiment ID's for subset: {self.subset}")
 
         # Copy the sqlite file
@@ -65,14 +65,9 @@ class SqliteExport(FormatExport):
              .filter(~RetentionTime.compound_id.in_(session.query(Experiment.compound_id)))
              .delete(synchronize_session=False))
 
-            # Delete experiment group information
-            (session.query(expGroupExp)
-             .filter(~expGroupExp.c.experiment_id.in_(session.query(Experiment.experiment_id)))
-             .delete(synchronize_session=False))
-
             # Delete compound group information
-            (session.query(compGroupComp)
-             .filter(~compGroupComp.c.compound_id.in_(session.query(Compound.compound_id)))
+            (session.query(CompoundGroupMap)
+             .filter(~CompoundGroupMap.c.compound_id.in_(session.query(Compound.compound_id)))
              .delete(synchronize_session=False))
 
             # Commit changes to session

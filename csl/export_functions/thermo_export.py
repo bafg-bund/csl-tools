@@ -1,4 +1,4 @@
-from csl.config import DEFAULT_PAIRS_INST_CHROM
+from csl.config import DEFAULT_PAIRS_DSOURCE_CHROM
 from csl.export_functions.format_export import FormatExport
 from csl.export_functions.utils import *
 from csl.utils.sql_utils import create_session
@@ -24,18 +24,18 @@ class ThermoExport(FormatExport):
         logger.info("Starting CSL data export")
 
         if 'all' in self.subset:
-            data_sources = DEFAULT_PAIRS_INST_CHROM.keys()
+            data_sources = DEFAULT_PAIRS_DSOURCE_CHROM.keys()
         else:
             data_sources = self.subset
 
         # Get all experiment IDs and bulk load everything
-        exp_ids = get_experiment_ids_by_exp_group(session, 'all')
+        exp_ids = get_experiment_ids_by_data_src(session, 'all')
         logger.info(f"Bulk loading {len(exp_ids)} experiments")
         sql_data_dict = sql_bulk_queries_by_exp_ids(session, exp_ids)
 
         # Process experiment IDs by chromatographic method
         for data_source in data_sources:
-            chrom_method = DEFAULT_PAIRS_INST_CHROM[data_source]
+            chrom_method = DEFAULT_PAIRS_DSOURCE_CHROM[data_source]
             logger.info(f"Exporting file for {chrom_method}")
 
             # Generate the output file name based on the CSL version and the current date

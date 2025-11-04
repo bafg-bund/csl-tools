@@ -13,7 +13,7 @@ DEFAULT_PAIRS_INST_CHROM = {
     'bfg': 'bfg_nts_rp1',
     'uba': 'uba_nts_rp1',
     'lfuby': 'lfuby_nts_rp1',
-    'lanuk': 'lanuk_nts',
+    'lanuk': 'lanuk_nts_rp1',
     'bfgmonde': 'bfg_nts_rp2'  # Todo: Temporary for model creation
     # 'lubw': 'lubw_nts_rp1'  # Todo: activate once RT model is implemented
 }

@@ -20,7 +20,7 @@ def mock_logger():
 
 
 @pytest.fixture
-def mock_inst_def():
+def mock_dsrc_def():
     """Mocks the data-source-specific defaults used in process workflows."""
     return {
         'def_pol_p': 'mock_pol_p',
@@ -118,7 +118,7 @@ def mock_entry_df():
         "spec_i": pd.DataFrame({'mz': [9.9, 7.7], 'int': [99.9, 77.7]}),
         "compgroup_i": ['Pesticide','Herbicide'],
         "col_type_i": "mock_col_type",
-        "var_expg_csl": 'mock_expg',
+        "var_dsrc_csl": 'mock_dsrc',
         "var_compg_csl": 'mock_compg',
         "instrument_i": 'mock_instrument',
         "experiment_id_i": 'mock_experiment_id',
@@ -129,13 +129,13 @@ def mock_entry_df():
 
 
 @pytest.fixture
-def mock_inst_method_pairs():
+def mock_dsrc_method_pairs():
     """Mocks the mapping of data sources to chromatographic methods."""
     return {
-        'inst_a': 'method_a',
-        'inst_b': 'method_b',
-        'inst_c': 'method_c',
-        'inst_d': 'method_d'
+        'dsrc_a': 'method_a',
+        'dsrc_b': 'method_b',
+        'dsrc_c': 'method_c',
+        'dsrc_d': 'method_d'
     }
 
 
@@ -143,8 +143,8 @@ def mock_inst_method_pairs():
 def mock_models_to_bfg():
     """Mocks the models for predicting BfG RTs from other RTs."""
     return {
-        'inst_b': MagicMock(return_value=22.5),
-        'inst_c': MagicMock(return_value=7.0)
+        'dsrc_b': MagicMock(return_value=22.5),
+        'dsrc_c': MagicMock(return_value=7.0)
     }
 
 
@@ -152,8 +152,8 @@ def mock_models_to_bfg():
 def mock_models_from_bfg():
     """Mocks the models for predicting RTs from BfG RTs."""
     return {
-        'inst_b': MagicMock(return_value=12.5),
-        'inst_c': MagicMock(return_value=15.0)
+        'dsrc_b': MagicMock(return_value=12.5),
+        'dsrc_c': MagicMock(return_value=15.0)
     }
 
 
@@ -165,8 +165,8 @@ def mock_formatted_data_mbank():
     mock_f_data.title = 'Compound; Instr; MS2; 140 V'
     mock_f_data.date = '2025.01.09'
     mock_f_data.authors = 'Person A; Person B; Person C'
-    mock_f_data.inst_license = 'dl-de/by-2-0'
-    mock_f_data.inst_copyright = 'Copyright 2025 Data source'
+    mock_f_data.dsrc_license = 'CC BY 4.0'
+    mock_f_data.dsrc_copyright = 'Copyright 2025 Data source'
     mock_f_data.comment_chunk = (f"COMMENT: Information\n"
          f"COMMENT: Additional information\n")
     mock_f_data.compound_name = 'Compound'
@@ -206,8 +206,8 @@ def mock_formatted_data_thermo():
     mock_f_data.title = 'Compound; Instr; MS2; 140 V'
     mock_f_data.date = '2025.01.09'
     mock_f_data.authors = 'Person A; Person B; Person C'
-    mock_f_data.inst_license = 'dl-de/by-2-0'
-    mock_f_data.inst_copyright = 'Copyright 2025 Data source'
+    mock_f_data.dsrc_license = 'dl-de/by-2-0'
+    mock_f_data.dsrc_copyright = 'Copyright 2025 Data source'
     mock_f_data.comment_chunk = (f"COMMENT: Information\n"
          f"COMMENT: Additional information\n")
     mock_f_data.compound_classes = 'Industrial_process; Biocide'

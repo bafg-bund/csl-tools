@@ -1,4 +1,4 @@
-from csl.config import DEFAULT_PAIRS_INST_CHROM
+from csl.config import DEFAULT_PAIRS_DSOURCE_CHROM
 from csl.utils import *
 from csl.rtscan_functions.operation_rtscan import OperationRtscan
 from csl.rtscan_functions.utils.rtscan_utils import *
@@ -45,31 +45,31 @@ class UpdateRtscan(OperationRtscan):
         # Loop through compound IDs to check experimental and predicted RT data
         for uq_comp_id in tqdm(uq_comp_ids):
             # Get data sources linked to (any or experimental) retention time data in the CSL for each compound ID
-            inst_rt, inst_exp_rt, inst_pred_rt = get_inst_rt_info(uq_comp_id, session, DEFAULT_PAIRS_INST_CHROM)
+            dsrc_rt, dsrc_exp_rt, dsrc_pred_rt = get_dsrc_rt_info(uq_comp_id, session, DEFAULT_PAIRS_DSOURCE_CHROM)
 
             # Check experimental RT data
-            dupl, pred_to_false, no_exp_rt = check_experimental_data(uq_comp_id, inst_exp_rt, session, DEFAULT_PAIRS_INST_CHROM)
+            dupl, pred_to_false, no_exp_rt = check_experimental_data(uq_comp_id, dsrc_exp_rt, session, DEFAULT_PAIRS_DSOURCE_CHROM)
             dupl_all.append(dupl)
             pred_to_false_all.append(pred_to_false)
             no_exp_rt_all.append(no_exp_rt)
 
             # Check and correct "predicted" flags for predicted data entries
-            pred_to_true = check_predicted_flags_pred_data(uq_comp_id, inst_pred_rt, session, DEFAULT_PAIRS_INST_CHROM)
+            pred_to_true = check_predicted_flags_pred_data(uq_comp_id, dsrc_pred_rt, session, DEFAULT_PAIRS_DSOURCE_CHROM)
             pred_to_true_all.append(pred_to_true)
 
             # Check predicted RT data and predict missing RTs
-            if not 'bfg' in inst_rt:
+            if not 'bfg' in dsrc_rt:
                 # Predict BfG RT if it doesn't exist yet and add entry to session
-                rt_bfg_pred = predict_bfg_rt(uq_comp_id, session, models_from_x_to_bfg, check_order, inst_rt, DEFAULT_PAIRS_INST_CHROM)
+                rt_bfg_pred = predict_bfg_rt(uq_comp_id, session, models_from_x_to_bfg, check_order, dsrc_rt, DEFAULT_PAIRS_DSOURCE_CHROM)
                 if rt_bfg_pred:
                     # Add BfG to the list of data sources with available RTs
-                    inst_rt.append('bfg')
+                    dsrc_rt.append('bfg')
                     pred_to_bfg_all.append(uq_comp_id)
 
-            inst_miss_rt = list(set(DEFAULT_PAIRS_INST_CHROM.keys()) - set(inst_rt))  # Get list of data sources without any RT
-            for inst in inst_miss_rt:
+            dsrc_miss_rt = list(set(DEFAULT_PAIRS_DSOURCE_CHROM.keys()) - set(dsrc_rt))  # Get list of data sources without any RT
+            for dsrc in dsrc_miss_rt:
                 # Predict the RTs for all other data sources without any RT
-                rt_pred = predict_rt(uq_comp_id, session, models_from_bfg_to_x, inst, DEFAULT_PAIRS_INST_CHROM)
+                rt_pred = predict_rt(uq_comp_id, session, models_from_bfg_to_x, dsrc, DEFAULT_PAIRS_DSOURCE_CHROM)
                 if rt_pred:
                     pred_from_bfg_all.append(uq_comp_id)
                 else:
@@ -80,7 +80,15 @@ class UpdateRtscan(OperationRtscan):
                                          pred_to_true_all, pred_from_bfg_all, pred_to_bfg_all,
                                          no_pred_rt_all)
 
-        # Ask for user input and commit changes if confirmed. Ends the session.
-        commit_changes_choice(new_path_csl, session)
+        # Check if the session was modified
+        def has_data(x):
+            return any(map(has_data, x)) if isinstance(x, list) else True
+
+        if any(map(has_data, [pred_to_false_all, pred_to_true_all, pred_to_bfg_all, pred_from_bfg_all])):
+            # Ask for user input and commit changes if confirmed. Ends the session.
+            commit_changes_choice(new_path_csl, session)
+        else:
+            close_session_remove_file(new_path_csl, session)
+            logger.info('No changes in current session detected.')
 
         logger.info('End of update rtscan workflow')

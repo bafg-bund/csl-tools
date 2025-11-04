@@ -1,6 +1,6 @@
 from csl.process_functions.utils import *
 from csl.utils.sql_utils import create_session
-from csl.config import DEFAULT_PAIRS_INST_CHROM
+from csl.config import DEFAULT_PAIRS_DSOURCE_CHROM
 
 from abc import ABC, abstractmethod
 
@@ -61,19 +61,19 @@ class FormatProcess(ABC):
             if var[1]:
                 extract_data_add[var[0]] = var[1]
             elif not var[1] and var[0] == 'var_chrom_method':
-                options = DEFAULT_PAIRS_INST_CHROM.values()
+                options = DEFAULT_PAIRS_DSOURCE_CHROM.values()
                 message = 'Select the chromatographic method for the experiments to be added'
                 choice = get_user_choice(list(options), message)
                 extract_data_add[var[0]] = choice
                 logger.info(f"Chromatographic method: {choice}")
-            elif not var[1] and var[0] == 'var_expg_csl':
-                options = DEFAULT_PAIRS_INST_CHROM.keys()
-                message = 'Select the default value for the experiment group for the experiments to be added'
+            elif not var[1] and var[0] == 'var_dsrc_csl':
+                options = DEFAULT_PAIRS_DSOURCE_CHROM.keys()
+                message = 'Select the default value for the data source for the experiments to be added'
                 choice = get_user_choice(list(options), message)
                 extract_data_add[var[0]] = choice
-                logger.info(f"Default experiment group: {choice}")
+                logger.info(f"Default data source: {choice}")
             elif not var[1] and var[0] == 'var_compg_csl':
-                options = DEFAULT_PAIRS_INST_CHROM.keys()
+                options = DEFAULT_PAIRS_DSOURCE_CHROM.keys()
                 message = 'Select the default value for the compound group for the experiments to be added'
                 choice = get_user_choice(list(options), message)
                 extract_data_add[var[0]] = choice
@@ -85,7 +85,7 @@ class FormatProcess(ABC):
 
 
     # noinspection PyMethodMayBeStatic
-    def process_data(self, extract_data, inst_def, spec_adduct):
+    def process_data(self, extract_data, dsrc_def, spec_adduct):
         """
         Formats the previously extracted and collected data based in data-source-specific variables to match the
         required format for csl-matching/commits.
@@ -98,7 +98,7 @@ class FormatProcess(ABC):
 
         Args:
             extract_data (DataFrame) : Extracted and collected data.
-            inst_def (dict)          : Data-source-specific defaults.
+            dsrc_def (dict)          : Data-source-specific defaults.
             spec_adduct (dict)       : Special cases in adduct formatting.
 
         Returns:
@@ -119,7 +119,7 @@ class FormatProcess(ABC):
             logger.info(f'Compound: {entry['var_comp']}; CE: {entry['var_ce']}; File path: {entry['file_path']}')
 
             # Polarity
-            pol_i = get_polarity(entry['var_ion_mode'], inst_def['def_pol_p'], inst_def['def_pol_n'])
+            pol_i = get_polarity(entry['var_ion_mode'], dsrc_def['def_pol_p'], dsrc_def['def_pol_n'])
             if not pol_i:
                 logger.warning(f'Unexpected polarity type: {entry['var_ion_mode']}')
                 entry_err = True
@@ -134,7 +134,7 @@ class FormatProcess(ABC):
             # Adduct format conversion
             if entry['var_adduct']:  # adduct name is replaced if entry exists
                 adduct_name = entry['var_adduct']
-            adduct_i = format_adduct(adduct_name, spec_adduct, inst_def['def_qf'], pol_i)
+            adduct_i = format_adduct(adduct_name, spec_adduct, dsrc_def['def_qf'], pol_i)
             if not adduct_i:
                 logger.warning(f'Adduct name not detected. Check fields for compound name and ion mode.')
                 entry_err = True
@@ -261,7 +261,7 @@ class FormatProcess(ABC):
         return form_data
 
 
-    def match_with_csl(self, form_data, inst_def):
+    def match_with_csl(self, form_data):
         """
         Matches formatted data with the CSL to detect duplicates and add new experimental information.
         The function also sorts entries based on whether they can be added to the CSL or should be skipped.
@@ -273,7 +273,6 @@ class FormatProcess(ABC):
 
         Args:
             form_data (DataFrame) : All data entries including formatted data.
-            inst_def (dict)       : Data-source-specific defaults.
 
         Returns:
             form_data_match (DataFrame) : Data updated with flags from CSL-matching
@@ -306,7 +305,7 @@ class FormatProcess(ABC):
                     entry_err = True
                 else:
                     # Add new experimental information to the session and check relevant entries in the CSL
-                    add_exp_to_session(session, entry, inst_def)
+                    add_exp_to_session(session, entry)
                     entry_add = True
 
             flags = {

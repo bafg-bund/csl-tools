@@ -1,4 +1,4 @@
-from csl.config import DEFAULT_PAIRS_INST_CHROM
+from csl.config import DEFAULT_PAIRS_DSOURCE_CHROM
 from csl.utils import *
 from csl.rtscan_functions.operation_rtscan import OperationRtscan
 from csl.rtscan_functions.utils.rtscan_utils import *
@@ -39,10 +39,10 @@ class RecalcRtscan(OperationRtscan):
             for uq_comp_id in tqdm(uq_comp_ids):
 
                 # Get data sources linked to predicted retention time data in the CSL for each compound ID
-                _, _, inst_pred_rt = get_inst_rt_info(uq_comp_id, session, DEFAULT_PAIRS_INST_CHROM)
+                _, _, dsrc_pred_rt = get_dsrc_rt_info(uq_comp_id, session, DEFAULT_PAIRS_DSOURCE_CHROM)
 
                 # Recalculate the RTs for all data sources with predicted RT
-                recalc_comp_id = recalculate_pred_rt(uq_comp_id, session, inst_pred_rt, DEFAULT_PAIRS_INST_CHROM)
+                recalc_comp_id = recalculate_pred_rt(uq_comp_id, session, dsrc_pred_rt, DEFAULT_PAIRS_DSOURCE_CHROM)
                 recalc_comp_id_all.append(recalc_comp_id)
 
             # Summarize the result
@@ -53,5 +53,8 @@ class RecalcRtscan(OperationRtscan):
             # Ask for user input and commit changes if confirmed. Ends the session.
             if len(recalc_comp_id_all) > 0:
                 commit_changes_choice(new_path_csl, session)
+            else:
+                close_session_remove_file(new_path_csl, session)
+                logger.info('No changes in current session detected.')
 
         logger.info('End of recalc rtscan workflow')

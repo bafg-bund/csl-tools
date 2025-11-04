@@ -42,8 +42,8 @@ def var_fix_mbank():
         'var_chrom_method': None,       # Chromatographic method
         'var_isotope': 'monoisotopic',  # Type of molecular mass
         'var_ce_unit': 'V',             # Unit for collision energy
-        'var_expg_csl': None,           # Default label for experimentGroup.name in CSL
-        'var_compg_csl': None,          # Default label for compoundGroup.name in CSL
+        'var_dsrc_csl': None,           # Default label for data_source.name in CSL
+        'var_compg_csl': None,          # Default label for compound_group.name in CSL
     }
     return mbank_var_fix
 

@@ -32,8 +32,8 @@ def sql_query_with_filters_envi(session, chrom_method):
         .join(RetentionTime, RetentionTime.compound_id == Compound.compound_id)
         .filter(
             and_(
-                Parameter.CE.between(ce_filter[0], ce_filter[1]),
-                Parameter.CES.between(ces_filter[0], ces_filter[1]),
+                Parameter.ce.between(ce_filter[0], ce_filter[1]),
+                Parameter.ces.between(ces_filter[0], ces_filter[1]),
                 # Parameter.instrument.in_(instrument_filter),  # Filtering by instrument currently not needed
                 RetentionTime.chrom_method == chrom_method,
             )
@@ -68,8 +68,8 @@ def process_data_entry_envi(csl_data, chrom_method):
     adduct, restrict_adduct = get_adduct_info_envi(csl_data.adduct)
     ion_mode = get_ion_mode_envi(csl_data.parameter.polarity)
     fragments = get_fragments_int_cutoff(csl_data.fragments, fragment_cutoff_percent)
-    cas = get_cas_envi(csl_data.compound.CAS)
-    smiles = get_smiles_envi(csl_data.compound.SMILES)
+    cas = get_cas_envi(csl_data.compound.cas)
+    smiles = get_smiles_envi(csl_data.compound.smiles)
     inchi = csl_data.compound.inchi
 
     # Build row entry in correct order using extracted data and default values for additional rows

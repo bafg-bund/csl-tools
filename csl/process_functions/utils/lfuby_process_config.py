@@ -14,7 +14,7 @@
 # 2) Fixed variable for non-extractable data:
 # Use this when necessary information cannot be extracted from the data files or is fixed (e.g. one instrument name).
 #   → Define in var_fix_<institution>.
-from csl.config import DEFAULT_PAIRS_INST_CHROM
+from csl.config import DEFAULT_PAIRS_DSOURCE_CHROM
 
 def var_regex_lfuby():
     """
@@ -45,7 +45,7 @@ def var_fix_lfuby():
     Mapping of CSL-relevant variables (keys) to lfuby-specific default/fixed information (values).
     The information is currently fixed for this format or does not appear in the data files (can't be extracted).
     """
-    all_methods = DEFAULT_PAIRS_INST_CHROM
+    all_methods = DEFAULT_PAIRS_DSOURCE_CHROM
 
     lfuby_var_fix = {
         'var_chrom_method': all_methods['lfuby'],  # Chromatographic method
@@ -55,8 +55,8 @@ def var_fix_lfuby():
         'var_ce_unit': 'V',                        # Unit for collision energy
         'var_adduct': None,                        # Adduct
         'var_inchi': None,                         # InChI
-        'var_expg_csl': 'lfuby',                   # Default label for experimentGroup.name in CSL
-        'var_compg_csl': 'lfuby',                  # Default label for compoundGroup.name in CSL
+        'var_dsrc_csl': 'lfuby',                   # Default label for data_source.name in CSL
+        'var_compg_csl': 'lfuby',                  # Default label for compound_group.name in CSL
         'var_instrument_type': 'LC-ESI-Orbitrap',  # Instrument type
         'var_accession': None,                     # Accession string (used in MassBank)
     }
