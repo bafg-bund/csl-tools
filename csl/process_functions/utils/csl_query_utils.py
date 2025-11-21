@@ -139,6 +139,7 @@ def add_exp_to_session(session, entry):
     # Check if the data source exists (e.g., 'UBA', 'BfG') in the CSL and add it if necessary.
     data_src = session.query(DataSource).filter_by(name=dsrc_csl_def).one_or_none()
     if not data_src:
+        # Todo: Should include long_name and authors in the future via config input
         logger.info(f'Adding missing default data source: "{dsrc_csl_def}"')
         data_src = DataSource(name=dsrc_csl_def)
         session.add(data_src)
@@ -196,12 +197,26 @@ def add_exp_to_session(session, entry):
         return False
 
     if comp_res:  # If the compound exists in the CSL
+        # Check if the compound name of the record and the compound name of the CSL match
+        if not comp_i == comp_res.name:
+            logger.warning(f'Current compound "{comp_i}" shares the same InChIkey (main layer) and/or CAS with compound "{comp_res.name}" in the CSL. \n'
+                           f'Please check the compound name (different spelling?). Note that the CSL currently does not support synonyms yet. \n'
+                           f'Current record will be skipped.')  # Todo: Implement synonym support
+            return False
+
         # Add compound groups that do not exist yet for this compound
         for cg in comp_group:
             if cg.name not in [group.name for group in comp_res.compound_groups]:
                 logger.info(f'Adding compound group "{cg.name}" to the compound "{comp_i}"')
                 comp_res.compound_groups.append(cg)
     else:  # If the compound was not found in the CSL
+        # First check if the compound name already exists in the CSL (inchikey missmatch)
+        if session.query(Compound).filter(Compound.name == comp_i).all():
+            logger.warning(f'Compound name exists in the CSL, but InChIkey (main layer) differs. \n'
+                           f'Please adjust the record data if possible. \n'
+                           f'Current record will be skipped.')
+            return False
+
         logger.info(f'Compound "{comp_i}" not found in CSL. Adding entry.')
         comp_res = Compound(formula=formula_i, cas=cas_i, smiles=smiles_i, name=comp_i,
                             compound_groups=comp_group, inchikey=inchikey_i, inchi=inchi_i)
