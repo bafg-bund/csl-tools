@@ -223,8 +223,7 @@ def add_exp_to_session(session, entry):
         # Add compound entry to session
         session.add(comp_res)
 
-    # Check for existing retention time (filter by compound_id and chrom. method). Use RT from file if no RT exists,
-    # otherwise prefer existing RT. Also check for RT inconsistency (warning at difference >10 s).
+    # Check for existing retention time and update if necessary
     rt_res = session.query(RetentionTime).filter_by(compound_id=comp_res.compound_id, chrom_method=chrom_method
                                                      ).one_or_none()
     if not rt_res:
@@ -233,8 +232,14 @@ def add_exp_to_session(session, entry):
         rt_res = RetentionTime(chrom_method=chrom_method, rt=rt_i, compound=comp_res, predicted='FALSE')
         session.add(rt_res)
     else:
-        if abs(rt_res.rt-rt_i)*60 > 10:
-            logger.warning(f'Retention times from file ({rt_i}) and CSL ({rt_res.rt}) differ by more than 10 s.')
+        # If existing RT is modeled, update its value and metadata
+        if rt_res.predicted == 'TRUE':
+            rt_res.rt = rt_i
+            rt_res.predicted = 'FALSE'
+        else:
+            # Check for RT inconsistency (warning at difference >10 s)
+            if abs(rt_res.rt-rt_i)*60 > 10:
+                logger.warning(f'Retention times from file ({rt_i}) and CSL ({rt_res.rt}) differ by more than 10 s.')
 
     # Search experimental parameters and add them from the file if they don't exist
     para_res = session.query(Parameter).filter_by(instrument=instrument, polarity=pol_i, ce=ce_i, ces=ces_i,
