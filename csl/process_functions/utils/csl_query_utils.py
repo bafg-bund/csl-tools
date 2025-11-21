@@ -98,7 +98,8 @@ def add_exp_to_session(session, entry):
         entry (pandas.series) : Data of one entry (pandas.core.series.Series)
 
     Returns:
-        (No return variables, but the session object is updated)
+        exp_added (bool) : True: No issues, session object is updated
+                           False: Issues found, record skipped and session object reset
     """
     from datetime import datetime
     from sqlalchemy import func
@@ -192,7 +193,7 @@ def add_exp_to_session(session, entry):
         # Run query
         comp_res = get_single_compound_entry(base_query, refine_query)
     else:
-        comp_res = None
+        return False
 
     if comp_res:  # If the compound exists in the CSL
         # Add compound groups that do not exist yet for this compound
@@ -239,3 +240,5 @@ def add_exp_to_session(session, entry):
     for frag in spec_i.itertuples():
         frag_i = Fragment(mz=frag.mz, int=frag.int, experiment=exp)
         session.add(frag_i)
+
+    return True

@@ -305,8 +305,11 @@ class FormatProcess(ABC):
                     entry_err = True
                 else:
                     # Add new experimental information to the session and check relevant entries in the CSL
-                    add_exp_to_session(session, entry)
-                    entry_add = True
+                    exp_added = add_exp_to_session(session, entry)
+                    if exp_added:
+                        entry_add = True
+                    else:
+                        entry_err = True
 
             flags = {
                 'csl_dupl_flag': entry_dupl,
@@ -339,7 +342,8 @@ class FormatProcess(ABC):
         logger = logging.getLogger(__name__)
 
         form_err_data = form_data_match[form_data_match['form_err_flag']]
-        form_warn_data = form_data_match[(form_data_match['form_warn_flag']) & (~form_data_match['csl_dupl_flag'])]
+        form_warn_data = form_data_match[(form_data_match['form_warn_flag']) & (~form_data_match['csl_dupl_flag'])
+                                         & (~form_data_match['form_err_flag'])]
         csl_dupl_data = form_data_match[form_data_match['csl_dupl_flag']]
         csl_err_data = form_data_match[form_data_match['csl_err_flag']]
         csl_add_data = form_data_match[form_data_match['csl_add_flag']]
