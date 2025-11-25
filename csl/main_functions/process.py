@@ -31,7 +31,7 @@ WORKFLOWS = {
 }
 
 
-def process_data(format: str, path_csl: str, path_data: str or list[str], path_extra: str or None):
+def process_data(format: str, path_csl: str, path_data: str | list[str], path_extra: str | None = None):
     """
     Executes the appropriate workflow for processing MS2 data files based on the data source type.
 
