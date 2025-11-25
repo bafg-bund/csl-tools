@@ -56,7 +56,7 @@ process_parser.add_argument('path_csl', type=str,
                             help='Path to CSL file')
 process_parser.add_argument('path_data', type=str, nargs='?',
                             help='(Optional) Path to data file or directory (Default: Opens dialog to select files)')
-process_parser.add_argument('--path_extra', type=str, help='Path to supplementary data file (compound name and retention time; see README.md for requirements)')
+process_parser.add_argument('--path_extra', type=str, help='Path to supplementary data file (compound name and retention time; CSV UTF-8 semicolon-separated)')
 
 
 # Define 'export' command and its arguments

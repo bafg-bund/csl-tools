@@ -105,13 +105,17 @@ csl process <format> <path_csl> <path_data>
 ```
 
 #### Arguments
-- `format`: Specify import format. Choose from:
+- `format`: Specify import format.   
+Choose from:
   - `mbank`: MassBank documents.
   - `lfuby`: LfU Bayern import format (ThermoFisher/mzVault).
   - `lubw` : LUBW import format (ThermoFisher/mzVault).
-  - `lanuk`: LANUK import format (SCIEX/LibraryView) (not implemented).
+  - `lanuk`: LANUK import format (SCIEX/LibraryView).
 - `path_csl`: Path to the CSL file.
-- `path_data`: (Optional) Path to the data file or directory (Default: Opens dialog to select files)').
+- `path_data`: (Optional) Path to the data file or directory (Default: Opens dialog to select files).
+- `--path_extra`: (Optional, `lanuk` only) 
+Path to a supplementary file (CSV UTF-8 semicolon-separated) containing compound names and retention times required for 
+the import of LibraryView-based files. (Default: Opens dialog to select file)
 
 #### Examples
 Process data from the Bavarian Environment Agency (LfU).
@@ -120,7 +124,15 @@ csl process lfuby path/to/CSL.db path/to/data.txt
 ```
 ```python
 from csl import process_data
-process_data(format='thermo', path_csl='path/to/CSL.db', path_data='path/to/data.txt')
+process_data(format='lfuby', path_csl='path/to/CSL.db', path_data='path/to/data.txt')
+```
+Process LibraryView-based data files.
+```
+csl process lanuk path/to/CSL.db path/to/data.sdf --path_extra path/to/extra_file.csv
+```
+```python
+from csl import process_data
+process_data(format='lanuk', path_csl='path/to/CSL.db', path_data='path/to/data.txt', path_extra='path/to/extra_file.csv')
 ```
 
 
@@ -131,7 +143,8 @@ csl export <format> <path_csl> <path_out> <subset>
 ```
 
 #### Arguments
-- `format`: Specify the export format. Choose from:
+- `format`: Specify the export format.   
+Choose from:
   - `thermo`: MSP/NIST export format (e.g., for importing to mzVault).
   - `envi`  : enviMass export format.
   - `mbank` : MassBank export format.
