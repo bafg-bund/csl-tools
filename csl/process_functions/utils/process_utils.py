@@ -184,55 +184,58 @@ def format_adduct(adduct_name, spec_adduct, qf_def, pol_i):
     return adduct_i
 
 
-def get_collision_energy(data_ce):
+def get_collision_energy(data_ce, data_ces):
     """
-    Determines the collision energy (CE) and collision energy spread (CES) according to CSL requirements.
-    - For a single CE input value, the function returns that value as `ce_i` and sets `ces_i` to None (no spread).
-    - For multiple CE input values, the function calculates the CES and identifies the middle CE value as `ce_i`.
-    - If the CES calculation is unexpected or non-standard, a warning is issued by setting `ces_warn` to True.
-    - Negative CE value inputs are converted to positive values
+    Formats collision energy (CE) and collision energy spread (CES) values according to CSL requirements.
+    - In case of a single CE value: CES is formatted or set to 0 if input is empty.
+    - In case of multiple CE values: CES is calculated and middle CE value is selected.
+    - Negative CE/CES value inputs are converted to positive values
 
     Args:
-        data_ce (str) : One or more collision energy values from the data.
+        data_ce (str or None)  : One or more collision energy values from the data.
+        data_ces (str or None) : Collision energy spread from the data.
 
     Returns:
         ce_i (int)      : Primary collision energy (CE) value. If multiple CE values are provided, `ce_i` will be the
-                          value from the middle position. Returns None, if the input is invalid.
-        ces_i (int)     : Collision energy spread (CES). CES is calculated only if multiple CE values are provided.
-                          Returns None, if the input is invalid or unexpected.
-        ces_warn (bool) : A flag indicating whether a warning should be issued due to unexpected CES calculations.
-                          True if a warning is issued, False otherwise.
+                          value from the middle position.
+        ces_i (int)     : Collision energy spread (CES). CES is calculated if multiple CE values are provided.
     """
     import re
     import numpy as np
 
-    ces_warn = False
-    if data_ce:
+    if not data_ce:
+        ce_i = None
+        ces_i = None
+        return ce_i, ces_i
+    else: # Format CE
         str_nrs = re.findall(r'\d+', data_ce)  # Find numbers in string
         int_nrs = list(map(int, str_nrs))  # Convert to list of int
-        int_nrs_real = [int_nr for int_nr in int_nrs if int_nr > 0]  # Remove zeros
+        int_nrs_real = [int_nr for int_nr in int_nrs if int_nr > 0]  # Remove zero
+
+        # In case of a single CE value: formats CES or set to 0 if input is None
         if len(int_nrs_real) == 1:  # One CE
             ce_i = int_nrs_real[0]
-            ces_i = 0  # Spread
+            if data_ces:
+                ces_i = abs(int(data_ces))
+            else:
+                ces_i = 0
+
+        # In case of multiple CE values: calculate CES and select representative CE value
         elif len(int_nrs_real) == 3:  # Three CE
             ce_i = int_nrs_real[1]  # Assuming correct positions!
-            # Calculating CES. Checking for equal difference in CES.
+            # Calculate CES. Check for equal difference in CES.
             ce_diff = np.diff(int_nrs_real)
             ce_diff_unique = np.unique(ce_diff)
             if len(ce_diff_unique) == 1:
                 ces_i = abs(int(ce_diff_unique[0]))  # Assuming correct positions!
-                if ces_i != 20:  # Equal difference in CES, but value not expected
-                    ces_warn = True
             else:  # Non-equal difference in CES
-                ce_i = None  # Setting to `None` even though CE might be ok.
+                ce_i = None  # Set to `None` even though CE might be ok.
                 ces_i = None
         else:  # Unexpected number of CE
             ce_i = None
             ces_i = None
-    else:  # No data found
-        ce_i = None
-        ces_i = None
-    return ce_i, ces_i, ces_warn
+
+    return ce_i, ces_i
 
 
 def get_ionization_type(data_ionization):
@@ -375,15 +378,19 @@ def get_retention_time(data_rt):
     Retrieves and returns the retention time as a float.
 
     Args:
-        data_rt (str): Retention time from the data.
+        data_rt (str, float, int): Retention time from the data.
 
     Returns:
-        rt_i (float): Retention time as a float. Returns None, if the input is invalid.
+        rt_i (float): Retention time as a float. Returns None, if the input is empty.
     """
     if data_rt:
-        rt_i = float(data_rt.split()[0])
+        if isinstance(data_rt, str):
+            rt_i = float(data_rt.split()[0])
+        else:
+            rt_i = float(data_rt)
     else:
         rt_i = None
+
     return rt_i
 
 

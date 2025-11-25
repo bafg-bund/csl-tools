@@ -8,11 +8,11 @@ import pandas as pd
 @pytest.fixture
 def workflow():
     class TestProcess(FormatProcess):
-        def extract_data_regex(self, file, var_regex):
+        def extract_data_regex(self, file, var_regex, file_extra=None):
             """Mock return for the function `extract_data_regex`."""
             return pd.DataFrame([{"var_comp": "Test", "var_ce": 10, "file_path": file}])
 
-    return TestProcess(path_data='dummy_data_path', path_csl='dummy_csl_path')
+    return TestProcess(path_data='dummy_data_path', path_csl='dummy_csl_path', path_extra='dummy_extra_path')
 
 
 class TestFormatProcess:
@@ -25,7 +25,7 @@ class TestFormatProcess:
                       return_value=('comp', 'adduct')), \
              patch('csl.process_functions.format_process.format_adduct', return_value='formatted_adduct'), \
              patch('csl.process_functions.format_process.get_collision_energy',
-                      return_value=('ce', 'ces', False)), \
+                      return_value=('ce', 'ces')), \
              patch('csl.process_functions.format_process.get_ionization_type', return_value='ionization_type'), \
              patch('csl.process_functions.format_process.get_formula', return_value='formula'), \
              patch('csl.process_functions.format_process.get_inchikey',
@@ -61,7 +61,7 @@ class TestFormatProcess:
                    return_value=('comp', 'adduct')), \
              patch('csl.process_functions.format_process.format_adduct',return_value='formatted_adduct'), \
              patch('csl.process_functions.format_process.get_collision_energy',
-                   return_value=('ce', 'ces', False)), \
+                   return_value=('ce', 'ces')), \
              patch('csl.process_functions.format_process.get_ionization_type', return_value='ionization_type'), \
              patch('csl.process_functions.format_process.get_formula', return_value='formula'), \
              patch('csl.process_functions.format_process.get_inchikey', return_value=(None, None)), \

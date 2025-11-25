@@ -10,7 +10,6 @@ class LanukProcess(FormatProcess):
 
         logger = logging.getLogger(__name__)
         logger.info('Executing lanuk workflow to process MS2 data files')
-        logger.warning('LANUK workflow currently implemented for testing only.')
 
         # Load defaults and settings
         var_regex = var_regex_lanuk()
@@ -30,17 +29,6 @@ class LanukProcess(FormatProcess):
             logger.info('Processing data')
             form_data = self.process_data(extract_data_add, dsrc_def, spec_adduct)
 
-            # Todo: Lanuk workflow works until here for sure. The reading was modified (only extract_var_regex_lanuk)
-            #  the processing runs perfectly without modification.
-            #  As some data types are missing in the raw data, placehoders were inserted for testing purposes.
-            #  This affects:
-            #   - RT
-            #   - InChiKey (Not needed if CAS exists)
-            #   - SMILES
-            #   - Compound Group (Default is added: LANUK)
-            #  Furthermore, assumptions were made: ionization type 'ESI', collision type 'Q' (from existing csl data), and
-            #  type of molecular mass 'monoisotopic'. They all need confirmation.
-
             # Match extracted data with CSL
             logger.info('Matching extracted experiments with CSL')
             form_data_match, session = self.match_with_csl(form_data)
@@ -51,6 +39,7 @@ class LanukProcess(FormatProcess):
 
         logger.info('End of lanuk workflow')
 
-    def extract_data_regex(self, file, var_regex):
+
+    def extract_data_regex(self, file, var_regex, file_extra=None):
         """lanuk-specific data extraction."""
-        return extract_data_regex_lanuk(file, var_regex)
+        return extract_data_regex_lanuk(file, var_regex, file_extra)

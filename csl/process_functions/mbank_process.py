@@ -39,6 +39,6 @@ class MbankProcess(FormatProcess):
         logger.info('End of mbank workflow')
 
 
-    def extract_data_regex(self, file, var_regex):
+    def extract_data_regex(self, file, var_regex, file_extra=None):
         """mbank-specific data extraction."""
         return extract_data_regex_mbank(file, var_regex)

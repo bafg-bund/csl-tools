@@ -3,7 +3,7 @@ def var_regex_mbank():
     Mapping of CSL-relevant parameters (keys) to mbank-specific identifiers (values) for data extraction.
 
     The identifiers should appear in every experiment of the data files. Define them as the shortest (but unique)
-    common regular expression (not case-sensitive).
+    common identifier (not case-sensitive).
     """
     mbank_var_regex = {
         # Relevant in CSL and mandatory in MassBank
@@ -44,6 +44,7 @@ def var_fix_mbank():
         'var_ce_unit': 'V',             # Unit for collision energy
         'var_dsrc_csl': None,           # Default label for data_source.name in CSL
         'var_compg_csl': None,          # Default label for compound_group.name in CSL
+        'var_ces': None                 # Collision energy spread
     }
     return mbank_var_fix
 

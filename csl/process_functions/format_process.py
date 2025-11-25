@@ -5,9 +5,10 @@ from csl.config import DEFAULT_PAIRS_DSOURCE_CHROM
 from abc import ABC, abstractmethod
 
 class FormatProcess(ABC):
-    def __init__(self, path_csl, path_data):
+    def __init__(self, path_csl, path_data, path_extra):
         self.path_csl = path_csl
         self.path_data = path_data
+        self.path_extra = path_extra
 
     def process(self):
         raise NotImplementedError("Subclasses should implement this!")
@@ -31,7 +32,7 @@ class FormatProcess(ABC):
         # Data extraction based on the subclass-specific method and regular expressions
         data_extract_all = []
         for file in file_paths:
-            data_extract_file = self.extract_data_regex(file, var_regex)
+            data_extract_file = self.extract_data_regex(file, var_regex, self.path_extra)
             data_extract_file['file_path'] = file  # Add current file path for every entry
             data_extract_all.append(data_extract_file)
 
@@ -43,7 +44,7 @@ class FormatProcess(ABC):
 
 
     @abstractmethod
-    def extract_data_regex(self, file, var_regex):
+    def extract_data_regex(self, file, var_regex, file_extra):
         """Subclasses should implement this method to extract data."""
         pass
 
@@ -142,16 +143,13 @@ class FormatProcess(ABC):
                 logger.info(f'Adduct name: {adduct_name}; Formatted adduct name: {adduct_i}')
 
             # Collision energy (CE) and collision energy spread (CES)
-            ce_i, ces_i, ces_warn = get_collision_energy(entry['var_ce'])
-            if not ce_i or not ce_i and not ces_i:
+            ce_i, ces_i = get_collision_energy(entry['var_ce'], entry['var_ces'])
+            if not ce_i:
                 logger.warning(
                     f'No collision energy (CE) or unexpected number of CE or non-equal difference in CE spread. '
                     f'Check field for collision energy.')
                 entry_err = True
-            elif ces_warn:
-                logger.warning(f'Unexpected collision energy spread. Verify field for collision energy. '
-                               f'\n''Will NOT automatically skip file due to this warning.')
-                entry_warn = True
+
 
             # Ionization type
             ionization_i = get_ionization_type(entry['var_ionization'])

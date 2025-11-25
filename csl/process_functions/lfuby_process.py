@@ -38,6 +38,6 @@ class LfubyProcess(FormatProcess):
 
         logger.info('End of lfuby workflow')
 
-    def extract_data_regex(self, file, var_regex):
+    def extract_data_regex(self, file, var_regex, file_extra=None):
         """lfuby-specific data extraction."""
         return extract_data_regex_lfuby(file, var_regex)

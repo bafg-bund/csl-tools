@@ -33,7 +33,7 @@ def test_process_mbank():
 
     # Process mbank workflow
     with mock.patch('builtins.input', side_effect=['1','1','1','yes']):  # Mocks user input
-        process_data(format='mbank', path_csl=csl_copy_path, path_data=data_path)
+        process_data(format='mbank', path_csl=csl_copy_path, path_data=data_path, path_extra=None)
 
     # Connect to CSL database
     session = create_session(path_csl=csl_copy_path)

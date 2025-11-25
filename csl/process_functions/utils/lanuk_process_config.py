@@ -21,17 +21,22 @@ def var_regex_lanuk():
     Mapping of CSL-relevant variables (keys) to lanuk-specific identifiers (values) for data extraction.
 
     The identifiers should appear in every "chunk" of the data files! Define them as the shortest (but unique)
-    common regular expression (not case-sensitive).
+    common identifier (not case-sensitive).
+
+    Note: InChIKey (var_inchikey), InChI (var_inchi) and SMILES (var_smiles) are calculated from the molblock and
+    retention time (var_rt) is extracted from supplementary data.
     """
     lanuk_var_regex = {
-        'var_comp': 'NAME',                 # Compound Name
-        'var_cas': 'CASNO',                 # CAS registry number
-        'var_formula': 'FORMULA',           # Molecular formula
-        'var_mz': 'PRECURSOR M/Z',          # Precursor m/z
-        'var_ce': 'COLLISION ENERGY',       # Collision energy
-        'var_ion_mode': 'ION MODE',         # Type of operation mode
-        'var_instrument': 'INSTRUMENT',     # Instrument name
-        'var_peak': 'MASS SPECTRAL PEAKS',  # Mass spectral peaks
+        'var_molblock': 'V2000',               # Molblock
+        'var_comp': 'NAME',                    # Compound Name
+        'var_cas': 'CASNO',                    # CAS registry number
+        'var_formula': 'FORMULA',              # Molecular formula
+        'var_mz': 'PRECURSOR M/Z',             # Precursor m/z
+        'var_ce': 'COLLISION ENERGY',          # Collision energy
+        'var_ces': 'COLLISION ENERGY SPREAD',  # Collision energy spread
+        'var_ion_mode': 'ION MODE',            # Type of operation mode
+        'var_instrument': 'INSTRUMENT',        # Instrument name
+        'var_peak': 'MASS SPECTRAL PEAKS',     # Mass spectral peaks
     }
     return lanuk_var_regex
 
@@ -45,28 +50,18 @@ def var_fix_lanuk():
 
     lanuk_var_fix = {
         'var_chrom_method': all_methods['lanuk'],      # Chromatographic method
-        'var_isotope': 'monoisotopic',                 # Type of molecular mass # todo: Placeholder. Assumed monoisotopic
-        'var_ionization': 'ESI',                       # Ionization type # todo: Placeholder. Assumed 'ESI'
-        'var_rt': '99',                                # Retention time # todo: Placeholder.
-        'var_inchikey': 'inchikey_placeholder',        # InChIKey  # todo: Placeholder.
-        'var_smiles': 'smiles_placeholder',            # Simplified Molecular Line Entry Specification (SMILES) todo: Placeholder.
-        'var_col_type': 'Q',                           # Collision type  # todo: Assumed 'Q' based on existing CSL entries
+        'var_isotope': 'monoisotopic',                 # Type of molecular mass # todo: Assumed 'monoisotopic'
+        'var_ionization': 'ESI',                       # Ionization type # todo: Assumed 'ESI'; may differ among instruments. Need dictionary or post-correction.
+        'var_col_type': 'Q',                           # Collision type  # todo: Assumed 'Q'; may differ among instruments. Need dictionary or post-correction.
         'var_ce_unit': 'V',                            # Unit for collision energy
-        'var_compgroup': 'compgroup_placeholder',      # Compound group # todo: Placeholder.
+        'var_compgroup': None,                         # Compound group
         'var_adduct': None,                            # Adduct
-        'var_inchi': None,                             # InChI
-        'var_instrument_type': None,                   # Instrument type # todo: see below
+        'var_instrument_type': None,                   # Instrument type # todo: Can't set static type, as instruments differ. Need dictionary or post-correction.
         'var_accession': None,                         # Accession string (used in MassBank)
         'var_dsrc_csl': 'lanuk',                       # Default label for data_source.name in CSL
         'var_compg_csl': 'lanuk',                      # Default label for compound_group.name in CSL
     }
     return lanuk_var_fix
-
-# Todo: Unique type of instruments found in testfile:
-# ['3200 Q TRAP', '4000 Q TRAP', '5500 Q TRAP', 'Generic Single Quad',
-#  'Q TRAP', 'Triple TOF 5600', 'Triple TOF 6600', 'TripleTOF 5600',
-#  'TripleTOF 6600', 'ZenoTOF™ 7600 System']
-# Todo: Instrument type in CSL: LC-ESI-QTOF TripleTOF 6600 SCIEX
 
 
 def defaults_lanuk():
@@ -85,7 +80,6 @@ def defaults_lanuk():
 def adduct_notation_lanuk():
     """
     Special cases for adduct notation.
-    Todo: No special adduct notation for lanuk.
     """
     lanuk_spec_adduct = {
     }

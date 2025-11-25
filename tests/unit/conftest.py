@@ -63,6 +63,7 @@ def mock_extract_data():
         "var_col_type": 'mock_col_type',
         "var_ce_unit": 'mock_ce_unit',
         "var_accession": 'mock_accession',
+        "var_ces": 'mock_ces'
     }]
     return pd.DataFrame(data)
 

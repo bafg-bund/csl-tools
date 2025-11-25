@@ -17,7 +17,7 @@ from csl.main_functions.process import process_data
 from csl.main_functions.export import export_data
 from csl.main_functions.rtscan import scan_rt
 from tkinter import Tk
-from tkinter.filedialog import askopenfilenames
+from tkinter.filedialog import askopenfilenames, askopenfilename
 
 
 def select_data_files():
@@ -27,6 +27,15 @@ def select_data_files():
     fpaths = askopenfilenames(title="Select one or more data files")
     root.destroy()
     return list(fpaths)
+
+
+def select_suppl_file():
+    """Opens a file dialog to select one supplementary file for sciex import."""
+    root = Tk()
+    root.withdraw()  # Hide the root window
+    fpath = askopenfilename(title="Select supplementary file (compound name and retention time)")
+    root.destroy()
+    return fpath
 
 
 # Prepare the argument parser
@@ -47,6 +56,7 @@ process_parser.add_argument('path_csl', type=str,
                             help='Path to CSL file')
 process_parser.add_argument('path_data', type=str, nargs='?',
                             help='(Optional) Path to data file or directory (Default: Opens dialog to select files)')
+process_parser.add_argument('--path_extra', type=str, help='Path to supplementary data file (compound name and retention time; see README.md for requirements)')
 
 
 # Define 'export' command and its arguments
@@ -80,7 +90,14 @@ def main():
                 print("No files selected. Exiting.")
                 exit(1)
             args.path_data = file_paths
-        process_data(args.format, args.path_csl, args.path_data)
+        if args.format == 'lanuk':
+            if not args.path_extra:
+                file_path = select_suppl_file()
+                if not file_path:
+                    print("No file selected. Exiting.")
+                    exit(1)
+                args.path_extra = file_path
+        process_data(args.format, args.path_csl, args.path_data, args.path_extra)
 
     elif args.command == 'export':
         export_data(args.format, args.path_csl, args.path_out, args.subset)

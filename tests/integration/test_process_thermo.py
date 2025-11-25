@@ -36,7 +36,7 @@ def test_process_thermo():
 
     # Process thermo workflow
     with mock.patch('builtins.input', return_value='yes'):  # Mocks user input
-        process_data(format='lfuby', path_csl=csl_copy_path, path_data=data_path)  # Todo: lfuby_workflow
+        process_data(format='lfuby', path_csl=csl_copy_path, path_data=data_path, path_extra=None)  # Todo: lfuby_workflow
 
     # Connect to CSL database
     session = create_session(path_csl=csl_copy_path)

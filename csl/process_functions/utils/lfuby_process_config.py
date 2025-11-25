@@ -21,7 +21,7 @@ def var_regex_lfuby():
     Mapping of CSL-relevant parameters (keys) to lfuby-specific identifiers (values) for data extraction.
 
     The identifiers should appear in every experiment of the data files. Define them as the shortest (but unique)
-    common regular expression (not case-sensitive).
+    common identifier (not case-sensitive).
     """
     lfuby_var_regex = {
         'var_comp': 'Name',               # Compound name
@@ -59,6 +59,7 @@ def var_fix_lfuby():
         'var_compg_csl': 'lfuby',                  # Default label for compound_group.name in CSL
         'var_instrument_type': 'LC-ESI-Orbitrap',  # Instrument type
         'var_accession': None,                     # Accession string (used in MassBank)
+        'var_ces': None                            # Collision energy spread
     }
     return lfuby_var_fix
 

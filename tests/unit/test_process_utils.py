@@ -98,23 +98,23 @@ def test_format_adduct(adduct_name, pol_i, expected_adduct_i):
     assert adduct_i == expected_adduct_i
 
 
-@pytest.mark.parametrize("data_ce, expected_ce_i, expected_ces_i, expected_ces_warn", [
-    ('10', 10, 0, False),
-    ('20, 40, 60', 40, 20, False),
-    ('-10', 10, 0, False),              # Negative input values are transformed to positive values
-    ('-20, -40, -60', 40, 20, False),
-    ('20.00,40.00,60.00', 40, 20, False),
-    ('10, 20, 30', 20, 10, True),       # Warning when CES is not 20
-    ('10, 20, 50', None, None, False),  # Non-equal difference in CES
-    ('20, 40', None, None, False),      # Unexpected number of CE
-    ('', None, None, False)             # No data
+@pytest.mark.parametrize("data_ce, data_ces, expected_ce_i, expected_ces_i", [
+    ('10', '0', 10, 0),                 # CE/CES values are correctly formatted
+    ('20, 40, 60', [], 40, 20),         # CES is calculated from multiple CE values
+    ('-30', '-15', 30, 15),             # Negative input values are transformed to positive values
+    ('-20, -40, -60', [], 40, 20),
+    ('20.00,40.00,60.00', [], 40, 20),  # Different input format works
+    ([],'10', None, None),              # No CE input value
+    ('10, 20, 50', [], None, None),     # Non-equal difference in CES
+    ('20, 40', [], None, None),         # Unexpected number of CE
+    ('', '', None, None),               # No data
+    ([], [], None, None)
 ])
-def test_get_collision_energy(data_ce, expected_ce_i, expected_ces_i, expected_ces_warn):
+def test_get_collision_energy(data_ce, data_ces, expected_ce_i, expected_ces_i):
     """Tests the function with parametrized inputs."""
-    ce_i, ces_i, ces_warn = get_collision_energy(data_ce)
+    ce_i, ces_i = get_collision_energy(data_ce, data_ces)
     assert ce_i == expected_ce_i
     assert ces_i == expected_ces_i
-    assert ces_warn == expected_ces_warn
 
 
 @pytest.mark.parametrize("data_ionization, expected_ionization_i",

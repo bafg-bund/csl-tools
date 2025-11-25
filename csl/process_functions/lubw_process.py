@@ -38,6 +38,6 @@ class LubwProcess(FormatProcess):
 
         logger.info('End of lubw workflow')
 
-    def extract_data_regex(self, file, var_regex):
+    def extract_data_regex(self, file, var_regex, file_extra=None):
         """lubw-specific data extraction."""
         return extract_data_regex_lubw(file, var_regex)
