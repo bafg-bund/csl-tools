@@ -84,12 +84,10 @@ def extract_data_regex_lanuk(file_path_data, var_regex, file_path_extra):
         return record
 
 
-    def add_rt_to_dict(record, rt_dict):
+    def add_rt_from_dict(record, rt_dict):
         """Matches record compound name to dictionary (compound name and retention times) and adds RT value to record."""
-        if record['var_comp'].lower() in rt_dict:
-            record['var_rt'] = rt_dict[record['var_comp'].lower()]
-        else:
-            record['var_rt'] = []
+        var_comp = record.get('var_comp')
+        record['var_rt'] = rt_dict.get(var_comp.lower(), []) if var_comp else []
         return record
 
 
@@ -118,7 +116,7 @@ def extract_data_regex_lanuk(file_path_data, var_regex, file_path_extra):
     for chunk in chunks:
         record = extract_data_in_chunk(chunk_identifier + chunk, var_regex)
         record = add_smiles_and_inchikey_to_dict(record)
-        record = add_rt_to_dict(record, comp_rt_dict)
+        record = add_rt_from_dict(record, comp_rt_dict)
         records.append(record)
 
     # Create DataFrame
