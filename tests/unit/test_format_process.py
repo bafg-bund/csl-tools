@@ -12,7 +12,7 @@ def workflow():
             """Mock return for the function `extract_data_regex`."""
             return pd.DataFrame([{"var_comp": "Test", "var_ce": 10, "file_path": file}])
 
-    return TestProcess(path_data='dummy_data_path', path_csl='dummy_csl_path', path_extra='dummy_extra_path')
+    return TestProcess(path_data='data_path', path_csl='csl_path', path_config='config_path', path_extra='extra_path')
 
 
 class TestFormatProcess:

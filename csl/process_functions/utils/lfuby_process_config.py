@@ -40,6 +40,30 @@ def var_regex_lfuby():
     return lfuby_var_regex
 
 
+def var_regex_mzvault_old():
+    """
+    Mapping of CSL-relevant parameters (keys) to mzVault-specific identifiers (values) for data extraction.
+    Older mzVault version.
+
+    The identifiers should appear in every experiment of the data files. Define them as the shortest (but unique)
+    common identifier (not case-sensitive).
+    """
+    mzvault_var_regex = {
+        'var_comp': 'Name',                # Compound Name
+        'var_mz': 'Selected Ion m/z',      # Precursor m/z
+        'var_ce': 'Collision_energy',      # Collision energy
+        'var_ion_mode': 'MS:1000130',      # Type of operation mode
+        'var_rt': 'RetentionTime',         # Retention time
+        'var_inchikey': 'InChiKey',        # InChIKey
+        'var_formula': 'Formula',          # Molecular formula
+        'var_cas': 'CASNo',                # CAS registry number
+        'var_smiles': 'Smiles',            # Simplified Molecular Line Entry Specification (SMILES)
+        'var_peak': 'MS:1009006',          # Mass spectral peaks
+        'var_compgroup': 'CompoundClass',  # Compound group
+    }
+    return mzvault_var_regex
+
+
 def var_fix_lfuby():
     """
     Mapping of CSL-relevant variables (keys) to lfuby-specific default/fixed information (values).
@@ -49,15 +73,8 @@ def var_fix_lfuby():
 
     lfuby_var_fix = {
         'var_chrom_method': all_methods['lfuby'],  # Chromatographic method
-        'var_instrument': 'QExactive',             # Instrument name
-        'var_isotope': 'monoisotopic',             # Type of molecular mass
-        'var_col_type': 'HCD',                     # Collision type
-        'var_ce_unit': 'V',                        # Unit for collision energy
         'var_adduct': None,                        # Adduct
         'var_inchi': None,                         # InChI
-        'var_dsrc_csl': 'lfuby',                   # Default label for data_source.name in CSL
-        'var_compg_csl': 'lfuby',                  # Default label for compound_group.name in CSL
-        'var_instrument_type': 'LC-ESI-Orbitrap',  # Instrument type
         'var_accession': None,                     # Accession string (used in MassBank)
         'var_ces': None                            # Collision energy spread
     }
@@ -77,17 +94,15 @@ def defaults_lfuby():
     return lfuby_defaults
 
 
-def adduct_notation_lfuby():
+def defaults_mzvault_old():
     """
-    Special cases for adduct notation.
-    Define special cases in the below dictionary if they deviate from standard adduct notation convention
-    Standard adduct notation convention is: "[M+{adduct_name}]+" for positive ion mode
-    and "[M-{adduct_name}]-" for negative ion mode. E.g.: "[M+NH4]+" for Desmedipham_NH4 for positive polarity.
+    Mapping of mzVault-specific default settings for data processing.
+    Older mzVault version.
+    These settings are expected to never have more than one state within each process workflow.
     """
-    lfuby_spec_adduct = {
-        'cation': '[M]+',
-        'Ethylamin': '[M+C2H7N+H]+',
-        'FA': '[M+HCOO-]-',
-        'NaFA': '[M+NaCOO-]-',
+    mzvault_old_defaults = {
+        'def_pol_p': 'Positive scan',  # Default identifier for positive ion mode
+        'def_pol_n': 'Negative scan',  # Default identifier for positive ion mode
+        'def_qf': 'QF',                # Default identifier for precursor ions ("Quellfragmente")
     }
-    return lfuby_spec_adduct
+    return mzvault_old_defaults

@@ -40,10 +40,6 @@ def var_fix_mbank():
     """
     mbank_var_fix = {
         'var_chrom_method': None,       # Chromatographic method
-        'var_isotope': 'monoisotopic',  # Type of molecular mass
-        'var_ce_unit': 'V',             # Unit for collision energy
-        'var_dsrc_csl': None,           # Default label for data_source.name in CSL
-        'var_compg_csl': None,          # Default label for compound_group.name in CSL
         'var_ces': None                 # Collision energy spread
     }
     return mbank_var_fix
@@ -60,10 +56,3 @@ def defaults_mbank():
         'def_qf': None,           # Default identifier for precursor ions ("Quellfragmente")
     }
     return mbank_defaults
-
-
-def adduct_notation_mbank():
-    """Special cases for adduct notation."""
-    mbank_spec_adduct = {
-    }
-    return mbank_spec_adduct

@@ -11,10 +11,11 @@ class MbankProcess(FormatProcess):
         logger.info('Executing mbank workflow to process MS2 data files')
 
         # Load defaults and settings
+        par_config, adduct_notation = self.load_config()
         var_regex = var_regex_mbank()
         var_fix = var_fix_mbank()
         dsrc_def = defaults_mbank()
-        spec_adduct = adduct_notation_mbank()
+        fixed_par = par_config | var_fix
 
         # Read files
         logger.info('Reading file(s)')
@@ -22,11 +23,11 @@ class MbankProcess(FormatProcess):
         if not extract_data.empty:
             # Adding default information
             logger.info('Adding fixed information to extracted data')
-            extract_data_add = self.add_fixed_variables(extract_data, var_fix)
+            extract_data_add = self.add_fixed_variables(extract_data, fixed_par)
 
             # Processing files
             logger.info('Processing data')
-            form_data = self.process_data(extract_data_add, dsrc_def, spec_adduct)
+            form_data = self.process_data(extract_data_add, dsrc_def, adduct_notation)
 
             # Match extracted data with CSL
             logger.info('Matching extracted experiments with CSL')

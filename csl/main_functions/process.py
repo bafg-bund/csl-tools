@@ -31,7 +31,7 @@ WORKFLOWS = {
 }
 
 
-def process_data(format: str, path_csl: str, path_data: str | list[str], path_extra: str | None = None):
+def process_data(format: str, path_csl: str, path_data: str | list[str], path_config: str, path_extra: str | None = None):
     """
     Executes the appropriate workflow for processing MS2 data files based on the data source type.
 
@@ -41,8 +41,9 @@ def process_data(format: str, path_csl: str, path_data: str | list[str], path_ex
             - 'lanuk'   : Files from data source 'lanuk' (North Rhine-Westphalia Office of Nature, Environment and Climate).
             - 'lubw'    : Files from data source 'lubw' (Baden-Württemberg State Institute for the Environment).
             - 'mbank'   : MassBank documents.
-        path_csl (str)  : Path to the CSL file.
+        path_csl (str)               : Path to the CSL file.
         path_data (str or list[str]) : File path(s) or directory path containing the MS2 data files to process.
+        path_config (str)            : Path to configuration file.
         path_extra (str or None)     : File path to supplementary data (only for format 'lanuk')
     """
     # Validate all provided file paths
@@ -54,8 +55,9 @@ def process_data(format: str, path_csl: str, path_data: str | list[str], path_ex
     if path_extra:
         validate_file_path(path_extra)
     validate_file_path(path_csl)
+    validate_file_path(path_config)
 
     # Select and execute the appropriate process workflow based on the format
     workflow_class = WORKFLOWS[format]
-    workflow = workflow_class(path_csl, path_data, path_extra)
+    workflow = workflow_class(path_csl, path_data, path_config, path_extra)
     workflow.process()

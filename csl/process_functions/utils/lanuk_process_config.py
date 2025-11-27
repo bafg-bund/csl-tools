@@ -50,16 +50,9 @@ def var_fix_lanuk():
 
     lanuk_var_fix = {
         'var_chrom_method': all_methods['lanuk'],      # Chromatographic method
-        'var_isotope': 'monoisotopic',                 # Type of molecular mass # todo: Assumed 'monoisotopic'
-        'var_ionization': 'ESI',                       # Ionization type # todo: Assumed 'ESI'; may differ among instruments. Need dictionary or post-correction.
-        'var_col_type': 'Q',                           # Collision type  # todo: Assumed 'Q'; may differ among instruments. Need dictionary or post-correction.
-        'var_ce_unit': 'V',                            # Unit for collision energy
         'var_compgroup': None,                         # Compound group
         'var_adduct': None,                            # Adduct
-        'var_instrument_type': None,                   # Instrument type # todo: Can't set static type, as instruments differ. Need dictionary or post-correction.
         'var_accession': None,                         # Accession string (used in MassBank)
-        'var_dsrc_csl': 'lanuk',                       # Default label for data_source.name in CSL
-        'var_compg_csl': 'lanuk',                      # Default label for compound_group.name in CSL
     }
     return lanuk_var_fix
 
@@ -75,12 +68,3 @@ def defaults_lanuk():
         'def_qf': 'QF',    # Default identifier for precursor ions ("Quellfragmente")
     }
     return lanuk_defaults
-
-
-def adduct_notation_lanuk():
-    """
-    Special cases for adduct notation.
-    """
-    lanuk_spec_adduct = {
-    }
-    return lanuk_spec_adduct

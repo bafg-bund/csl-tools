@@ -5,14 +5,29 @@ from csl.config import DEFAULT_PAIRS_DSOURCE_CHROM
 from abc import ABC, abstractmethod
 
 class FormatProcess(ABC):
-    def __init__(self, path_csl, path_data, path_extra):
+    def __init__(self, path_csl, path_data, path_config, path_extra):
         self.path_csl = path_csl
         self.path_data = path_data
+        self.path_config = path_config
         self.path_extra = path_extra
 
     def process(self):
         raise NotImplementedError("Subclasses should implement this!")
 
+    def load_config(self):
+        """Loads and returns configuration for data processing from YAML file."""
+        import yaml
+
+        with open(self.path_config) as stream:
+            try:
+                config = yaml.safe_load(stream)
+            except yaml.YAMLError as exc:
+                raise ValueError(exc)
+
+        par_config = config.get("par_config", {})
+        adduct_notation = config.get("adduct_notation", {})
+
+        return par_config, adduct_notation
 
     def read_files(self, var_regex):
         """

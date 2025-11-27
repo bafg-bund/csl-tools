@@ -1,21 +1,27 @@
 from csl.main_functions.process import process_data
 from csl.utils.sql_utils import create_session, Experiment, Compound
 from csl.config import ROOT_DIR
+import pytest
 import os
 import shutil
 from pathlib import Path
 from unittest import mock
 
 
-def test_process_thermo():
+@pytest.mark.parametrize("data_file_path, config_file_path",
+                         [('tests/fixtures/import/lfuby_testfiles','tests/fixtures/import/test_config/lfuby_config.yaml'),
+                          # ('tests/fixtures/import/lubw_testfiles','tests/fixtures/import/test_config/lubw_config.yaml')
+                          ])
+def test_process_thermo(data_file_path, config_file_path):
     """
     Tests processing of ThermoFisher/mzVault-based experiments and import into the CSL.
         Todo: Currently based on lfuby_workflow. Change later to thermo workflow
     """
     # Prepare paths
-    data_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/lfuby_testfiles')  # Todo: lfuby_workflow
+    data_path = os.path.join(ROOT_DIR, data_file_path)  # Todo: lfuby_workflow
     csl_template_path = os.path.join(ROOT_DIR,'tests/fixtures/import/CSL_v0_4entries.db')
     csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_4entries.db')
+    config_path = os.path.join(ROOT_DIR, config_file_path)
     temp_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 
     # Create temp_path folder if necessary
@@ -36,7 +42,8 @@ def test_process_thermo():
 
     # Process thermo workflow
     with mock.patch('builtins.input', return_value='yes'):  # Mocks user input
-        process_data(format='lfuby', path_csl=csl_copy_path, path_data=data_path, path_extra=None)  # Todo: lfuby_workflow
+        process_data(format='lfuby', path_csl=csl_copy_path, path_data=data_path,
+                     path_config=config_path, path_extra=None)  # Todo: lfuby_workflow
 
     # Connect to CSL database
     session = create_session(path_csl=csl_copy_path)
@@ -46,7 +53,7 @@ def test_process_thermo():
 
     # Assert that the correct compound was added to the CSL
     compounds = session.query(Compound.name).all()
-    assert any('Desmedipham' in cp for cp in compounds)
+    assert any('NewSubstance' in cp for cp in compounds)
 
     # Cleanup
     session.close()

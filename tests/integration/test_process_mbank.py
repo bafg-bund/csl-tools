@@ -13,6 +13,7 @@ def test_process_mbank():
     data_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/mbank_testfiles')
     csl_template_path = os.path.join(ROOT_DIR,'tests/fixtures/import/CSL_v0_4entries.db')
     csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_4entries.db')
+    config_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/test_config/bfg_config.yaml')
     temp_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 
     # Create temp_path folder if necessary
@@ -32,8 +33,9 @@ def test_process_mbank():
     shutil.copy(csl_template_path, csl_copy_path)
 
     # Process mbank workflow
-    with mock.patch('builtins.input', side_effect=['1','1','1','yes']):  # Mocks user input
-        process_data(format='mbank', path_csl=csl_copy_path, path_data=data_path, path_extra=None)
+    with mock.patch('builtins.input', side_effect=['1','yes']):  # Mocks user input
+        process_data(format='mbank', path_csl=csl_copy_path, path_data=data_path,
+                     path_config=config_path, path_extra=None)
 
     # Connect to CSL database
     session = create_session(path_csl=csl_copy_path)

@@ -12,10 +12,11 @@ class LanukProcess(FormatProcess):
         logger.info('Executing lanuk workflow to process MS2 data files')
 
         # Load defaults and settings
+        par_config, adduct_notation = self.load_config()
         var_regex = var_regex_lanuk()
         var_fix = var_fix_lanuk()
         dsrc_def = defaults_lanuk()
-        spec_adduct = adduct_notation_lanuk()
+        fixed_par = par_config | var_fix
 
         # Read files
         logger.info('Reading file(s)')
@@ -23,11 +24,11 @@ class LanukProcess(FormatProcess):
         if not extract_data.empty:
             # Adding default information
             logger.info('Adding fixed information to extracted data')
-            extract_data_add = self.add_fixed_variables(extract_data, var_fix)
+            extract_data_add = self.add_fixed_variables(extract_data, fixed_par)
 
             # Processing files
             logger.info('Processing data')
-            form_data = self.process_data(extract_data_add, dsrc_def, spec_adduct)
+            form_data = self.process_data(extract_data_add, dsrc_def, adduct_notation)
 
             # Match extracted data with CSL
             logger.info('Matching extracted experiments with CSL')

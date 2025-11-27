@@ -15,7 +15,7 @@ def extract_data_regex_lfuby(file_path, var_regex):
     import re
     import pandas as pd
 
-    def extract_data_in_chunk(chunk, var_regex):
+    def extract_data_in_chunk(chunk, var_regex, delim):
         """Extract data of a single chunk based on regular expressions."""
         data_extract_dict = {}
         peak_extract = []
@@ -28,8 +28,11 @@ def extract_data_regex_lfuby(file_path, var_regex):
                 for line in chunk.strip().split('\n'):
                     match = regex.search(line)
                     if match:
-                        delim = ':'
-                        parts = re.split(pattern=delim, string=line, maxsplit=1)
+                        if len(delim)>1:
+                            use_delim = delim[0] if delim[0] in line else delim[1]
+                        else:
+                            use_delim = delim[0]
+                        parts = re.split(pattern=use_delim, string=line, maxsplit=1)
                         if len(parts) > 1:
                             data_extract_dict[var_key] = parts[-1].strip()
                         else:  # If line is malformed
@@ -56,12 +59,17 @@ def extract_data_regex_lfuby(file_path, var_regex):
         content = file.read()
 
     # Split content into chunks based on an identifier
-    chunk_identifier = 'Name: '
+    if 'MS:1009003|Name' in content:  # Export format of older mzVault version
+        chunk_identifier = 'MS:1009003|Name'
+        delim = ['=', r'\|']
+    else:  # Export format of mzVault version 2.3.64.0
+        chunk_identifier = 'Name: '
+        delim = ':'
     chunks = content.split(chunk_identifier)[1:]
     # Parse each chunk into a dictionary
     records = []
     for chunk in chunks:
-        record = extract_data_in_chunk(chunk_identifier + chunk, var_regex)
+        record = extract_data_in_chunk(chunk_identifier + chunk, var_regex, delim)
         records.append(record)
 
     # Create DataFrame

@@ -29,11 +29,11 @@ def select_data_files():
     return list(fpaths)
 
 
-def select_suppl_file():
-    """Opens a file dialog to select one supplementary file for sciex import."""
+def select_one_file(sel_file_str):
+    """Opens a file dialog to select one file."""
     root = Tk()
     root.withdraw()  # Hide the root window
-    fpath = askopenfilename(title="Select supplementary file (compound name and retention time)")
+    fpath = askopenfilename(title=f"Select {sel_file_str}")
     root.destroy()
     return fpath
 
@@ -52,31 +52,28 @@ process_parser = subparsers.add_parser('process', help='Processes MS2 data files
 
 process_parser.add_argument('format', type=str, choices=['mbank', 'lfuby', 'lanuk', 'lubw'],  # Todo: change format to thermo and sciex
                             help='Specify format')
-process_parser.add_argument('path_csl', type=str,
-                            help='Path to CSL file')
+process_parser.add_argument('path_csl', type=str, help='Path to CSL file')
 process_parser.add_argument('path_data', type=str, nargs='?',
-                            help='(Optional) Path to data file or directory (Default: Opens dialog to select files)')
-process_parser.add_argument('--path_extra', type=str, help='Path to supplementary data file (compound name and retention time; CSV UTF-8 semicolon-separated)')
+                            help='Path to data file or directory (Default: Opens dialog to select files)')
+process_parser.add_argument('path_config', type=str, nargs='?', help='Path to configuration file (YAML)')
+process_parser.add_argument('--path_extra', type=str, help='Path to supplementary data file '
+                                                           '(compound name and retention time; CSV UTF-8 semicolon-separated)')
 
 
 # Define 'export' command and its arguments
 export_parser = subparsers.add_parser('export', help='Exports the CSL to various formats')
 export_parser.add_argument('format', type=str, choices=['thermo', 'envi', 'mbank', 'sqlite'],
                            help='Specify export format',)
-export_parser.add_argument('path_csl', type=str,
-                           help='Path to CSL file')
+export_parser.add_argument('path_csl', type=str, help='Path to CSL file')
 export_parser.add_argument('path_out', type=str, help='Path to the directory where the exported file(s) will be saved.')
 export_parser.add_argument('subset', type=str, nargs='*', choices=['lfuby', 'bfg', 'uba', 'all'],
                             default= 'all', help='(Optional) Choose data source(s) for subsetting the CSL data '
-                                                 'before exporting (choices: lfuby, bfg, uba, all; '
-                                                 'Default: all)')
+                                                 'before exporting (choices: lfuby, bfg, uba, all; Default: all)')
 
 # Define 'rtscan' command and its arguments
 rtscan_parser = subparsers.add_parser('rtscan', help='Operates on retention time data in the CSL')
-rtscan_parser.add_argument('operation', type=str, choices=['update', 'recalc'],
-                           help='Specify operation type',)
-rtscan_parser.add_argument('path_csl', type=str,
-                           help='Path to CSL file')
+rtscan_parser.add_argument('operation', type=str, choices=['update', 'recalc'], help='Specify operation type',)
+rtscan_parser.add_argument('path_csl', type=str, help='Path to CSL file')
 
 def main():
     # Parse the command-line arguments
@@ -90,14 +87,20 @@ def main():
                 print("No files selected. Exiting.")
                 exit(1)
             args.path_data = file_paths
+        if not args.path_config:
+            file_path = select_one_file('configuration file (.yaml)')
+            if not file_path:
+                print("No file selected. Exiting.")
+                exit(1)
+            args.path_config = file_path
         if args.format == 'lanuk':
             if not args.path_extra:
-                file_path = select_suppl_file()
+                file_path = select_one_file('supplementary file containing compound name and retention time (.csv)')
                 if not file_path:
                     print("No file selected. Exiting.")
                     exit(1)
                 args.path_extra = file_path
-        process_data(args.format, args.path_csl, args.path_data, args.path_extra)
+        process_data(args.format, args.path_csl, args.path_data, args.path_config, args.path_extra)
 
     elif args.command == 'export':
         export_data(args.format, args.path_csl, args.path_out, args.subset)

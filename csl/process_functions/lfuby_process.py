@@ -11,10 +11,15 @@ class LfubyProcess(FormatProcess):
         logger.info('Executing lfuby workflow to process MS2 data files')
 
         # Load defaults and settings
-        var_regex = var_regex_lfuby()
+        par_config, adduct_notation = self.load_config()
         var_fix = var_fix_lfuby()
-        dsrc_def = defaults_lfuby()
-        spec_adduct = adduct_notation_lfuby()
+        if par_config['var_dsrc_csl'] == 'lubw':  # Older mzVault version
+            var_regex = var_regex_mzvault_old()
+            dsrc_def = defaults_mzvault_old()
+        else:  # mzVault version 2.3.64.0
+            var_regex = var_regex_lfuby()
+            dsrc_def = defaults_lfuby()
+        fixed_par = par_config | var_fix  # Combine constant parameters
 
         # Read files
         logger.info('Reading file(s)')
@@ -22,11 +27,11 @@ class LfubyProcess(FormatProcess):
         if not extract_data.empty:
             # Adding default information
             logger.info('Adding fixed information to extracted data')
-            extract_data_add = self.add_fixed_variables(extract_data, var_fix)
+            extract_data_add = self.add_fixed_variables(extract_data, fixed_par)
 
             # Processing files
             logger.info('Processing data')
-            form_data = self.process_data(extract_data_add, dsrc_def, spec_adduct)
+            form_data = self.process_data(extract_data_add, dsrc_def, adduct_notation)
 
             # Match extracted data with CSL
             logger.info('Matching extracted experiments with CSL')
