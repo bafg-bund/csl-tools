@@ -109,7 +109,6 @@ def add_exp_to_session(session, entry):
 
     # Prepare all variables
     dsrc_csl_def = entry['var_dsrc_csl']
-    compg_csl_def = entry['var_compg_csl']
     comp_i = entry['comp_i']
     formula_i = entry['formula_i']
     smiles_i = entry['smiles_i']
@@ -153,13 +152,13 @@ def add_exp_to_session(session, entry):
                 comp_group.append(cg_db)
 
     if not comp_group:
-        existing_cg = session.query(CompoundGroup).filter_by(name=compg_csl_def).one_or_none()
+        existing_cg = session.query(CompoundGroup).filter_by(name=dsrc_csl_def).one_or_none()
         # Create the default compound group if necessary.
         if not existing_cg:
-            logger.info(f'Adding missing default compound group: "{compg_csl_def}"')
-            new_cg = CompoundGroup(name=compg_csl_def)
+            logger.info(f'Adding missing default compound group: "{dsrc_csl_def}"')
+            new_cg = CompoundGroup(name=dsrc_csl_def)
             session.add(new_cg)
-        comp_group = session.query(CompoundGroup).filter_by(name=compg_csl_def).one_or_none()
+        comp_group = session.query(CompoundGroup).filter_by(name=dsrc_csl_def).one_or_none()
         if not isinstance(comp_group, list):
             comp_group = [comp_group]
 

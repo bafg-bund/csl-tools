@@ -72,31 +72,24 @@ class FormatProcess(ABC):
         logger = logging.getLogger(__name__)
 
         extract_data_add = extract_data
+
+        # Add chromatographic method based on data source
+        dsrc = var_fix.get('var_dsrc_csl')
+        if not dsrc:
+            raise ValueError("Data source is empty or missing (check your config.yaml).")
+        try:
+            extract_data_add['var_chrom_method'] = DEFAULT_PAIRS_DSOURCE_CHROM[dsrc]
+        except KeyError:
+            raise ValueError(f"Chromatographic method for data source '{dsrc}' is not defined (check config.py).")
+
+        # Add each parameter and its value.
         for var in var_fix.items():
-            # Add value to column of DataFrame. Special case for var_chrom_method if None
             if var[1]:
                 extract_data_add[var[0]] = var[1]
-            elif not var[1] and var[0] == 'var_chrom_method':
-                options = DEFAULT_PAIRS_DSOURCE_CHROM.values()
-                message = 'Select the chromatographic method for the experiments to be added'
-                choice = get_user_choice(list(options), message)
-                extract_data_add[var[0]] = choice
-                logger.info(f"Chromatographic method: {choice}")
-            elif not var[1] and var[0] == 'var_dsrc_csl':
-                options = DEFAULT_PAIRS_DSOURCE_CHROM.keys()
-                message = 'Select the default value for the data source for the experiments to be added'
-                choice = get_user_choice(list(options), message)
-                extract_data_add[var[0]] = choice
-                logger.info(f"Default data source: {choice}")
-            elif not var[1] and var[0] == 'var_compg_csl':
-                options = DEFAULT_PAIRS_DSOURCE_CHROM.keys()
-                message = 'Select the default value for the compound group for the experiments to be added'
-                choice = get_user_choice(list(options), message)
-                extract_data_add[var[0]] = choice
-                logger.info(f"Default compound group: {choice}")
             else:
                 logger.warning(f"No value for {var[0]}.")
                 extract_data_add[var[0]] = var[1]
+
         return extract_data_add
 
 

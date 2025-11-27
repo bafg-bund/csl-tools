@@ -7,7 +7,6 @@ par_config:
   var_instrument: 'QExactive'             # Instrument name
   var_instrument_type: 'LC-ESI-Orbitrap'  # Instrument type
   var_dsrc_csl: 'lubw'                    # Default label for data_source.name in CSL
-  var_compg_csl: 'lubw'                   # Default label for compound_group.name in CSL  // Todo: change later
 
 # Special adduct notation rules (optional).
 adduct_notation: {}

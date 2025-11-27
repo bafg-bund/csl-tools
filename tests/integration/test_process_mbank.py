@@ -33,7 +33,7 @@ def test_process_mbank():
     shutil.copy(csl_template_path, csl_copy_path)
 
     # Process mbank workflow
-    with mock.patch('builtins.input', side_effect=['1','yes']):  # Mocks user input
+    with mock.patch('builtins.input', side_effect=['yes']):  # Mocks user input
         process_data(format='mbank', path_csl=csl_copy_path, path_data=data_path,
                      path_config=config_path, path_extra=None)
 

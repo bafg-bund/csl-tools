@@ -6,7 +6,6 @@ par_config:
   var_ce_unit: 'V'             # Unit for collision energy
   var_instrument_type: null    # Instrument type                   // Todo: change later to dictionary
   var_dsrc_csl: 'lanuk'        # Default label for data_source.name in CSL
-  var_compg_csl: 'lanuk'       # Default label for compound_group.name in CSL  // Todo: change later
 
 # Special adduct notation rules (optional).
 adduct_notation: {}

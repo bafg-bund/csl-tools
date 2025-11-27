@@ -14,7 +14,6 @@
 # 2) Fixed variable for non-extractable data:
 # Use this when necessary information cannot be extracted from the data files or is fixed (e.g. one instrument name).
 #   → Define in var_fix_<institution>.
-from csl.config import DEFAULT_PAIRS_DSOURCE_CHROM
 
 def var_regex_lubw():
     """
@@ -44,10 +43,7 @@ def var_fix_lubw():
     Mapping of CSL-relevant variables (keys) to lubw-specific default/fixed information (values).
     The information is currently fixed for this format or does not appear in the data files (can't be extracted).
     """
-    all_methods = DEFAULT_PAIRS_DSOURCE_CHROM
-
     lubw_var_fix = {
-        'var_chrom_method': all_methods['lubw'],   # Chromatographic method
         'var_instrument': 'QExactive',             # Instrument name
         'var_isotope': 'monoisotopic',             # Type of molecular mass
         'var_col_type': 'HCD',                     # Collision type

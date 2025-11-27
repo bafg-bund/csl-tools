@@ -39,7 +39,6 @@ def var_fix_mbank():
     The information is currently fixed for this format or does not appear in the data files (can't be extracted).
     """
     mbank_var_fix = {
-        'var_chrom_method': None,       # Chromatographic method
         'var_ces': None                 # Collision energy spread
     }
     return mbank_var_fix

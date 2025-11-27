@@ -120,7 +120,6 @@ def mock_entry_df():
         "compgroup_i": ['Pesticide','Herbicide'],
         "col_type_i": "mock_col_type",
         "var_dsrc_csl": 'mock_dsrc',
-        "var_compg_csl": 'mock_compg',
         "instrument_i": 'mock_instrument',
         "experiment_id_i": 'mock_experiment_id',
         "form_err_flag": False,
