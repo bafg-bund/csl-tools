@@ -6,10 +6,10 @@ import glob
 from pathlib import Path
 
 
-def test_export_thermo():
+def test_export_mzvault():
     """Tests export of CSL entries as MSP/NIST documents."""
     # Prepare paths
-    csl_path = os.path.join(ROOT_DIR,'tests/fixtures/export/CSL_v0_export_thermo_1bfg_1uba.db')
+    csl_path = os.path.join(ROOT_DIR,'tests/fixtures/export/CSL_v0_export_mzvault_1bfg_1uba.db')
     out_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 
     # Create out_path folder if necessary
@@ -25,8 +25,8 @@ def test_export_thermo():
         except PermissionError as e:
             print(f"Could not delete {f}: {e}")
 
-    # Export thermo workflow
-    export_data(format='thermo', path_csl=csl_path, path_out=out_path)
+    # Export workflow
+    export_data(format='mzvault', path_csl=csl_path, path_out=out_path)
 
     # Assert that the correct number of files were produced
     all_methods = DEFAULT_PAIRS_DSOURCE_CHROM

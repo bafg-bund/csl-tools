@@ -8,9 +8,9 @@ import pandas as pd
 @pytest.fixture
 def workflow():
     class TestProcess(FormatProcess):
-        def extract_data_regex(self, file, var_regex, file_extra=None):
+        def extract_data_regex(self, file, par_regex, file_extra=None):
             """Mock return for the function `extract_data_regex`."""
-            return pd.DataFrame([{"var_comp": "Test", "var_ce": 10, "file_path": file}])
+            return pd.DataFrame([{"par_comp": "Test", "par_ce": 10, "file_path": file}])
 
     return TestProcess(path_data='data_path', path_csl='csl_path', path_config='config_path', path_extra='extra_path')
 
@@ -109,8 +109,8 @@ class TestFormatProcess:
 
         # Add relevant data to the DataFrame fixture
         tmp_data = {
-            'var_comp': ['compound1'],
-            'var_ce': ['40'],
+            'par_comp': ['compound1'],
+            'par_ce': ['40'],
             'file_path': ['file1']
         }
         mock_format_data = pd.concat(objs=[mock_format_data, pd.DataFrame(tmp_data)], axis='columns')

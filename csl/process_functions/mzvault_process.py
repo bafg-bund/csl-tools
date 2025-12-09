@@ -2,25 +2,28 @@ from csl.process_functions import FormatProcess
 from csl.process_functions.utils import *
 
 
-class LanukProcess(FormatProcess):
+class MzvaultProcess(FormatProcess):
     def process(self):
-        """Workflow to process MS2 data files from the data source lanuk
-        (Landesamt für Natur, Umwelt und Klima Nordrhein-Westfalen)."""
+        """Workflow to process mzVault-based MS2 data files."""
         import logging
 
         logger = logging.getLogger(__name__)
-        logger.info('Executing lanuk workflow to process MS2 data files')
+        logger.info('Executing mzvault workflow to process MS2 data files')
 
         # Load defaults and settings
         par_config, adduct_notation = self.load_config()
-        var_regex = var_regex_lanuk()
-        var_fix = var_fix_lanuk()
-        dsrc_def = defaults_lanuk()
-        fixed_par = par_config | var_fix
+        par_fix = par_fix_mzvault()
+        if par_config['par_data_source'] == 'lubw':  # mzVault version 2.3.45.15
+            par_regex = par_regex_mzvault_old()
+            defaults = defaults_mzvault_old()
+        else:  # mzVault version 2.3.64.0
+            par_regex = par_regex_mzvault()
+            defaults = defaults_mzvault()
+        fixed_par = par_config | par_fix  # Combine constant parameters
 
         # Read files
         logger.info('Reading file(s)')
-        extract_data = self.read_files(var_regex)
+        extract_data = self.read_files(par_regex)
         if not extract_data.empty:
             # Adding default information
             logger.info('Adding fixed information to extracted data')
@@ -28,7 +31,7 @@ class LanukProcess(FormatProcess):
 
             # Processing files
             logger.info('Processing data')
-            form_data = self.process_data(extract_data_add, dsrc_def, adduct_notation)
+            form_data = self.process_data(extract_data_add, defaults, adduct_notation)
 
             # Match extracted data with CSL
             logger.info('Matching extracted experiments with CSL')
@@ -38,9 +41,8 @@ class LanukProcess(FormatProcess):
             logger.info('Preparing to commit session changes to CSL')
             self.commit_to_csl(session, form_data_match)
 
-        logger.info('End of lanuk workflow')
+        logger.info('End of mzvault workflow')
 
-
-    def extract_data_regex(self, file, var_regex, file_extra=None):
-        """lanuk-specific data extraction."""
-        return extract_data_regex_lanuk(file, var_regex, file_extra)
+    def extract_data_regex(self, file, par_regex, file_extra=None):
+        """mzvault-specific data extraction."""
+        return extract_data_regex_mzvault(file, par_regex)

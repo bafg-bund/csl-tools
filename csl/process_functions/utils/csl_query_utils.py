@@ -31,14 +31,14 @@ def check_duplicate(session, entry):
         join(Parameter, Experiment.parameter_id == Parameter.parameter_id)
 
     qry = qry.filter(Experiment.adduct == entry['adduct_i'],
-                     Experiment.isotope == entry['var_isotope'],
+                     Experiment.isotope == entry['par_isotope'],
                      Parameter.instrument == entry['instrument_i'],
                      Parameter.ionisation == entry['ionization_i'],
                      Parameter.polarity == entry['pol_i'],
                      Parameter.ce == entry['ce_i'],
                      Parameter.ces == entry['ces_i'],
                      Parameter.collision_type == entry['col_type_i'],
-                     Parameter.ce_unit == entry['var_ce_unit'])
+                     Parameter.ce_unit == entry['par_ce_unit'])
 
     inchikey_main_i = entry['inchikey_main_i']
     cas_i = entry['cas_i']
@@ -108,24 +108,24 @@ def add_exp_to_session(session, entry):
     logger = logging.getLogger(__name__)
 
     # Prepare all variables
-    dsrc_csl_def = entry['var_dsrc_csl']
+    dsrc_csl_def = entry['par_data_source']
     comp_i = entry['comp_i']
     formula_i = entry['formula_i']
     smiles_i = entry['smiles_i']
     inchikey_i = entry['inchikey_i']
     inchi_i = entry['inchi_i']
-    chrom_method = entry['var_chrom_method']
+    chrom_method = entry['par_chrom_method']
     rt_i = entry['rt_i']
-    instrument = entry['var_instrument']
+    instrument = entry['par_instrument']
     pol_i = entry['pol_i']
     ce_i = entry['ce_i']
     ces_i = entry['ces_i']
-    ce_unit = entry['var_ce_unit']
+    ce_unit = entry['par_ce_unit']
     col_type_i = entry['col_type_i']
     ionization_i = entry['ionization_i']
     mz_i = entry['mz_i']
     adduct_i = entry['adduct_i']
-    isotope = entry['var_isotope']
+    isotope = entry['par_isotope']
     spec_i = entry['spec_i']
     inchikey_main_i = entry['inchikey_main_i']
     cas_i = entry['cas_i']

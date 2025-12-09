@@ -2,11 +2,9 @@
 Main function to process MS2 data files from various formats.
 
 Process Classes:
-    lfuby : Workflow for 'lfuby' (Bayerisches Landesamt für Umwelt).
-    lanuk : Workflow for 'lanuk' (Landesamt für Natur, Umwelt und Klima Nordrhein-Westfalen).
-    lubw  : Workflow for 'lubw' (Landesanstalt für Umwelt Baden-Württemberg).
-    mbank : Workflow for MassBank documents.
-    Todo: In the future import/processing will be changed to software-specific workflows only
+    mbank   : Workflow for MassBank documents.
+    mzVault : Workflow for mzVault-based documents.
+    libview : Workflow for LibraryView-based documents.
 """
 from csl.utils import validate_file_path, setup_logger
 from csl.process_functions import *
@@ -24,10 +22,9 @@ setup_logger(log_fpath)  # Sets basic logger configuration and adds stream handl
 
 # Define process workflow dictionary
 WORKFLOWS = {
-    "lfuby": LfubyProcess,
-    "lanuk": LanukProcess,
-    "lubw": LubwProcess,
     "mbank": MbankProcess,
+    "mzvault": MzvaultProcess,
+    "libview": LibviewProcess,
 }
 
 
@@ -37,14 +34,14 @@ def process_data(format: str, path_csl: str, path_data: str | list[str], path_co
 
     Args:
         format (str)    : Format of files to be processed. Choose from:
-            - 'lfuby'   : Files from data source 'lfuby' (Bavarian Environment Agency).
-            - 'lanuk'   : Files from data source 'lanuk' (North Rhine-Westphalia Office of Nature, Environment and Climate).
-            - 'lubw'    : Files from data source 'lubw' (Baden-Württemberg State Institute for the Environment).
             - 'mbank'   : MassBank documents.
+            - 'mzVault' : mzVault-based documents.
+            - 'libview' : LibraryView-based documents.
+
         path_csl (str)               : Path to the CSL file.
         path_data (str or list[str]) : File path(s) or directory path containing the MS2 data files to process.
         path_config (str)            : Path to configuration file.
-        path_extra (str or None)     : File path to supplementary data (only for format 'lanuk')
+        path_extra (str or None)     : File path to supplementary data (only for format 'libview')
     """
     # Validate all provided file paths
     if isinstance(path_data, (list, tuple)):  # If user selected multiple files

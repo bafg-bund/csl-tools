@@ -41,29 +41,29 @@ def mock_spec_adduct():
 def mock_extract_data():
     """Mocks the extracted data (DataFrame) used in process workflows."""
     data = [{
-        "var_comp": 'mock_compound',
-        "var_adduct": 'mock_adduct',
-        "var_mz": '900',
-        "var_ce": '40',
-        "var_ionization": 'mock_ionization',
-        "var_ion_mode": 'mock_ion_mode',
-        "var_rt": '22',
-        "var_inchikey": 'mock_inchikey',
-        "var_formula": 'mock_formula',
-        "var_cas": 'mock_cas',
-        "var_smiles": 'mock_smiles',
-        "var_peak": ['9.9 99.9', '7.7 77.7'],
-        "var_compgroup": 'mock_cg1;mock_cg2',
-        "var_inchi": 'mock_inchi',
+        "par_comp": 'mock_compound',
+        "par_adduct": 'mock_adduct',
+        "par_mz": '900',
+        "par_ce": '40',
+        "par_ionization": 'mock_ionization',
+        "par_ion_mode": 'mock_ion_mode',
+        "par_rt": '22',
+        "par_inchikey": 'mock_inchikey',
+        "par_formula": 'mock_formula',
+        "par_cas": 'mock_cas',
+        "par_smiles": 'mock_smiles',
+        "par_peak": ['9.9 99.9', '7.7 77.7'],
+        "par_compgroup": 'mock_cg1;mock_cg2',
+        "par_inchi": 'mock_inchi',
         "file_path": 'mock_file_path',
-        "var_chrom_method": 'mock_chrom_method',
-        "var_instrument": 'mock_instrument',
-        "var_instrument_type": 'mock_instrument_type',
-        "var_isotope": 'mock_isotope',
-        "var_col_type": 'mock_col_type',
-        "var_ce_unit": 'mock_ce_unit',
-        "var_accession": 'mock_accession',
-        "var_ces": 'mock_ces'
+        "par_chrom_method": 'mock_chrom_method',
+        "par_instrument": 'mock_instrument',
+        "par_instrument_type": 'mock_instrument_type',
+        "par_isotope": 'mock_isotope',
+        "par_col_type": 'mock_col_type',
+        "par_ce_unit": 'mock_ce_unit',
+        "par_accession": 'mock_accession',
+        "par_ces": 'mock_ces'
     }]
     return pd.DataFrame(data)
 
@@ -83,25 +83,25 @@ def mock_format_data():
 def mock_entry_df():
     """Mocks the data entry (that includes the formatted data) used in csl queries in process workflows."""
     data = {
-        "var_comp": 'mock_compound',
-        "var_mz": '900',
-        "var_ce": '40',
-        "var_ionization": 'mock_ionization',
-        "var_ion_mode": 'mock_ion_mode',
-        "var_rt": '22',
-        "var_inchikey": 'mock_inchikey',
-        "var_formula": 'mock_formula',
-        "var_cas": 'mock_cas',
-        "var_smiles": 'mock_smiles',
-        "var_peak": ['9.9 99.9', '7.7 77.7'],
+        "par_comp": 'mock_compound',
+        "par_mz": '900',
+        "par_ce": '40',
+        "par_ionization": 'mock_ionization',
+        "par_ion_mode": 'mock_ion_mode',
+        "par_rt": '22',
+        "par_inchikey": 'mock_inchikey',
+        "par_formula": 'mock_formula',
+        "par_cas": 'mock_cas',
+        "par_smiles": 'mock_smiles',
+        "par_peak": ['9.9 99.9', '7.7 77.7'],
         "file_path": 'mock_file_path',
-        "var_chrom_method": 'mock_chrom_method',
-        "var_instrument": 'mock_instrument',
-        "var_instrument_type": 'mock_instrument_type',
-        "var_isotope": 'mock_isotope',
-        "var_col_type": 'mock_col_type',
-        "var_ce_unit": 'mock_ce_unit',
-        "var_accession": 'mock_accession',
+        "par_chrom_method": 'mock_chrom_method',
+        "par_instrument": 'mock_instrument',
+        "par_instrument_type": 'mock_instrument_type',
+        "par_isotope": 'mock_isotope',
+        "par_col_type": 'mock_col_type',
+        "par_ce_unit": 'mock_ce_unit',
+        "par_accession": 'mock_accession',
         "pol_i": 'mock_form_pol',
         "comp_i": 'mock_pol_comp',
         "adduct_i": 'mock_pol_adduct',
@@ -119,7 +119,7 @@ def mock_entry_df():
         "spec_i": pd.DataFrame({'mz': [9.9, 7.7], 'int': [99.9, 77.7]}),
         "compgroup_i": ['Pesticide','Herbicide'],
         "col_type_i": "mock_col_type",
-        "var_dsrc_csl": 'mock_dsrc',
+        "par_data_source": 'mock_dsrc',
         "instrument_i": 'mock_instrument',
         "experiment_id_i": 'mock_experiment_id',
         "form_err_flag": False,
@@ -198,8 +198,8 @@ def mock_formatted_data_mbank():
 
 
 @pytest.fixture
-def mock_formatted_data_thermo():
-    """Mocks a FormattedData dataclass required for building final text chunks in the thermo export workflow."""
+def mock_formatted_data_mzvault():
+    """Mocks a FormattedData dataclass required for building final text chunks in the mzvault export workflow."""
     mock_f_data = MagicMock()
     mock_f_data.compound_name = 'Compound'
     mock_f_data.accession = 'BAFG-CSL2501225'

@@ -1,8 +1,8 @@
 # Configuration for bfg
 par_config:
-  var_isotope: 'monoisotopic'  # Type of molecular mass
-  var_ce_unit: 'V'             # Unit for collision energy
-  var_dsrc_csl: 'bfg'          # Default label for data_source.name in CSL
+  par_isotope: 'monoisotopic'  # Type of molecular mass
+  par_ce_unit: 'V'             # Unit for collision energy
+  par_data_source: 'bfg'       # Data source identifier (needs to be whitelisted in config.py)
 
 # Special adduct notation rules (optional).
 adduct_notation: {}

@@ -50,7 +50,7 @@ subparsers = parser.add_subparsers(dest='command', help='Available commands')
 # Define 'process' command and its arguments
 process_parser = subparsers.add_parser('process', help='Processes MS2 data files from a specified format and imports the data into the CSL')
 
-process_parser.add_argument('format', type=str, choices=['mbank', 'lfuby', 'lanuk', 'lubw'],  # Todo: change format to thermo and sciex
+process_parser.add_argument('format', type=str, choices=['mbank', 'mzvault', 'libview'],
                             help='Specify format')
 process_parser.add_argument('path_csl', type=str, help='Path to CSL file')
 process_parser.add_argument('path_data', type=str, nargs='?',
@@ -62,7 +62,7 @@ process_parser.add_argument('--path_extra', type=str, help='Path to supplementar
 
 # Define 'export' command and its arguments
 export_parser = subparsers.add_parser('export', help='Exports the CSL to various formats')
-export_parser.add_argument('format', type=str, choices=['thermo', 'envi', 'mbank', 'sqlite'],
+export_parser.add_argument('format', type=str, choices=['mzvault', 'envi', 'mbank', 'sqlite'],
                            help='Specify export format',)
 export_parser.add_argument('path_csl', type=str, help='Path to CSL file')
 export_parser.add_argument('path_out', type=str, help='Path to the directory where the exported file(s) will be saved.')
@@ -93,7 +93,7 @@ def main():
                 print("No file selected. Exiting.")
                 exit(1)
             args.path_config = file_path
-        if args.format == 'lanuk':
+        if args.format == 'libview':
             if not args.path_extra:
                 file_path = select_one_file('supplementary file containing compound name and retention time (.csv)')
                 if not file_path:

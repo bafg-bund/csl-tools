@@ -2,28 +2,24 @@ from csl.process_functions import FormatProcess
 from csl.process_functions.utils import *
 
 
-class LfubyProcess(FormatProcess):
+class LibviewProcess(FormatProcess):
     def process(self):
-        """Workflow to process MS2 data files from the data source lfuby (Bayerisches Landesamt für Umwelt)."""
+        """Workflow to process libview-based MS2 data files."""
         import logging
 
         logger = logging.getLogger(__name__)
-        logger.info('Executing lfuby workflow to process MS2 data files')
+        logger.info('Executing libview workflow to process MS2 data files')
 
         # Load defaults and settings
         par_config, adduct_notation = self.load_config()
-        var_fix = var_fix_lfuby()
-        if par_config['var_dsrc_csl'] == 'lubw':  # Older mzVault version
-            var_regex = var_regex_mzvault_old()
-            dsrc_def = defaults_mzvault_old()
-        else:  # mzVault version 2.3.64.0
-            var_regex = var_regex_lfuby()
-            dsrc_def = defaults_lfuby()
-        fixed_par = par_config | var_fix  # Combine constant parameters
+        par_regex = par_regex_libview()
+        par_fix = par_fix_libview()
+        defaults = defaults_libview()
+        fixed_par = par_config | par_fix
 
         # Read files
         logger.info('Reading file(s)')
-        extract_data = self.read_files(var_regex)
+        extract_data = self.read_files(par_regex)
         if not extract_data.empty:
             # Adding default information
             logger.info('Adding fixed information to extracted data')
@@ -31,7 +27,7 @@ class LfubyProcess(FormatProcess):
 
             # Processing files
             logger.info('Processing data')
-            form_data = self.process_data(extract_data_add, dsrc_def, adduct_notation)
+            form_data = self.process_data(extract_data_add, defaults, adduct_notation)
 
             # Match extracted data with CSL
             logger.info('Matching extracted experiments with CSL')
@@ -41,8 +37,9 @@ class LfubyProcess(FormatProcess):
             logger.info('Preparing to commit session changes to CSL')
             self.commit_to_csl(session, form_data_match)
 
-        logger.info('End of lfuby workflow')
+        logger.info('End of libview workflow')
 
-    def extract_data_regex(self, file, var_regex, file_extra=None):
-        """lfuby-specific data extraction."""
-        return extract_data_regex_lfuby(file, var_regex)
+
+    def extract_data_regex(self, file, par_regex, file_extra=None):
+        """libview-specific data extraction."""
+        return extract_data_regex_libview(file, par_regex, file_extra)

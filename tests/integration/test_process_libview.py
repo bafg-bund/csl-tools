@@ -8,11 +8,11 @@ from pathlib import Path
 from unittest import mock
 
 
-def test_process_sciex():
-    """Tests processing of SCIEX/LibraryView-based experiments and import into the CSL."""
+def test_process_libview():
+    """Tests processing of LibraryView-based experiments and import into the CSL."""
     # Prepare paths
-    data_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/lanuk_testfiles/LibView_testdata.sdf')
-    extra_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/lanuk_testfiles/extrafile_testdata.CSV')
+    data_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/libview_testfiles/libview_testdata.sdf')
+    extra_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/libview_testfiles/extrafile_testdata.CSV')
     csl_template_path = os.path.join(ROOT_DIR,'tests/fixtures/import/CSL_v0_4entries.db')
     csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_4entries.db')
     config_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/test_config/lanuk_config.yaml')
@@ -34,9 +34,9 @@ def test_process_sciex():
     # Copy the database file
     shutil.copy(csl_template_path, csl_copy_path)
 
-    # Process sciex workflow
+    # Process workflow
     with mock.patch('builtins.input', return_value='yes'):  # Mocks user input
-        process_data(format='lanuk', path_csl=csl_copy_path, path_data=data_path,
+        process_data(format='libview', path_csl=csl_copy_path, path_data=data_path,
                      path_config=config_path, path_extra=extra_path)
 
     # Connect to CSL database
@@ -59,11 +59,11 @@ def test_process_sciex():
         print(f"Could not delete database file: {e}")
 
 
-def test_process_replace_predicted_sciex():
+def test_process_replace_predicted_libview():
     """Tests processing of experiments with experimental RT that need to replace existing modeled RT entries."""
     # Prepare paths
-    data_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/lanuk_testfiles/LibView_replace_predicted.sdf')
-    extra_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/lanuk_testfiles/extrafile_testdata.CSV')
+    data_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/libview_testfiles/libview_replace_predicted.sdf')
+    extra_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/libview_testfiles/extrafile_testdata.CSV')
     csl_template_path = os.path.join(ROOT_DIR,'tests/fixtures/import/CSL_v0_4entries.db')
     csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_4entries.db')
     config_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/test_config/lanuk_config.yaml')
@@ -85,9 +85,9 @@ def test_process_replace_predicted_sciex():
     # Copy the database file
     shutil.copy(csl_template_path, csl_copy_path)
 
-    # Process sciex workflow
+    # Process workflow
     with mock.patch('builtins.input', return_value='yes'):  # Mocks user input
-        process_data(format='lanuk', path_csl=csl_copy_path, path_data=data_path,
+        process_data(format='libview', path_csl=csl_copy_path, path_data=data_path,
                      path_config=config_path, path_extra=extra_path)
 
     # Connect to CSL database

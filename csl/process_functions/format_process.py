@@ -29,12 +29,12 @@ class FormatProcess(ABC):
 
         return par_config, adduct_notation
 
-    def read_files(self, var_regex):
+    def read_files(self, par_regex):
         """
         Collects file paths and extracts data using format-specific regular expressions.
 
         Args:
-            var_regex (dict) : Mapping of parameters (keys) to format-specific identifiers (values) for data extraction.
+            par_regex (dict) : Mapping of parameters (keys) to format-specific identifiers (values) for data extraction.
 
         Returns:
             data_extract_all (DataFrame) : Extracted data from all files based on regular expressions.
@@ -47,7 +47,7 @@ class FormatProcess(ABC):
         # Data extraction based on the subclass-specific method and regular expressions
         data_extract_all = []
         for file in file_paths:
-            data_extract_file = self.extract_data_regex(file, var_regex, self.path_extra)
+            data_extract_file = self.extract_data_regex(file, par_regex, self.path_extra)
             data_extract_file['file_path'] = file  # Add current file path for every entry
             data_extract_all.append(data_extract_file)
 
@@ -59,14 +59,14 @@ class FormatProcess(ABC):
 
 
     @abstractmethod
-    def extract_data_regex(self, file, var_regex, file_extra):
+    def extract_data_regex(self, file, par_regex, file_extra):
         """Subclasses should implement this method to extract data."""
         pass
 
 
     # noinspection PyMethodMayBeStatic
-    def add_fixed_variables(self, extract_data, var_fix):
-        """Adds fixed information (specified in <data source>_config.py) to each entry."""
+    def add_fixed_variables(self, extract_data, par_fix):
+        """Adds fixed information (specified in <software>_process_config.py and config.yaml) to each entry."""
         import logging
 
         logger = logging.getLogger(__name__)
@@ -74,30 +74,29 @@ class FormatProcess(ABC):
         extract_data_add = extract_data
 
         # Add chromatographic method based on data source
-        dsrc = var_fix.get('var_dsrc_csl')
+        dsrc = par_fix.get('par_data_source')
         if not dsrc:
             raise ValueError("Data source is empty or missing (check your config.yaml).")
         try:
-            extract_data_add['var_chrom_method'] = DEFAULT_PAIRS_DSOURCE_CHROM[dsrc]
+            extract_data_add['par_chrom_method'] = DEFAULT_PAIRS_DSOURCE_CHROM[dsrc]
         except KeyError:
             raise ValueError(f"Chromatographic method for data source '{dsrc}' is not defined (check config.py).")
 
         # Add each parameter and its value.
-        for var in var_fix.items():
-            if var[1]:
-                extract_data_add[var[0]] = var[1]
+        for par in par_fix.items():
+            if par[1]:
+                extract_data_add[par[0]] = par[1]
             else:
-                logger.warning(f"No value for {var[0]}.")
-                extract_data_add[var[0]] = var[1]
+                logger.warning(f"No value for {par[0]}.")
+                extract_data_add[par[0]] = par[1]
 
         return extract_data_add
 
 
     # noinspection PyMethodMayBeStatic
-    def process_data(self, extract_data, dsrc_def, spec_adduct):
+    def process_data(self, extract_data, defaults, spec_adduct):
         """
-        Formats the previously extracted and collected data based in data-source-specific variables to match the
-        required format for csl-matching/commits.
+        Formats the previously extracted and collected data to match the required format for csl-matching/commits.
 
         Data entries are checked for errors and marked with flags in DataFrame:
             form_err_flag (bool)  : True : Entry has format errors. Will not enter csl-matching process.
@@ -107,7 +106,7 @@ class FormatProcess(ABC):
 
         Args:
             extract_data (DataFrame) : Extracted and collected data.
-            dsrc_def (dict)          : Data-source-specific defaults.
+            defaults (dict)          : Software-specific defaults.
             spec_adduct (dict)       : Special cases in adduct formatting.
 
         Returns:
@@ -125,25 +124,25 @@ class FormatProcess(ABC):
             entry_err = False
             entry_warn = False
 
-            logger.info(f'Compound: {entry['var_comp']}; CE: {entry['var_ce']}; File path: {entry['file_path']}')
+            logger.info(f'Compound: {entry['par_comp']}; CE: {entry['par_ce']}; File path: {entry['file_path']}')
 
             # Polarity
-            pol_i = get_polarity(entry['var_ion_mode'], dsrc_def['def_pol_p'], dsrc_def['def_pol_n'])
+            pol_i = get_polarity(entry['par_ion_mode'], defaults['def_pol_p'], defaults['def_pol_n'])
             if not pol_i:
-                logger.warning(f'Unexpected polarity type: {entry['var_ion_mode']}')
+                logger.warning(f'Unexpected polarity type: {entry['par_ion_mode']}')
                 entry_err = True
 
             # Compound and adduct name (adduct name only for <CompoundName_AdductName> notation)
-            comp_i, adduct_name = get_compound_and_adduct_name(entry['var_comp'])
+            comp_i, adduct_name = get_compound_and_adduct_name(entry['par_comp'])
             if not comp_i or not adduct_name:
                 logger.warning(
-                    f'Unexpected or missing compound/adduct name: {entry['var_comp']}.')
+                    f'Unexpected or missing compound/adduct name: {entry['par_comp']}.')
                 entry_err = True
 
             # Adduct format conversion
-            if entry['var_adduct']:  # adduct name is replaced if entry exists
-                adduct_name = entry['var_adduct']
-            adduct_i = format_adduct(adduct_name, spec_adduct, dsrc_def['def_qf'], pol_i)
+            if entry['par_adduct']:  # adduct name is replaced if entry exists
+                adduct_name = entry['par_adduct']
+            adduct_i = format_adduct(adduct_name, spec_adduct, defaults['def_qf'], pol_i)
             if not adduct_i:
                 logger.warning(f'Adduct name not detected. Check fields for compound name and ion mode.')
                 entry_err = True
@@ -151,7 +150,7 @@ class FormatProcess(ABC):
                 logger.info(f'Adduct name: {adduct_name}; Formatted adduct name: {adduct_i}')
 
             # Collision energy (CE) and collision energy spread (CES)
-            ce_i, ces_i = get_collision_energy(entry['var_ce'], entry['var_ces'])
+            ce_i, ces_i = get_collision_energy(entry['par_ce'], entry['par_ces'])
             if not ce_i:
                 logger.warning(
                     f'No collision energy (CE) or unexpected number of CE or non-equal difference in CE spread. '
@@ -160,25 +159,25 @@ class FormatProcess(ABC):
 
 
             # Ionization type
-            ionization_i = get_ionization_type(entry['var_ionization'])
+            ionization_i = get_ionization_type(entry['par_ionization'])
             if not ionization_i:
                 logger.warning('Ionization type not detected.')
                 entry_err = True
 
             # Formula
-            formula_i = get_formula(entry['var_formula'])
+            formula_i = get_formula(entry['par_formula'])
             if not formula_i:
                 logger.warning('Formula not detected.')
                 entry_err = True
 
             # InChIKey
-            inchikey_i, inchikey_main_i = get_inchikey(entry['var_inchikey'])
+            inchikey_i, inchikey_main_i = get_inchikey(entry['par_inchikey'])
             if not inchikey_i:
                 logger.warning('InChiKey not detected.')
                 entry_warn = True
 
             # CAS registry number
-            cas_i = get_cas(entry['var_cas'])
+            cas_i = get_cas(entry['par_cas'])
             if not cas_i:
                 logger.warning('CAS registry number not detected or malformed.')
                 entry_warn = True
@@ -188,7 +187,7 @@ class FormatProcess(ABC):
                 entry_err = True
 
             # SMILES
-            smiles_i = get_smiles(entry['var_smiles'])
+            smiles_i = get_smiles(entry['par_smiles'])
             if not smiles_i:
                 logger.warning('Smiles not detected.')
                 entry_err = True
@@ -200,37 +199,37 @@ class FormatProcess(ABC):
                 entry_err = True
 
             # Precursor mass
-            mz_i = get_precursor_mz(entry['var_mz'])
+            mz_i = get_precursor_mz(entry['par_mz'])
             if not mz_i:
                 logger.warning('Precursor mass not detected.')
                 entry_err = True
 
             # Retention time
-            rt_i = get_retention_time(entry['var_rt'])
+            rt_i = get_retention_time(entry['par_rt'])
             if not rt_i:
                 logger.warning('Retention time not detected.')
                 entry_err = True
 
             # Spectra / Peaks
-            spec_i = get_peaks(entry['var_peak'])
+            spec_i = get_peaks(entry['par_peak'])
             if spec_i.empty:
                 logger.warning('No spectra detected.')
                 entry_err = True
 
             # Compound group
-            compgroup_i = get_compound_group(entry['var_compgroup'])
+            compgroup_i = get_compound_group(entry['par_compgroup'])
 
             # Collision type / Fragmentation mode
-            col_type_i = get_collision_type(entry['var_col_type'])
+            col_type_i = get_collision_type(entry['par_col_type'])
             if not col_type_i:
                 logger.warning('Collision type / Fragmentation mode not detected.')
                 entry_err = True
 
             # Instrument
-            instrument_i = get_instrument(entry['var_instrument'], entry['var_instrument_type'])
+            instrument_i = get_instrument(entry['par_instrument'], entry['par_instrument_type'])
 
             # Experiment ID from accession string
-            experiment_id_i = get_experiment_id(entry['var_accession'])
+            experiment_id_i = get_experiment_id(entry['par_accession'])
 
             # Organize formatted data from one entry in dictionary
             form_data_entry = {

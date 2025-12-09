@@ -101,38 +101,38 @@ You can either run the tools via terminal commands or import and run the corresp
 ### `process`
 Processes MS2 data files from a specified format and imports data into the CSL.
 ```
-csl process <format> <path_csl> <path_data>
+csl process <format> <path_csl> <path_data> <path_config> <--path_extra>
 ```
 
 #### Arguments
 - `format`: Specify import format.   
 Choose from:
   - `mbank`: MassBank documents.
-  - `lfuby`: LfU Bayern import format (ThermoFisher/mzVault).
-  - `lubw` : LUBW import format (ThermoFisher/mzVault).
-  - `lanuk`: LANUK import format (SCIEX/LibraryView).
+  - `mzvault`: mzVault-based data files.
+  - `libview`: LibraryView-based data files.
 - `path_csl`: Path to the CSL file.
-- `path_data`: (Optional) Path to the data file or directory (Default: Opens dialog to select files).
-- `--path_extra`: (Optional, `lanuk` only) 
+- `path_data`: Path to the data file or directory (Default: Opens dialog to select files).
+- `path_config`: Path to configuration file (YAML).
+- `--path_extra`: (Optional, `libview` only) 
 Path to a supplementary file (CSV UTF-8 semicolon-separated) containing compound names and retention times required for 
 the import of LibraryView-based files. (Default: Opens dialog to select file)
 
 #### Examples
-Process data from the Bavarian Environment Agency (LfU).
+Process data exported from mzVault as NIST MSP file (.msp).
 ```
-csl process lfuby path/to/CSL.db path/to/data.txt
-```
-```python
-from csl import process_data
-process_data(format='lfuby', path_csl='path/to/CSL.db', path_data='path/to/data.txt')
-```
-Process LibraryView-based data files.
-```
-csl process lanuk path/to/CSL.db path/to/data.sdf --path_extra path/to/extra_file.csv
+csl process mzvault path/CSL.db path/data.msp path/config.yaml
 ```
 ```python
 from csl import process_data
-process_data(format='lanuk', path_csl='path/to/CSL.db', path_data='path/to/data.txt', path_extra='path/to/extra_file.csv')
+process_data(format='mzvault', path_csl='path/CSL.db', path_data='path/data.msp', path_config='path/config.yaml')
+```
+Process data exported from LibraryView as SDF file (.sdf).
+```
+csl process libview path/CSL.db path/data.sdf path/config.yaml --path_extra path/extra_file.csv
+```
+```python
+from csl import process_data
+process_data(format='libview', path_csl='path/CSL.db', path_data='path/data.sdf', path_config='path/config.yaml', path_extra='path/extra_file.csv')
 ```
 
 
@@ -145,7 +145,7 @@ csl export <format> <path_csl> <path_out> <subset>
 #### Arguments
 - `format`: Specify the export format.   
 Choose from:
-  - `thermo`: MSP/NIST export format (e.g., for importing to mzVault).
+  - `mzvault`: NIST/MSP export format (e.g., for importing to mzVault).
   - `envi`  : enviMass export format.
   - `mbank` : MassBank export format.
   - `sqlite`: SQLite export format (used to subset the CSL by a specific data source).
@@ -158,31 +158,31 @@ Choose from:
   - `all`: No subsetting (Default)
 
 #### Example
-Exports CSL-files from the data sources 'bfg' and 'uba' into the MSP/NIST format.
+Exports CSL-files from the data sources 'bfg' and 'uba' into the NIST/MSP format.
 ```
-csl export thermo path/to/CSL.db path/to/output_dir bfg uba
+csl export mzvault path/CSL.db path/output_dir bfg uba
 ```
 ```python
 from csl import export_data
-export_data(format='thermo', path_csl='path/to/CSL.db', path_out='path/to/output_dir', subset=['bfg', 'uba'])
+export_data(format='mzvault', path_csl='path/CSL.db', path_out='path/output_dir', subset=['bfg', 'uba'])
 ```
 
-Exports all CSL-files into the MSP/NIST format.
+Exports all CSL-files into the NIST/MSP format.
 ```
-csl export thermo path/to/CSL.db path/to/output_dir
+csl export mzvault path/CSL.db path/output_dir
 ```
 ```python
 from csl import export_data
-export_data(format='thermo', path_csl='path/to/CSL.db', path_out='path/to/output_dir')
+export_data(format='mzvault', path_csl='path/CSL.db', path_out='path/output_dir')
 ```
 
 Exports CSL-files from the data source 'bfg' into the MassBank format.
 ```
-csl export mbank path/to/CSL.db path/to/output_dir bfg
+csl export mbank path/CSL.db path/output_dir bfg
 ```
 ```python
 from csl import export_data
-export_data(format='mbank', path_csl='path/to/CSL.db', path_out='path/to/output_dir', subset='bfg')
+export_data(format='mbank', path_csl='path/CSL.db', path_out='path/output_dir', subset='bfg')
 ```
 
 
@@ -200,11 +200,11 @@ csl rtscan <operation> <path_csl>
 
 #### Example
 ```
-csl rtscan update path/to/CSL.db
+csl rtscan update path/CSL.db
 ```
 ```python
 from csl import scan_rt
-scan_rt(operation='update', path_csl='path/to/CSL.db')
+scan_rt(operation='update', path_csl='path/CSL.db')
 ```
 
 ### Notes

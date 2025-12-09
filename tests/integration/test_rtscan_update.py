@@ -36,7 +36,7 @@ def test_rtscan_update():
     # Copy the database file
     shutil.copy(csl_template_path, csl_copy_path)
 
-    # Rtscan update workflow
+    # Rtscan workflow
     with mock.patch('builtins.input', return_value='yes'):  # Mocks user input
         scan_rt(operation='update', path_csl=csl_copy_path)
 

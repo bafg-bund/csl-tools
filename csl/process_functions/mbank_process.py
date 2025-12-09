@@ -12,14 +12,14 @@ class MbankProcess(FormatProcess):
 
         # Load defaults and settings
         par_config, adduct_notation = self.load_config()
-        var_regex = var_regex_mbank()
-        var_fix = var_fix_mbank()
+        par_regex = par_regex_mbank()
+        par_fix = par_fix_mbank()
         dsrc_def = defaults_mbank()
-        fixed_par = par_config | var_fix
+        fixed_par = par_config | par_fix
 
         # Read files
         logger.info('Reading file(s)')
-        extract_data = self.read_files(var_regex)
+        extract_data = self.read_files(par_regex)
         if not extract_data.empty:
             # Adding default information
             logger.info('Adding fixed information to extracted data')
@@ -40,6 +40,6 @@ class MbankProcess(FormatProcess):
         logger.info('End of mbank workflow')
 
 
-    def extract_data_regex(self, file, var_regex, file_extra=None):
+    def extract_data_regex(self, file, par_regex, file_extra=None):
         """mbank-specific data extraction."""
-        return extract_data_regex_mbank(file, var_regex)
+        return extract_data_regex_mbank(file, par_regex)

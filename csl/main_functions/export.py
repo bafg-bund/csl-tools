@@ -2,10 +2,10 @@
 Main function to export CSL data as various formats.
 
 Export classes:
-    thermo : Workflow for exporting the CSL as a file readable by mzVault (.msp).
-    envi   : Workflow for exporting the CSL as a file usable for enviMass (.csv).
-    mbank  : Workflow for exporting the CSL as Massbank documents (.txt).
-    sqlite : Workflow for exporting a subset of the CSL as SQLite file (.db).
+    mzvault : Workflow for exporting the CSL as a file readable by mzVault (.msp).
+    envi    : Workflow for exporting the CSL as a file usable for enviMass (.csv).
+    mbank   : Workflow for exporting the CSL as Massbank documents (.txt).
+    sqlite  : Workflow for exporting a subset of the CSL as SQLite file (.db).
 """
 from csl.utils import validate_file_path, setup_logger
 from csl.export_functions import *
@@ -23,7 +23,7 @@ setup_logger(log_fpath)  # Sets basic logger configuration and adds stream handl
 
 # Define export workflow dictionary
 WORKFLOWS = {
-    "thermo": ThermoExport,
+    "mzvault": MzvaultExport,
     "envi": EnviExport,
     "mbank": MbankExport,
     "sqlite": SqliteExport
@@ -36,7 +36,7 @@ def export_data(format: str, path_csl: str, path_out: str, subset: str or list[s
 
     Args:
         format (str)   : Export format. Choose from:
-            - 'thermo' : File readable by mzVault (.msp).
+            - 'mzvault' : File readable by mzVault (.msp).
             - 'envi'   : File usable for enviMass (.csv).
             - 'mbank'  : MassBank documents (.txt).
             - 'sqlite' : Subset of the CSL as SQLite file (.db).
