@@ -133,7 +133,8 @@ def add_exp_to_session(session, entry):
     file_path = entry['file_path']
 
     # Log compound name, adduct and file path for reference
-    logger.info(f"Compound: {comp_i}; CE: {ce_i}; File path: {file_path}")
+    logger.info(f'Compound: {entry['par_comp']}; Instr.: {entry['par_instrument']}; '
+                f'Ion mode: {entry['par_ion_mode']}; CE: {entry['par_ce']}; File path: {entry['file_path']}')
 
     # Check if the data source exists (e.g., 'UBA', 'BfG') in the CSL and add it if necessary.
     data_src = session.query(DataSource).filter_by(name=dsrc_csl_def).one_or_none()

@@ -124,7 +124,8 @@ class FormatProcess(ABC):
             entry_err = False
             entry_warn = False
 
-            logger.info(f'Compound: {entry['par_comp']}; CE: {entry['par_ce']}; File path: {entry['file_path']}')
+            logger.info(f'Compound: {entry['par_comp']}; Instr.: {entry['par_instrument']}; '
+                        f'Ion mode: {entry['par_ion_mode']}; CE: {entry['par_ce']}; File path: {entry['file_path']}')
 
             # Instrument
             instrument_i = get_instrument(entry['par_instrument'], entry['par_instrument_type'])

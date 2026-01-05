@@ -2,7 +2,7 @@
 Main function to export CSL data as various formats.
 
 Export classes:
-    mzvault : Workflow for exporting the CSL as a file readable by mzVault (.msp).
+    mzvault : Workflow for exporting the CSL as a file readable by mzVault/ThermoFisher (.msp).
     envi    : Workflow for exporting the CSL as a file usable for enviMass (.csv).
     mbank   : Workflow for exporting the CSL as Massbank documents (.txt).
     sqlite  : Workflow for exporting a subset of the CSL as SQLite file (.db).

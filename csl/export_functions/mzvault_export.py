@@ -9,13 +9,12 @@ class MzvaultExport(FormatExport):
     def export(self):
         """Workflow to export CSL data to a text file."""
         import os.path
-        from collections import defaultdict
         from datetime import datetime
         from tqdm import tqdm
         import logging
 
         logger = logging.getLogger(__name__)
-        logger.info('Executing export workflow for MSP/NIST documents (mzvault workflow)')
+        logger.info('Executing export workflow for mzVault documents')
 
         # Connect to the CSL database
         session = create_session(self.path_csl)
