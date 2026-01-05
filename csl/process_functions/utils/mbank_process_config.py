@@ -40,6 +40,9 @@ def par_regex_mbank():
 
         # Optional in CSL but mandatory in MassBank
         'par_accession': 'ACCESSION:',                                 # MassBank accession string
+
+        # Other
+        'par_exact_mass': 'CH\\$EXACT_MASS:'                           # Exact mass
     }
     return mbank_par_regex
 

@@ -66,10 +66,11 @@ def par_fix_mzvault():
     These parameters are non-extractable and do not change across data files (software-specific).
     """
     mzvault_par_fix = {
-        'par_adduct': None,     # Adduct
-        'par_inchi': None,      # InChI
-        'par_accession': None,  # Accession string (used in MassBank)
-        'par_ces': None         # Collision energy spread
+        'par_adduct': None,      # Adduct
+        'par_inchi': None,       # InChI
+        'par_accession': None,   # Accession string (used in MassBank)
+        'par_ces': None,         # Collision energy spread
+        'par_exact_mass': None,  # Exact mass
     }
     return mzvault_par_fix
 

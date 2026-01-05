@@ -523,3 +523,26 @@ def get_experiment_id(data_accession):
     else:
         experiment_id_i = None
     return experiment_id_i
+
+
+def get_exact_mass_adduct_mass(data_exact_mass, smiles_i, data_mz):
+    """Returns exact mass and adduct mass. Calculates exact mass from SMILES if necessary."""
+    from rdkit import Chem
+    from rdkit.Chem import Descriptors
+
+    # Get exact mass from extracted data or calculate via smiles
+    if data_exact_mass:
+        exact_mass = float(data_exact_mass)
+    elif smiles_i:
+        mol = Chem.MolFromSmiles(smiles_i)
+        exact_mass = Descriptors.ExactMolWt(mol)
+    else:
+        exact_mass = None
+
+    # Calculate adduct mass
+    if exact_mass and data_mz:
+        adduct_mass = float(data_mz) - exact_mass
+    else:
+        adduct_mass = None
+
+    return exact_mass, adduct_mass

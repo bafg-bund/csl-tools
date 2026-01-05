@@ -4,6 +4,7 @@ from unittest.mock import patch
 import os
 import tempfile
 import pandas as pd
+import math
 
 
 @pytest.mark.parametrize("mock_data_paths, mock_isfile, expected_file_paths",
@@ -225,3 +226,22 @@ def test_get_experiment_id(data_accession, expected_experiment_id_i):
     """Tests the function with parametrized inputs."""
     experiment_id_i = get_experiment_id(data_accession)
     assert experiment_id_i == expected_experiment_id_i
+
+
+@pytest.mark.parametrize("data_exact_mass, smiles_i, data_mz, expected_exact_mass, expected_adduct_mass",
+                         [('90.90', None, '91.90', 90.90, 1.00),
+                          ('60.02', 'CC(=O)O', '61.04', 60.02, 1.02),
+                          (None, 'CC(=O)O', '61.04', 60.02, 1.02),
+                          (None, None, '61.04', None, None),
+                          ('60.02', None, None, 60.02, None)])
+def test_get_exact_mass_adduct_mass(data_exact_mass, smiles_i, data_mz, expected_exact_mass, expected_adduct_mass):
+    """Tests the function with parametrized inputs."""
+    exact_mass, adduct_mass = get_exact_mass_adduct_mass(data_exact_mass, smiles_i, data_mz)
+    if exact_mass is None:
+        assert expected_exact_mass is None
+    else:
+        assert math.isclose(exact_mass, expected_exact_mass, rel_tol=1e-2)
+    if adduct_mass is None:
+        assert expected_adduct_mass is None
+    else:
+        assert math.isclose(adduct_mass, expected_adduct_mass, rel_tol=1e-2)

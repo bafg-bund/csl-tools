@@ -40,7 +40,9 @@ class TestFormatProcess:
              patch('csl.process_functions.format_process.get_compound_group',
                       return_value=['Pesticide', 'Herbicide']), \
              patch('csl.process_functions.format_process.get_instrument', return_value='instrument'), \
-             patch('csl.process_functions.format_process.get_experiment_id', return_value='experiment_id'):
+             patch('csl.process_functions.format_process.get_experiment_id', return_value='experiment_id'), \
+             patch('csl.process_functions.format_process.get_exact_mass_adduct_mass',
+                   return_value=([9.9], [1.0])):
 
             # Call the process_data method
             form_data = workflow.process_data(mock_extract_data, mock_dsrc_def, mock_spec_adduct)
@@ -75,7 +77,9 @@ class TestFormatProcess:
              patch('csl.process_functions.format_process.get_compound_group',
                   return_value=['Pesticide', 'Herbicide']), \
              patch('csl.process_functions.format_process.get_instrument', return_value='instrument'), \
-             patch('csl.process_functions.format_process.get_experiment_id', return_value='experiment_id'):
+             patch('csl.process_functions.format_process.get_experiment_id', return_value='experiment_id'), \
+                patch('csl.process_functions.format_process.get_exact_mass_adduct_mass',
+                      return_value=([9.9], [1.0])):
 
             # Call the method
             form_data = workflow.process_data(mock_extract_data, mock_dsrc_def, mock_spec_adduct)

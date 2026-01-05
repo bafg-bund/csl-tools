@@ -20,16 +20,17 @@ def par_regex_libview():
     the molblock and retention time (par_rt) is extracted from supplementary data.
     """
     libview_par_regex = {
-        'par_molblock': 'V2000',               # Molblock
-        'par_comp': 'NAME',                    # Compound Name
-        'par_cas': 'CASNO',                    # CAS registry number
-        'par_formula': 'FORMULA',              # Molecular formula
-        'par_mz': 'PRECURSOR M/Z',             # Precursor m/z
-        'par_ce': 'COLLISION ENERGY',          # Collision energy
-        'par_ces': 'COLLISION ENERGY SPREAD',  # Collision energy spread
-        'par_ion_mode': 'ION MODE',            # Type of operation mode
-        'par_instrument': 'INSTRUMENT',        # Instrument name
-        'par_peak': 'MASS SPECTRAL PEAKS',     # Mass spectral peaks
+        'par_molblock': 'V2000',                # Molblock
+        'par_comp': 'NAME',                     # Compound Name
+        'par_cas': 'CASNO',                     # CAS registry number
+        'par_formula': 'FORMULA',               # Molecular formula
+        'par_mz': 'PRECURSOR M/Z',              # Precursor m/z
+        'par_ce': 'COLLISION ENERGY',           # Collision energy
+        'par_ces': 'COLLISION ENERGY SPREAD',   # Collision energy spread
+        'par_ion_mode': 'ION MODE',             # Type of operation mode
+        'par_instrument': 'INSTRUMENT',         # Instrument name
+        'par_peak': 'MASS SPECTRAL PEAKS',      # Mass spectral peaks
+        'par_exact_mass': 'MONOISOTOPIC MASS',  # Exact mass
     }
     return libview_par_regex
 

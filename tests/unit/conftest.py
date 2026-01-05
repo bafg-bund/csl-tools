@@ -63,7 +63,8 @@ def mock_extract_data():
         "par_col_type": 'mock_col_type',
         "par_ce_unit": 'mock_ce_unit',
         "par_accession": 'mock_accession',
-        "par_ces": 'mock_ces'
+        "par_ces": 'mock_ces',
+        "par_exact_mass": 'mock_exact_mass'
     }]
     return pd.DataFrame(data)
 

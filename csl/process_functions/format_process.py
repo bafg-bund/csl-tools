@@ -235,6 +235,9 @@ class FormatProcess(ABC):
             # Experiment ID from accession string
             experiment_id_i = get_experiment_id(entry['par_accession'])
 
+            # Get exact mass and adduct mass (not for CSL, but for checking)
+            exact_mass, adduct_mass = get_exact_mass_adduct_mass(entry['par_exact_mass'], smiles_i, entry['par_mz'])
+
             # Organize formatted data from one entry in dictionary
             form_data_entry = {
                 'pol_i': pol_i,
@@ -256,6 +259,8 @@ class FormatProcess(ABC):
                 'col_type_i': col_type_i,
                 'instrument_i': instrument_i,
                 'experiment_id_i': experiment_id_i,
+                'exact_mass': exact_mass,
+                'adduct_mass': adduct_mass,
                 'form_err_flag': entry_err,
                 'form_warn_flag': entry_warn
             }
@@ -265,7 +270,7 @@ class FormatProcess(ABC):
         form_data_entry_df = pd.DataFrame(form_data_entry_all)
 
         # Merge DataFrames along columns
-        form_data = pd.concat(objs=[extract_data, form_data_entry_df], axis='columns')
+        form_data = pd.concat(objs=[extract_data.reset_index(drop=True), form_data_entry_df.reset_index(drop=True)], axis='columns')
 
         return form_data
 
