@@ -8,6 +8,7 @@ from .mbank_export_utils import (get_exp_ids_mbank, extract_experiment_chunk_mba
                                  format_spectrum_mbank, format_formula_mbank, get_ion_mode_mbank,
                                  get_fragmentation_mode_mbank, get_accession_mbank)
 from .mzvault_export_utils import extract_experiment_chunk_mzvault
+from .libview_export_utils import extract_experiment_chunk_libview
 from .envi_export_config import (skip_compounds_envi, default_sql_query_filter_envi, adduct_name_pairs_envi,
                                  additional_columns_with_def_values_envi, column_names_order_envi)
 from .envi_export_utils import (sql_query_with_filters_envi, process_data_entry_envi, get_compound_name_envi,
@@ -41,6 +42,8 @@ __all__ = [
     "get_accession_mbank",
     # mzvault utils
     "extract_experiment_chunk_mzvault",
+    # libview utils
+    "extract_experiment_chunk_libview",
     # envi config
     "skip_compounds_envi",
     "default_sql_query_filter_envi",
