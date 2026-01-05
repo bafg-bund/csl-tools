@@ -3,7 +3,7 @@ par_config:
   par_isotope: 'monoisotopic'             # Type of molecular mass
   par_col_type: 'HCD'                     # Collision type
   par_ce_unit: 'V'                        # Unit for collision energy
-  par_instrument: 'QExactive'             # Instrument name
+  par_instrument: 'QExactive Thermo'      # Instrument name
   par_instrument_type: 'LC-ESI-Orbitrap'  # Instrument type
   par_data_source: 'lfuby'                # Data source identifier (needs to be whitelisted in config.py)
 

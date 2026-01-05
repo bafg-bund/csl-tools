@@ -71,7 +71,7 @@ NewSubstance1
 P
 
 >  <INSTRUMENT>
-TripleTOF 6600
+TripleTOF 6600 SCIEX
 
 >  <COLLISION ENERGY>
 40
@@ -173,7 +173,7 @@ SynonymSubstance
 P
 
 >  <INSTRUMENT>
-5500 Q TRAP
+TripleTOF 6600 SCIEX
 
 >  <COLLISION ENERGY>
 35
@@ -276,7 +276,7 @@ NewSubstance2
 P
 
 >  <INSTRUMENT>
-TripleTOF 6600
+TripleTOF 6600 SCIEX
 
 >  <COLLISION ENERGY>
 40
