@@ -126,6 +126,13 @@ class FormatProcess(ABC):
 
             logger.info(f'Compound: {entry['par_comp']}; CE: {entry['par_ce']}; File path: {entry['file_path']}')
 
+            # Instrument
+            instrument_i = get_instrument(entry['par_instrument'], entry['par_instrument_type'])
+            if not instrument_i:
+                logger.error(f"Instrument (name: {entry['par_instrument']}, type: {entry['par_instrument_type']}) not on whitelist. Skipping entry.")
+                extract_data = extract_data.drop(index)
+                continue
+
             # Polarity
             pol_i = get_polarity(entry['par_ion_mode'], defaults['def_pol_p'], defaults['def_pol_n'])
             if not pol_i:
@@ -224,9 +231,6 @@ class FormatProcess(ABC):
             if not col_type_i:
                 logger.warning('Collision type / Fragmentation mode not detected.')
                 entry_err = True
-
-            # Instrument
-            instrument_i = get_instrument(entry['par_instrument'], entry['par_instrument_type'])
 
             # Experiment ID from accession string
             experiment_id_i = get_experiment_id(entry['par_accession'])

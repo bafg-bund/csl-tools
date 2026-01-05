@@ -1,3 +1,5 @@
+from csl.config import WHITELIST_INSTR_NAME_TYPE
+
 def get_file_paths(data_path):
     """
     Returns file paths in correct format.
@@ -457,21 +459,45 @@ def get_collision_type(data_col_type):
     return col_type_i
 
 
-def get_instrument(data_instrument, data_instrument_type):
+def get_instrument(data_instrument=None, data_instrument_type=None):
     """
     Returns a string representing the instrument identifier.
 
     Args:
         data_instrument (str) : Instrument name or instrument type + name.
-        data_instrument_type (str or None) : Instrument type.
+        data_instrument_type (str) : Instrument type.
 
     Returns:
         instrument_i (str) : Formatted instrument identifier.
     """
-    if data_instrument and data_instrument_type:
-        instrument_i = f"{data_instrument_type} {data_instrument}"
-    elif data_instrument:
-        instrument_i = data_instrument
+    # Normalize inputs
+    instr = data_instrument or ""
+    instr_type = data_instrument_type or ""
+    instr = instr.strip()
+    instr_type = instr_type.strip()
+
+    # Check if instrument name contains type
+    detected_type = None
+    for t in set(WHITELIST_INSTR_NAME_TYPE.values()):
+        if instr.startswith(t+" "):
+            detected_type = t
+            instr = instr[len(t):].strip()
+
+    # Set instrument name
+    instr_name = instr if instr in WHITELIST_INSTR_NAME_TYPE.keys() else None
+
+    # Set instrument type
+    if detected_type:
+        instr_type_final = detected_type
+    else:
+        instr_type_final = instr_type if instr_type else None
+    instr_type_final = instr_type_final if instr_type_final in WHITELIST_INSTR_NAME_TYPE.values() else None
+
+    # Construct full instrument identifier
+    if instr_name and instr_type_final:
+        instrument_i = f"{instr_type_final} {instr_name}"
+    elif instr_name:
+        instrument_i = f"{WHITELIST_INSTR_NAME_TYPE[instr_name]} {instr_name}"
     else:
         instrument_i =  None
     return instrument_i

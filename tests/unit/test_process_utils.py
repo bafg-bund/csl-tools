@@ -208,7 +208,11 @@ def test_get_collision_type(data_col_type, expected_col_type_i):
 @pytest.mark.parametrize("data_instrument, data_instrument_type, expected_instrument_i",
                          [('TripleTOF 5600 SCIEX', 'LC-ESI-QTOF', 'LC-ESI-QTOF TripleTOF 5600 SCIEX'),
                           ('LC-ESI-QTOF TripleTOF 5600 SCIEX', None, 'LC-ESI-QTOF TripleTOF 5600 SCIEX'),
-                          ('QExactive','LC-ESI-Orbitrap','LC-ESI-Orbitrap QExactive')])
+                          ('QExactive Thermo', None, 'LC-ESI-Orbitrap QExactive Thermo'),
+                          ('Invalid instrument', None, None),
+                          ('Invalid instrument', 'Invalid type', None),
+                          ('TripleTOF 5600 SCIEX', 'Invalid type', 'LC-ESI-QTOF TripleTOF 5600 SCIEX'),
+                          ('Invalid instrument', 'LC-ESI-QTOF', None)])
 def test_get_instrument(data_instrument, data_instrument_type, expected_instrument_i):
     """Tests the function with parametrized inputs."""
     instrument_i = get_instrument(data_instrument, data_instrument_type)
