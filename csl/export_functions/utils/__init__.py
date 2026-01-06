@@ -1,5 +1,5 @@
 from .export_utils import (SqlQueryResult, get_chrom_methods, get_experiment_ids_by_data_src,
-                           sql_queries_by_exp_id_chrom_method, sql_bulk_queries_by_exp_ids_chrom_method,
+                           sql_bulk_queries_by_exp_ids_chrom_method,
                             sql_bulk_queries_by_exp_ids,
                            get_experiment_ids_by_chrom_method, get_precursor_charge, get_spectrum, get_splash_code,
                            get_compound_classes, get_contributors_copyright)
@@ -20,7 +20,6 @@ __all__ = [
     "SqlQueryResult",
     "get_chrom_methods",
     "get_experiment_ids_by_data_src",
-    "sql_queries_by_exp_id_chrom_method",
     "sql_bulk_queries_by_exp_ids",
     "get_experiment_ids_by_chrom_method",
     "sql_bulk_queries_by_exp_ids_chrom_method",

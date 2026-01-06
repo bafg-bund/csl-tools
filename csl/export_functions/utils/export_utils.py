@@ -102,43 +102,6 @@ def get_experiment_ids_by_chrom_method(session, chrom_method, predicted=None):
     return experiment_ids
 
 
-def sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method):
-    """
-    Queries the CSL database for experiment data and related metadata based on the experiment ID and method.
-
-    Args:
-        session (obj)      : SQLAlchemy session object connected to the CSL database.
-        exp_id (int)       : Experiment ID used to query the database.
-        chrom_method (str) : Chromatographic method identifier.
-
-    Returns:
-        SqlQueryResult (dataclass) : Dataclass containing the queried experiment data and metadata.
-    """
-    from sqlalchemy.orm import joinedload
-
-    # Get experiment table and preload related tables
-    experiment = session.query(Experiment).filter_by(experiment_id=exp_id) \
-        .options(joinedload(Experiment.compound),
-                 joinedload(Experiment.parameter),
-                 joinedload(Experiment.fragments),
-                 joinedload(Experiment.data_source)) \
-        .one()
-    compound = experiment.compound
-    parameter = experiment.parameter
-    fragments = experiment.fragments
-    data_source = experiment.data_source
-
-    # Get compound groups
-    compound_groups = session.query(CompoundGroup.name).join(CompoundGroupMap) \
-        .filter(CompoundGroupMap.c.compound_id == compound.compound_id).all()
-
-    # Get retention times
-    retention_time = session.query(RetentionTime).filter_by(compound_id=compound.compound_id,
-                                                            chrom_method=chrom_method).first()
-
-    return SqlQueryResult(experiment, compound, parameter, fragments, data_source, compound_groups, retention_time)
-
-
 def sql_bulk_queries_by_exp_ids_chrom_method(session, exp_ids, chrom_method):
     """
     Queries the CSL for experiment data and related metadata based on experiment IDs. Includes retention times only for

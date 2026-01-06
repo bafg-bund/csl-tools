@@ -1,4 +1,4 @@
-from .process_utils import get_file_paths, match_file_paths, get_user_choice
+from .process_utils import get_file_paths, match_file_paths
 from .process_utils import (get_polarity, get_compound_and_adduct_name, format_adduct, get_collision_energy,
                             get_ionization_type, get_formula, get_inchikey, get_cas, get_smiles, get_inchi_from_smiles,
                             get_precursor_mz, get_retention_time, get_peaks, get_compound_group, get_collision_type,
@@ -16,7 +16,6 @@ __all__ = [
     # process_utils
     "get_file_paths",
     "match_file_paths",
-    "get_user_choice",
     "get_polarity",
     "get_compound_and_adduct_name",
     "format_adduct",

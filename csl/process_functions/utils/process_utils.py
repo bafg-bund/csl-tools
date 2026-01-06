@@ -58,36 +58,6 @@ def match_file_paths(path_dir, fstr_id=None):
     return files
 
 
-def get_user_choice(options, message):
-    """
-    Lets user choose between options and returns the choice. User can manually enter string.
-
-    Args:
-        options (list of str) : Options
-        message (str) : Custom message for presenting the options.
-
-    Returns:
-        str : Chosen string
-    """
-
-    print(f"{message}:")
-
-    for idx, key in enumerate(options, 1):
-        print(f"{idx}. {key}")
-    print(f"{len(options) + 1}. Enter string manually")
-
-    while True:
-        choice = input("Enter number: ").strip()
-        if choice.isdigit():
-            choice = int(choice)
-            if 1 <= choice <= len(options):
-                return options[choice - 1]
-            elif choice == len(options) + 1:
-                return input("Enter your string: ").strip()
-
-        print("Invalid choice. Please enter a valid number.")
-
-
 def get_polarity(data_ionmode, pol_p_def, pol_n_def):
     """
     Determines polarity based on default identifier and formats polarity according to CSL requirements.
