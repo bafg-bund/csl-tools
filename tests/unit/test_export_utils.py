@@ -138,6 +138,7 @@ def test_get_experiment_ids_by_data_src(data_source, expected_exp_id):
                          [('bfg_nts_rp1', None, [34030, 12249, 14224, 31447]),
                           ('bfg_nts_rp1', False, [34030, 12249, 14224]),
                           ('bfg_nts_rp1', True, [31447]),
+                          ('bfg_nts_rp1', "True", [31447]),
                           ('lfuby_nts_rp1', False, [34030, 14224]),
                           ('uba_nts_rp1', False, [31447]),
                           ('lanuk_nts_rp1', False, []),

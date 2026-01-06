@@ -1,6 +1,6 @@
 from csl.process_functions.format_process import FormatProcess
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import pandas as pd
 
 
@@ -20,7 +20,8 @@ class TestFormatProcess:
     def test_process_data(self, workflow, mock_extract_data, mock_dsrc_def, mock_spec_adduct):
         """Tests processing of sample data without creating warning or error flags."""
 
-        with patch('csl.process_functions.format_process.get_polarity', return_value='polarity'), \
+        with patch('csl.process_functions.format_process.get_instrument', return_value='instrument'), \
+             patch('csl.process_functions.format_process.get_polarity', return_value='polarity'), \
              patch('csl.process_functions.format_process.get_compound_and_adduct_name',
                       return_value=('comp', 'adduct')), \
              patch('csl.process_functions.format_process.format_adduct', return_value='formatted_adduct'), \
@@ -39,7 +40,7 @@ class TestFormatProcess:
                       return_value=pd.DataFrame({'peak': [9.9, 9.9, 9.9]})), \
              patch('csl.process_functions.format_process.get_compound_group',
                       return_value=['Pesticide', 'Herbicide']), \
-             patch('csl.process_functions.format_process.get_instrument', return_value='instrument'), \
+             patch('csl.process_functions.format_process.get_collision_type', return_value='col_type'), \
              patch('csl.process_functions.format_process.get_experiment_id', return_value='experiment_id'), \
              patch('csl.process_functions.format_process.get_exact_mass_adduct_mass',
                    return_value=([9.9], [1.0])):
@@ -58,7 +59,8 @@ class TestFormatProcess:
     def test_process_data_inchi_cas_none(self, workflow, mock_extract_data, mock_dsrc_def, mock_spec_adduct):
         """Tests processing of sample data with missing InChIKey and CAS."""
 
-        with patch('csl.process_functions.format_process.get_polarity',return_value='polarity'), \
+        with patch('csl.process_functions.format_process.get_instrument', return_value='instrument'), \
+             patch('csl.process_functions.format_process.get_polarity',return_value='polarity'), \
              patch('csl.process_functions.format_process.get_compound_and_adduct_name',
                    return_value=('comp', 'adduct')), \
              patch('csl.process_functions.format_process.format_adduct',return_value='formatted_adduct'), \
@@ -76,13 +78,52 @@ class TestFormatProcess:
                   return_value=pd.DataFrame({'peak': [9.9, 9.9, 9.9]})), \
              patch('csl.process_functions.format_process.get_compound_group',
                   return_value=['Pesticide', 'Herbicide']), \
-             patch('csl.process_functions.format_process.get_instrument', return_value='instrument'), \
+             patch('csl.process_functions.format_process.get_collision_type', return_value='col_type'), \
              patch('csl.process_functions.format_process.get_experiment_id', return_value='experiment_id'), \
-                patch('csl.process_functions.format_process.get_exact_mass_adduct_mass',
+             patch('csl.process_functions.format_process.get_exact_mass_adduct_mass',
                       return_value=([9.9], [1.0])):
 
             # Call the method
             form_data = workflow.process_data(mock_extract_data, mock_dsrc_def, mock_spec_adduct)
+
+            # Assert that the returned data is a DataFrame and contains the expected flags
+            assert isinstance(form_data, pd.DataFrame)
+            assert 'form_err_flag' in form_data.columns
+            assert 'form_warn_flag' in form_data.columns
+            assert all(form_data['form_err_flag']) is True
+            assert all(form_data['form_warn_flag']) is True
+
+
+    def test_process_data_all_err(self, workflow, mock_extract_data, mock_dsrc_def, mock_spec_adduct):
+        """Tests all errors with logger warnings where processing continues."""
+        mock_logger = MagicMock()
+        with patch("logging.getLogger", return_value=mock_logger), \
+             patch('csl.process_functions.format_process.get_instrument', return_value='instrument'), \
+             patch('csl.process_functions.format_process.get_polarity',return_value=None), \
+             patch('csl.process_functions.format_process.get_compound_and_adduct_name',
+                   return_value=(None, None)), \
+             patch('csl.process_functions.format_process.format_adduct',return_value=None), \
+             patch('csl.process_functions.format_process.get_collision_energy',
+                   return_value=(None, None)), \
+             patch('csl.process_functions.format_process.get_ionization_type', return_value=None), \
+             patch('csl.process_functions.format_process.get_formula', return_value=None), \
+             patch('csl.process_functions.format_process.get_inchikey', return_value=(None, None)), \
+             patch('csl.process_functions.format_process.get_cas', return_value=None), \
+             patch('csl.process_functions.format_process.get_smiles', return_value=None), \
+             patch('csl.process_functions.format_process.get_inchi_from_smiles', return_value=None), \
+             patch('csl.process_functions.format_process.get_precursor_mz', return_value=None), \
+             patch('csl.process_functions.format_process.get_retention_time', return_value=None), \
+             patch('csl.process_functions.format_process.get_peaks', return_value=pd.DataFrame({'peak': []})), \
+             patch('csl.process_functions.format_process.get_compound_group', return_value=[]), \
+             patch('csl.process_functions.format_process.get_collision_type', return_value=None), \
+             patch('csl.process_functions.format_process.get_experiment_id', return_value=None), \
+             patch('csl.process_functions.format_process.get_exact_mass_adduct_mass', return_value=(None, None)):
+
+            # Call the method
+            form_data = workflow.process_data(mock_extract_data, mock_dsrc_def, mock_spec_adduct)
+
+            # Assert the number of logger warning calls
+            assert mock_logger.warning.call_count == 14
 
             # Assert that the returned data is a DataFrame and contains the expected flags
             assert isinstance(form_data, pd.DataFrame)
@@ -152,17 +193,7 @@ class TestFormatProcess:
                                                 'csl_err_flag': [False, False],
                                                 'csl_add_flag': [True, True]}),
                                   'yes'),
-                                 # Case 2: One error flag; One data entry eligible for CSL commit; User confirms
-                                 (pd.DataFrame({'comp_i': ['compound1', 'compound2'],
-                                                'ce_i': ['40', '30'],
-                                                'file_path': ['file1', 'file2'],
-                                                'form_err_flag': [False, False],
-                                                'form_warn_flag': [False, False],
-                                                'csl_dupl_flag': [False, False],
-                                                'csl_err_flag': [False, True],
-                                                'csl_add_flag': [True, False]}),
-                                  'yes'),
-                                 # Case 3: All data entries eligible for CSL commit; User cancels;
+                                 # Case 2: All data entries eligible for CSL commit; User cancels;
                                  (pd.DataFrame({'comp_i': ['compound1', 'compound2'],
                                                 'ce_i': ['40', '30'],
                                                 'file_path': ['file1', 'file2'],
@@ -172,13 +203,24 @@ class TestFormatProcess:
                                                 'csl_err_flag': [False, False],
                                                 'csl_add_flag': [True, True]}),
                                   'any_other_input'),
-                                 # Case 4: No data entries are eligible for CSL commit;
+                                 # Case 3: One error; One format warning entry eligible for CSL commit; User confirms;
                                  (pd.DataFrame({'comp_i': ['compound1', 'compound2'],
                                                 'ce_i': ['40', '30'],
                                                 'file_path': ['file1', 'file2'],
                                                 'form_err_flag': [False, False],
+                                                'form_warn_flag': [False, True],
+                                                'csl_dupl_flag': [False, False],
+                                                'csl_err_flag': [True, False],
+                                                'csl_add_flag': [False, True]}),
+                                  'yes'),
+
+                                 # Case 4: One duplicate, One format error; No data entries are eligible for CSL commit;
+                                 (pd.DataFrame({'comp_i': ['compound1', 'compound2'],
+                                                'ce_i': ['40', '30'],
+                                                'file_path': ['file1', 'file2'],
+                                                'form_err_flag': [False, True],
                                                 'form_warn_flag': [False, False],
-                                                'csl_dupl_flag': [True, True],
+                                                'csl_dupl_flag': [True, False],
                                                 'csl_err_flag': [False, False],
                                                 'csl_add_flag': [False, False]}),
                                   ''),
