@@ -102,6 +102,7 @@ def test_format_adduct(adduct_name, pol_i, expected_adduct_i):
 @pytest.mark.parametrize("data_ce, data_ces, expected_ce_i, expected_ces_i", [
     ('10', '0', 10, 0),                 # CE/CES values are correctly formatted
     ('20, 40, 60', [], 40, 20),         # CES is calculated from multiple CE values
+    ('60, 20, 40', [], 40, 20),         # Different order of inputs
     ('-30', '-15', 30, 15),             # Negative input values are transformed to positive values
     ('-20, -40, -60', [], 40, 20),
     ('20.00,40.00,60.00', [], 40, 20),  # Different input format works

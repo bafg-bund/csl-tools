@@ -194,12 +194,13 @@ def get_collision_energy(data_ce, data_ces):
 
         # In case of multiple CE values: calculate CES and select representative CE value
         elif len(int_nrs_real) == 3:  # Three CE
-            ce_i = int_nrs_real[1]  # Assuming correct positions!
+            int_nrs_real.sort()
+            ce_i = int_nrs_real[1]  # Middle CE
             # Calculate CES. Check for equal difference in CES.
             ce_diff = np.diff(int_nrs_real)
             ce_diff_unique = np.unique(ce_diff)
             if len(ce_diff_unique) == 1:
-                ces_i = abs(int(ce_diff_unique[0]))  # Assuming correct positions!
+                ces_i = abs(int(ce_diff_unique[0]))
             else:  # Non-equal difference in CES
                 ce_i = None  # Set to `None` even though CE might be ok.
                 ces_i = None
