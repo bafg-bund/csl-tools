@@ -3,7 +3,7 @@
 # 1) Parameters that can be identified and extracted from the data files
 #    → Define here in par_regex_<software>.
 # 2) Parameters that can not be extracted from the data files, but do not change across data files.
-#    → Define here in par_fix_<software>.
+#    → Add to par_fix in `add_fixed_variables`.
 # 3) Defaults for identifying software-specific variables
 #    → Define here in defaults_<software>.
 # 4) Parameters that are not software-specific, are constant within one import process, and are not software-specific.
@@ -45,17 +45,6 @@ def par_regex_mbank():
         'par_exact_mass': 'CH\\$EXACT_MASS:'                           # Exact mass
     }
     return mbank_par_regex
-
-
-def par_fix_mbank():
-    """
-    Mapping of CSL-relevant parameters (keys) to MassBank-specific default/fixed information (values).
-    These parameters are non-extractable and do not change across data files (software-specific).
-    """
-    mbank_par_fix = {
-        'par_ces': None  # Collision energy spread
-    }
-    return mbank_par_fix
 
 
 def defaults_mbank():

@@ -65,16 +65,30 @@ class FormatProcess(ABC):
 
 
     # noinspection PyMethodMayBeStatic
-    def add_fixed_variables(self, extract_data, par_fix):
-        """Adds fixed information (specified in <software>_process_config.py and config.yaml) to each entry."""
+    def add_fixed_variables(self, extract_data, par_config):
+        """Adds fixed information (specified in config.yaml or here in par_fix) to each entry."""
         import logging
 
         logger = logging.getLogger(__name__)
 
+        # List of potential parameters that may not be extracted from the data files and either:
+        # - do not change across data files.
+        # - are calculated through another parameter
+        par_fix = {
+            'par_compgroup': None,        # Compound group
+            'par_adduct': None,           # Adduct
+            'par_accession': None,        # Accession string (used in MassBank)
+            'par_inchi': None,            # InChI
+            'par_ces': None,              # Collision energy spread
+            'par_exact_mass': None,       # Exact mass
+            'par_instrument_type': None,  # Instrument type
+        }
+        fixed_par = par_config | par_fix  # Combine
+
         extract_data_add = extract_data
 
         # Add chromatographic method based on data source
-        dsrc = par_fix.get('par_data_source')
+        dsrc = fixed_par.get('par_data_source')
         if not dsrc:
             raise ValueError("Data source is empty or missing (check your config.yaml).")
         try:
@@ -82,13 +96,14 @@ class FormatProcess(ABC):
         except KeyError:
             raise ValueError(f"Chromatographic method for data source '{dsrc}' is not defined (check config.py).")
 
-        # Add each parameter and its value.
-        for par in par_fix.items():
-            if par[1]:
-                extract_data_add[par[0]] = par[1]
-            else:
-                logger.warning(f"No value for {par[0]}.")
-                extract_data_add[par[0]] = par[1]
+        # Add each parameter and its value if it is not provided already in the extracted data.
+        for par in fixed_par.items():
+            if not par[0] in extract_data_add.columns:
+                if par[1]:
+                    extract_data_add[par[0]] = par[1]
+                else:
+                    logger.warning(f"No value for {par[0]}.")
+                    extract_data_add[par[0]] = par[1]
 
         return extract_data_add
 

@@ -2,8 +2,8 @@
 
 # 1) Parameters that can be identified and extracted from the data files
 #    → Define here in par_regex_<software>.
-# 2) Parameters that can not be extracted from the data files, but do not change across data files.
-#    → Define here in par_fix_<software>.
+# 2) Parameters that can not be extracted from the data files, but do not change across data files or are calculated from another parameter.
+#    → Add to par_fix in `add_fixed_variables`.
 # 3) Defaults for identifying software-specific variables
 #    → Define here in defaults_<software>.
 # 4) Parameters that are not software-specific, are constant within one import process, and are not software-specific.
@@ -33,19 +33,6 @@ def par_regex_libview():
         'par_exact_mass': 'MONOISOTOPIC MASS',  # Exact mass
     }
     return libview_par_regex
-
-
-def par_fix_libview():
-    """
-    Mapping of CSL-relevant parameters (keys) to LibrayView-specific default/fixed information (values).
-    These parameters are non-extractable and do not change across data files (software-specific).
-    """
-    libview_par_fix = {
-        'par_compgroup': None,  # Compound group
-        'par_adduct': None,     # Adduct
-        'par_accession': None,  # Accession string (used in MassBank)
-    }
-    return libview_par_fix
 
 
 def defaults_libview():

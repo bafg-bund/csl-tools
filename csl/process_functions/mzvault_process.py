@@ -12,14 +12,12 @@ class MzvaultProcess(FormatProcess):
 
         # Load defaults and settings
         par_config, adduct_notation = self.load_config()
-        par_fix = par_fix_mzvault()
         if par_config['par_data_source'] == 'lubw':  # mzVault version 2.3.45.15
             par_regex = par_regex_mzvault_old()
             defaults = defaults_mzvault_old()
         else:  # mzVault version 2.3.64.0
             par_regex = par_regex_mzvault()
             defaults = defaults_mzvault()
-        fixed_par = par_config | par_fix  # Combine constant parameters
 
         # Read files
         logger.info('Reading file(s)')
@@ -27,7 +25,7 @@ class MzvaultProcess(FormatProcess):
         if not extract_data.empty:
             # Adding default information
             logger.info('Adding fixed information to extracted data')
-            extract_data_add = self.add_fixed_variables(extract_data, fixed_par)
+            extract_data_add = self.add_fixed_variables(extract_data, par_config)
 
             # Processing files
             logger.info('Processing data')

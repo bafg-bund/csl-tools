@@ -3,7 +3,7 @@
 # 1) Parameters that can be identified and extracted from the data files
 #    → Define here in par_regex_<software>.
 # 2) Parameters that can not be extracted from the data files, but do not change across data files.
-#    → Define here in par_fix_<software>.
+#    → Add to par_fix in `add_fixed_variables`.
 # 3) Defaults for identifying software-specific variables
 #    → Define here in defaults_<software>.
 # 4) Parameters that are not software-specific, are constant within one import process, and are not software-specific.
@@ -31,6 +31,7 @@ def par_regex_mzvault():
         'par_smiles': 'Smiles',            # Simplified Molecular Line Entry Specification (SMILES)
         'par_peak': 'Peak',                # Mass spectral peaks
         'par_compgroup': 'CompoundClass',  # Compound group
+        'par_adduct': 'Precursor_type',    # Adduct
     }
     return mzvault_par_regex
 
@@ -58,21 +59,6 @@ def par_regex_mzvault_old():
         'par_compgroup': 'CompoundClass',  # Compound group
     }
     return mzvault_par_regex
-
-
-def par_fix_mzvault():
-    """
-    Mapping of CSL-relevant parameters (keys) to mzVault-specific default/fixed information (values).
-    These parameters are non-extractable and do not change across data files (software-specific).
-    """
-    mzvault_par_fix = {
-        'par_adduct': None,      # Adduct
-        'par_inchi': None,       # InChI
-        'par_accession': None,   # Accession string (used in MassBank)
-        'par_ces': None,         # Collision energy spread
-        'par_exact_mass': None,  # Exact mass
-    }
-    return mzvault_par_fix
 
 
 def defaults_mzvault():

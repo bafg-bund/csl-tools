@@ -4,7 +4,6 @@ par_config:
   par_ionization: 'ESI'        # Ionization type
   par_col_type: 'Q'            # Collision type
   par_ce_unit: 'V'             # Unit for collision energy
-  par_instrument_type: null    # Instrument type                   // Todo: change to dictionary
   par_data_source: 'lanuk'     # Data source identifier (needs to be whitelisted in config.py)
 
 # Special adduct notation rules (optional).

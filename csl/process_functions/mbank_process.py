@@ -13,9 +13,7 @@ class MbankProcess(FormatProcess):
         # Load defaults and settings
         par_config, adduct_notation = self.load_config()
         par_regex = par_regex_mbank()
-        par_fix = par_fix_mbank()
         dsrc_def = defaults_mbank()
-        fixed_par = par_config | par_fix
 
         # Read files
         logger.info('Reading file(s)')
@@ -23,7 +21,7 @@ class MbankProcess(FormatProcess):
         if not extract_data.empty:
             # Adding default information
             logger.info('Adding fixed information to extracted data')
-            extract_data_add = self.add_fixed_variables(extract_data, fixed_par)
+            extract_data_add = self.add_fixed_variables(extract_data, par_config)
 
             # Processing files
             logger.info('Processing data')
