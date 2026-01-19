@@ -58,22 +58,21 @@ To contribute to the development or to run the project in development mode:
     pytest
     ```
 
-
 ## Contribution (source code)
 If you run into issues or have ideas for improvement, feel free to contact us.
 
 To make changes, please create a new branch and open a pull request to the `dev` branch.
 
 ## Contribution (spectral data)
-To contribute spectral data to the CSL, please follow the linked guidelines for the respective file formats.  
-Currently, the package can read:
+To contribute spectral data to the CSL, please refer to [this guideline](docs/SOP_contribution_spectra.md).  
+Currently, the package can process:
 
-- mzVault-based export files (_Thermo Fisher Scientific; Version 2.3 SP1; Build 2.3.64.0; July 8, 2021_) &#8594; [Requirements for mzVault-based export files](/docs/SOP_msp_nist_import.md)
-- MassBank documents &#8594; Please refer to the official [MassBank documentation](https://github.com/MassBank/MassBank-web/blob/main/Documentation/MassBankRecordFormat.md)
+- mzVault-based export files (_Thermo Fisher Scientific; Version 2.3.64.0 and 2.3.45.15_)
+- LibraryView-based export files (_SCIEX; Version 1.8_) 
+- MassBank documents
 
-In the future we plan to support the file format:
-- SCIEX / LibraryView files (SDF format) 
-
+Note that all spectral data will be periodically published under the `CC BY 4.0` license on Zenodo.  
+However, experimental data entries in the CSL and CSL-export files remain linked to contributor information, including author names, affiliations, and copyright statements.
 
 ## Usage
 The package provides both a Command-Line Interface (CLI) and a Python API for operations on the CSL.  
@@ -96,7 +95,6 @@ csl.scan_rt(...)
 - [rtscan](#rtscan) &#8594; Curation of retention time data.
 
 You can either run the tools via terminal commands or import and run the corresponding functions in a Python script.
-
 
 ### `process`
 Processes MS2 data files from a specified format and imports data into the CSL.
@@ -134,7 +132,6 @@ csl process libview path/CSL.db path/data.sdf path/config.yaml --path_extra path
 from csl import process_data
 process_data(format='libview', path_csl='path/CSL.db', path_data='path/data.sdf', path_config='path/config.yaml', path_extra='path/extra_file.csv')
 ```
-
 
 ### `export`
 Exports the CSL to the specified format.  
@@ -184,7 +181,6 @@ csl export mbank path/CSL.db path/output_dir bfg
 from csl import export_data
 export_data(format='mbank', path_csl='path/CSL.db', path_out='path/output_dir', subset='bfg')
 ```
-
 
 ### `rtscan`
 Operates on retention-time data stored in the CSL.  

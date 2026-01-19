@@ -1,0 +1,52 @@
+Name: Bezafibrate
+PrecursorMz: 362.11540
+Precursor_type: [M+H]+
+Collision_energy: 40
+Ionization: ESI
+IonMode: positive
+RetentionTime: 11.03300
+InChiKey: IIBYAHWJQTYFKB-UHFFFAOYSA-N
+Formula: C19H20ClNO4
+CASNo: 41859-67-0
+Smiles: CC(C)(Oc1ccc(CCNC(=O)c2ccc(Cl)cc2)cc1)C(O)=O
+CompoundClass: Pharmaceutical
+Comment: 
+Num peaks: 11
+77.0415 8.60
+87.0463 6.90
+91.0552 9.20
+93.0713 14.20
+103.0546 10.40
+110.9996 30.30
+121.0654 255.30
+138.9949 487.80
+161.0959 37.90
+276.0773 5.70
+316.1087 5.40
+
+Name: 3,6-Dimethyl-4-octyne-3,6-diol
+PrecursorMz: 188.16860
+Precursor_type: [M+NH4]+
+Collision_energy: 40
+Ionization: ESI
+IonMode: positive
+RetentionTime: 7.70700
+InChiKey: NUYADIDKTLPDGG-UHFFFAOYSA-N
+Formula: C10H18O2
+CASNo: 78-66-0
+Smiles: CCC(C)(C#CC(C)(CC)O)O
+CompoundClass: 
+Comment: 
+Num peaks: 12
+39.0225 2.20
+41.0378 5.10
+43.0177 11.60
+55.0538 3.10
+65.0379 1.30
+67.0530 1.90
+77.0376 10.10
+79.0534 4.80
+91.0533 20.70
+105.0693 8.60
+109.0639 7.20
+123.0795 1.50

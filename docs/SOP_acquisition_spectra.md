@@ -25,6 +25,5 @@ Notes for Orbitrap instruments:
 - Do not use normalized collision energy (NCE).
 
 ## Data preparation and export
-Refer to the software-specific SOPs for the requirements of the export format. If your software is not listed, please contact ntsportal@bafg.de to assist in developing a new SOP.
-
-[Requirements for mzVault-based export files](/docs/SOP_msp_nist_import.md)
+Refer to [this guideline](SOP_contribution_spectra.md) for the requirements of the export format. 
+If your software is not listed, please contact ntsportal@bafg.de for assistance.
