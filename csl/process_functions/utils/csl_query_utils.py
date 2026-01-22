@@ -130,18 +130,18 @@ def add_exp_to_session(session, entry):
     inchikey_main_i = entry['inchikey_main_i']
     cas_i = entry['cas_i']
     compgroup_i = entry['compgroup_i']
-    file_path = entry['file_path']
+    authors = entry['par_authors']
+    affiliation = entry['par_affiliation']
 
-    # Log compound name, adduct and file path for reference
+    # Log entry information for reference
     logger.info(f'Compound: {entry['par_comp']}; Instr.: {entry['par_instrument']}; '
                 f'Ion mode: {entry['par_ion_mode']}; CE: {entry['par_ce']}; File path: {entry['file_path']}')
 
-    # Check if the data source exists (e.g., 'UBA', 'BfG') in the CSL and add it if necessary.
-    data_src = session.query(DataSource).filter_by(name=dsrc_csl_def).one_or_none()
+    # Check if the data source exists (search by name and authors; !assumes correct spelling!) in the CSL and add it if necessary.
+    data_src = session.query(DataSource).filter_by(name=dsrc_csl_def, authors=authors).one_or_none()
     if not data_src:
-        # Todo: Should include long_name and authors in the future via config input
-        logger.info(f'Adding missing default data source: "{dsrc_csl_def}"')
-        data_src = DataSource(name=dsrc_csl_def)
+        logger.info(f'Adding new data source. Name: {dsrc_csl_def}; Authors: {authors}; Affiliation: {affiliation}')
+        data_src = DataSource(name=dsrc_csl_def, long_name=affiliation, authors=authors)
         session.add(data_src)
 
     # Match compound groups with existing ones in the CSL. Collect the matches. If no matches are found, use the default.

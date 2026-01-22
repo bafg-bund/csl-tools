@@ -82,6 +82,8 @@ class FormatProcess(ABC):
             'par_ces': None,              # Collision energy spread
             'par_exact_mass': None,       # Exact mass
             'par_instrument_type': None,  # Instrument type
+            'par_authors': None,          # Author name(s)
+            'par_affiliation': None,      # Author affiliation
         }
         fixed_par = par_config | par_fix  # Combine
 

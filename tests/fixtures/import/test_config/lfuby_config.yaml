@@ -6,6 +6,8 @@ par_config:
   par_instrument: 'QExactive Thermo'      # Instrument name
   par_instrument_type: 'LC-ESI-Orbitrap'  # Instrument type
   par_data_source: 'lfuby'                # Data source identifier (needs to be whitelisted in config.py)
+  par_authors: 'Name'                     # Author name(s)
+  par_affiliation: 'Affiliation'          # Author affiliation
 
 # Special adduct notation rules (optional).
 adduct_notation: {

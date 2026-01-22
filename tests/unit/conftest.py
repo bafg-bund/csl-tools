@@ -103,6 +103,8 @@ def mock_entry_df():
         "par_col_type": 'mock_col_type',
         "par_ce_unit": 'mock_ce_unit',
         "par_accession": 'mock_accession',
+        "par_authors": 'mock_authors',
+        "par_affiliation": 'mock_affiliation',
         "pol_i": 'mock_form_pol',
         "comp_i": 'mock_pol_comp',
         "adduct_i": 'mock_pol_adduct',

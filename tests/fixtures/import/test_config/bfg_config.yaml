@@ -1,8 +1,10 @@
 # Configuration for bfg
 par_config:
-  par_isotope: 'monoisotopic'  # Type of molecular mass
-  par_ce_unit: 'V'             # Unit for collision energy
-  par_data_source: 'bfg'       # Data source identifier (needs to be whitelisted in config.py)
+  par_isotope: 'monoisotopic'     # Type of molecular mass
+  par_ce_unit: 'V'                # Unit for collision energy
+  par_data_source: 'bfg'          # Data source identifier (needs to be whitelisted in config.py)
+  par_authors: 'Name'             # Author name(s)
+  par_affiliation: 'Affiliation'  # Author affiliation
 
 # Special adduct notation rules (optional).
 adduct_notation: {}
