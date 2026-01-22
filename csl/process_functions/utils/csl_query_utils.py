@@ -116,7 +116,7 @@ def add_exp_to_session(session, entry):
     inchi_i = entry['inchi_i']
     chrom_method = entry['par_chrom_method']
     rt_i = entry['rt_i']
-    instrument = entry['par_instrument']
+    instrument = entry['instrument_i']
     pol_i = entry['pol_i']
     ce_i = entry['ce_i']
     ces_i = entry['ces_i']
