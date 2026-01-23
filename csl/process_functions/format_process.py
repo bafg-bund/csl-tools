@@ -85,7 +85,7 @@ class FormatProcess(ABC):
             'par_authors': None,          # Author name(s)
             'par_affiliation': None,      # Author affiliation
         }
-        fixed_par = par_config | par_fix  # Combine
+        fixed_par = par_fix | par_config  # Combine
 
         extract_data_add = extract_data
 
