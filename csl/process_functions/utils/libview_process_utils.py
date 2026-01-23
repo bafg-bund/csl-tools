@@ -86,7 +86,7 @@ def extract_data_regex_libview(file_path_data, par_regex, file_path_extra):
     def add_rt_from_dict(record, rt_dict):
         """Matches record compound name to dictionary (compound name and retention times) and adds RT value to record."""
         par_comp = record.get('par_comp')
-        record['par_rt'] = rt_dict.get(par_comp.lower(), []) if par_comp else []
+        record['par_rt'] = rt_dict.get(par_comp.split("_", 1)[0].lower(), []) if par_comp else []
         return record
 
 
