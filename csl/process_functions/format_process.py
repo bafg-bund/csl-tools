@@ -18,7 +18,7 @@ class FormatProcess(ABC):
         """Loads and returns configuration for data processing from YAML file."""
         import yaml
 
-        with open(self.path_config) as stream:
+        with open(self.path_config, encoding="utf-8") as stream:
             try:
                 config = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
