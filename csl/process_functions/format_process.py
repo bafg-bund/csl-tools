@@ -1,6 +1,7 @@
 from csl.process_functions.utils import *
 from csl.utils.sql_utils import create_session
 from csl.config import DEFAULT_PAIRS_DSOURCE_CHROM
+from csl.config import ROOT_DIR
 
 from abc import ABC, abstractmethod
 
@@ -142,7 +143,8 @@ class FormatProcess(ABC):
             entry_warn = False
 
             logger.info(f'Compound: {entry['par_comp']}; Instr.: {entry['par_instrument']}; '
-                        f'Ion mode: {entry['par_ion_mode']}; CE: {entry['par_ce']}; File path: {entry['file_path']}')
+                        f'Ion mode: {entry['par_ion_mode']}; CE: {entry['par_ce']}; CES: {entry['par_ces']}; '
+                        f'File path: {entry['file_path']}')
 
             # Instrument
             instrument_i = get_instrument(entry['par_instrument'], entry['par_instrument_type'])
@@ -307,7 +309,7 @@ class FormatProcess(ABC):
             form_data (DataFrame) : All data entries including formatted data.
 
         Returns:
-            form_data_match (DataFrame) : Data updated with flags from CSL-matching
+            form_data_match (DataFrame) : Data updated with flags from CSL-matching.
             session (obj)  : Session object with temporary changes (potential commits).
         """
         import pandas as pd
@@ -359,17 +361,21 @@ class FormatProcess(ABC):
         return form_data_match, session
 
 
-    def commit_to_csl(self, session, form_data_match):
+    def summarize_and_commit_to_csl(self, session, extract_data_add, form_data_match):
         """
-        Handles the final step of committing experimental data files to the CSL. The user is prompted to confirm the
-        commit, and the session is closed afterward, regardless of the user's choice. The paths of committed files are
-        recorded in a CSV file.
+        Summarizes processing results and potentially committed data. The user is prompted to confirm the commit,
+        and the session is closed afterward, regardless of the user's choice.
 
         Args:
-            session (obj)               : Session object with temporary changes (potential commits).
-            form_data_match (DataFrame) : Data including relevant flags
+            session (obj)                : Session object with temporary changes (potential commits).
+            extract_data_add (DataFrame) : Extracted data.
+            form_data_match (DataFrame)  : Formatted data including relevant flags.
         """
         import logging
+        import pandas as pd
+        import numpy as np
+        import os.path
+        from datetime import datetime
 
         logger = logging.getLogger(__name__)
 
@@ -380,39 +386,117 @@ class FormatProcess(ABC):
         csl_err_data = form_data_match[form_data_match['csl_err_flag']]
         csl_add_data = form_data_match[form_data_match['csl_add_flag']]
 
-        # Log information about entry states
-        logger.info('Summary of information before CSL commit '
-                    '\n (Check more details on individual errors and warnings in the log).')
-        logger.info(f"Experiments eligible to be added: {len(csl_add_data)}")
-        logger.warning(f"Experiments that are eligible to be added, but with warnings: {len(form_warn_data)}")
-        logger.warning(f"Experiments that are already in the CSL (duplicates): {len(csl_dupl_data)}")
-        logger.error(f"Experiments that are not eligible to be added due to matching errors: {len(csl_err_data)}")
-        logger.error(f"Experiments that are not eligible for adding due to format errors: {len(form_err_data)}")
+        # Prepare information about entry states
+        summary_df = pd.DataFrame([
+            {
+                "Category": "All data",
+                "Data entries": len(extract_data_add),
+                "Unique compounds": extract_data_add['par_comp'].nunique()
+            },
+            {
+                "Category": "Filtered data",
+                "Data entries": len(form_data_match),
+                "Unique compounds": form_data_match['comp_i'].nunique()
+            },
+            {
+                "Category": "Data with format errors",
+                "Data entries": len(form_err_data),
+                "Unique compounds": form_err_data['comp_i'].nunique()
+            },
+            {
+                "Category": "Data with matching errors",
+                "Data entries": len(csl_err_data),
+                "Unique compounds": csl_err_data['comp_i'].nunique()
+            },
+            {
+                "Category": "Duplicate data",
+                "Data entries": len(csl_dupl_data),
+                "Unique compounds": csl_dupl_data['comp_i'].nunique()
+            },
+            {
+                "Category": "Data to be added",
+                "Data entries": len(csl_add_data),
+                "Unique compounds": csl_add_data['comp_i'].nunique()
+            },
+            {
+                "Category": "(Data to be added with warnings)",
+                "Data entries": f"({len(form_warn_data)})",
+                "Unique compounds": f"({form_warn_data['comp_i'].nunique()})"
+            },
+        ])
+
+        # Collect data entries with missing parameters for potential correction
+        df_missing = form_data_match[['pol_i', 'comp_i', 'adduct_i', 'ce_i', 'ionization_i', 'formula_i', 'inchikey_i', 'cas_i',
+                         'smiles_i', 'mz_i', 'rt_i', 'spec_i', 'col_type_i' ]]
+        df_missing = df_missing[df_missing.isna().any(axis=1)]  # Keep rows with any missing data
+        df_missing_md = df_missing.copy()
+        df_missing_md["spec_i"] = df_missing_md["spec_i"].notna().map(
+            {True: "exists", False: None}
+        )
+        cols_to_keep = df_missing_md.isna().any() | (df_missing_md.columns == "comp_i")
+        df_missing_md = df_missing_md.loc[:, cols_to_keep]  # Keep columns with any missing data
+        df_missing_md_unique = (  # Group by compound name
+            df_missing_md
+            .groupby("comp_i", dropna=False, as_index=False)
+            .agg(lambda x: x.dropna().iloc[0] if x.notna().any() else None)
+        )
+        df_missing_md_unique = df_missing_md_unique.replace({np.nan: None})
+
+        # Write missing parameter to an Excel file
+        if len(df_missing_md_unique)>0:
+            fname = datetime.now().strftime('%Y%m%d_%H%M%S') + '_missing_par.xlsx'
+            log_dir = os.path.join(ROOT_DIR, 'logs')
+            os.makedirs(log_dir, exist_ok=True)
+            log_fpath = os.path.join(log_dir, fname)
+            df_missing_md_unique.to_excel(log_fpath)
+
+        # Write logs for copy-pasting to Markdown tables
+        logger.info("Summary of information before CSL commit:\n"
+                    f"{summary_df.to_markdown(index=False)}")
+
+        logger.info("Overview of data entries with missing parameters:\n"
+                    f"{df_missing_md_unique.to_markdown(index=False)}")
+
+        logger.info(f"Unique substances (to be added):"
+                    f"\n{"\n".join(map(str, csl_add_data['comp_i'].unique()))}")
+        logger.warning(f"Unique substances with warnings (to be added):"
+                       f"\n{"\n".join(map(str, form_warn_data['comp_i'].unique()))}")
+        logger.warning(f"Unique substances duplicates (will not be added):"
+                       f"\n{"\n".join(map(str, csl_dupl_data['comp_i'].unique()))}")
+        logger.error(f"Unique substances with matching errors (will not be added):"
+                     f"\n{"\n".join(map(str, csl_err_data['comp_i'].unique()))}")
+        logger.error(f"Unique substances with format errors (will not be added):"
+                     f"\n{"\n".join(map(str, form_err_data['comp_i'].unique()))}")
 
         if len(form_err_data) > 0:
             logger.error('The following data will not be added to the CSL due to format errors:')
             for index, entry in form_err_data.iterrows():
-                logger.error(f'Compound: {entry['comp_i']}; CE: {entry['ce_i']}; File path: {entry['file_path']}')
+                logger.error(f'Compound: {entry['comp_i']}; Instr.: {entry['instrument_i']}; '
+                               f'Ion mode: {entry['par_ion_mode']}; CE: {entry['ce_i']}; CES: {entry['ces_i']}')
 
         if len(form_warn_data) > 0:
             logger.warning('The following data will be added to the CSL with warnings:')
             for index, entry in form_warn_data.iterrows():
-                logger.warning(f'Compound: {entry['comp_i']}; CE: {entry['ce_i']}; File path: {entry['file_path']}')
+                logger.warning(f'Compound: {entry['comp_i']}; Instr.: {entry['instrument_i']}; '
+                               f'Ion mode: {entry['par_ion_mode']}; CE: {entry['ce_i']}; CES: {entry['ces_i']}')
 
         if len(csl_err_data) > 0:
             logger.error('The following data will not be added to the CSL due to errors caused during CSL-matching:')
             for index, entry in csl_err_data.iterrows():
-                logger.error(f'Compound: {entry['comp_i']}; CE: {entry['ce_i']}; File path: {entry['file_path']}')
+                logger.error(f'Compound: {entry['comp_i']}; Instr.: {entry['instrument_i']}; '
+                               f'Ion mode: {entry['par_ion_mode']}; CE: {entry['ce_i']}; CES: {entry['ces_i']}')
 
         if len(csl_dupl_data) > 0:
             logger.warning('The following data already exists in the CSL and will not be added:')
             for index, entry in csl_dupl_data.iterrows():
-                logger.warning(f'Compound: {entry['comp_i']}; CE: {entry['ce_i']}; File path: {entry['file_path']}')
+                logger.warning(f'Compound: {entry['comp_i']}; Instr.: {entry['instrument_i']}; '
+                               f'Ion mode: {entry['par_ion_mode']}; CE: {entry['ce_i']}; CES: {entry['ces_i']}')
 
         if len(csl_add_data) > 0:
             logger.info('The following data will be added to the CSL:')
             for index, entry in csl_add_data.iterrows():
-                logger.info(f'Compound: {entry['comp_i']}; CE: {entry['ce_i']}; File path: {entry['file_path']}')
+                logger.info(f'Compound: {entry['comp_i']}; Instr.: {entry['instrument_i']}; '
+                               f'Ion mode: {entry['par_ion_mode']}; CE: {entry['ce_i']}; CES: {entry['ces_i']}')
 
         # Collect data eligible for addition
         add_data_all = form_data_match[form_data_match.csl_add_flag]

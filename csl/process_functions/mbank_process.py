@@ -33,7 +33,7 @@ class MbankProcess(FormatProcess):
 
             # Commit session to CSL
             logger.info('Preparing to commit session changes to CSL')
-            self.commit_to_csl(session, form_data_match)
+            self.summarize_and_commit_to_csl(session, extract_data_add, form_data_match)
 
         logger.info('End of mbank workflow')
 

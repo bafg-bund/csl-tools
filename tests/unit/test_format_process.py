@@ -183,31 +183,21 @@ class TestFormatProcess:
     @pytest.mark.parametrize("mock_form_data_match, user_input",
                              [
                                  # Case 1: All data entries eligible for CSL commit; User confirms;
-                                 (pd.DataFrame({
-                                                'comp_i': ['compound1', 'compound2'],
-                                                'ce_i': ['40', '30'],
-                                                'file_path': ['file1', 'file2'],
-                                                'form_err_flag': [False, False],
+                                 (pd.DataFrame({'form_err_flag': [False, False],
                                                 'form_warn_flag': [False, False],
                                                 'csl_dupl_flag': [False, False],
                                                 'csl_err_flag': [False, False],
                                                 'csl_add_flag': [True, True]}),
                                   'yes'),
                                  # Case 2: All data entries eligible for CSL commit; User cancels;
-                                 (pd.DataFrame({'comp_i': ['compound1', 'compound2'],
-                                                'ce_i': ['40', '30'],
-                                                'file_path': ['file1', 'file2'],
-                                                'form_err_flag': [False, False],
+                                 (pd.DataFrame({'form_err_flag': [False, False],
                                                 'form_warn_flag': [False, False],
                                                 'csl_dupl_flag': [False, False],
                                                 'csl_err_flag': [False, False],
                                                 'csl_add_flag': [True, True]}),
                                   'any_other_input'),
                                  # Case 3: One error; One format warning entry eligible for CSL commit; User confirms;
-                                 (pd.DataFrame({'comp_i': ['compound1', 'compound2'],
-                                                'ce_i': ['40', '30'],
-                                                'file_path': ['file1', 'file2'],
-                                                'form_err_flag': [False, False],
+                                 (pd.DataFrame({'form_err_flag': [False, False],
                                                 'form_warn_flag': [False, True],
                                                 'csl_dupl_flag': [False, False],
                                                 'csl_err_flag': [True, False],
@@ -215,22 +205,42 @@ class TestFormatProcess:
                                   'yes'),
 
                                  # Case 4: One duplicate, One format error; No data entries are eligible for CSL commit;
-                                 (pd.DataFrame({'comp_i': ['compound1', 'compound2'],
-                                                'ce_i': ['40', '30'],
-                                                'file_path': ['file1', 'file2'],
-                                                'form_err_flag': [False, True],
+                                 (pd.DataFrame({'form_err_flag': [False, True],
                                                 'form_warn_flag': [False, False],
                                                 'csl_dupl_flag': [True, False],
                                                 'csl_err_flag': [False, False],
                                                 'csl_add_flag': [False, False]}),
-                                  ''),
+                                 ''),
                              ])
-    def test_commit_to_csl(self, workflow, mock_session, mock_logger, monkeypatch, mock_form_data_match, user_input):
+    def test_summarize_and_commit_to_csl(self, workflow, mock_session, mock_logger, monkeypatch, mock_form_data_match, user_input):
         """Tests committing scenarios with different flags and user input."""
         # Mock user input
         with patch('builtins.input', return_value=user_input) as mock_input:
+
+            # Prepare mock data
+            mock_extract_data_add = pd.DataFrame({'par_comp': ['comp_a', 'comp_b']})
+            form_data_match_add = pd.DataFrame({
+                'pol_i': ['pos', 'neg'],
+                'comp_i': ['compound1', 'compound2'],
+                'adduct_i': ['adduct1', 'adduct2'],
+                'ionization_i': ['ESI', 'ESI'],
+                'formula_i': ['C1', 'C1'],
+                'inchikey_i': ['INCHIKEY', 'INCHIKEY'],
+                'cas_i': ['25-7', '25-7'],
+                'smiles_i': ['CCCC', 'CCCC'],
+                'mz_i': ['7', '7'],
+                'rt_i': ['7', '7'],
+                'spec_i': ['7', '7'],
+                'col_type_i': ['Q', 'Q'],
+                'instrument_i': ['instrument_a', 'instrument_b'],
+                'ce_i': ['40', '30'],
+                'ces_i': ['0', '15'],
+                'par_ion_mode': ['P', 'N'],
+                'file_path': ['file1', 'file2']})
+            mock_form_data_match = mock_form_data_match.join(form_data_match_add)
+
             # Call the method
-            workflow.commit_to_csl(mock_session, mock_form_data_match)
+            workflow.summarize_and_commit_to_csl(mock_session, mock_extract_data_add, mock_form_data_match)
 
             # Assert session calls
             if any(mock_form_data_match.csl_add_flag) and user_input == 'yes':
