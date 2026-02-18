@@ -12,12 +12,17 @@ class MzvaultProcess(FormatProcess):
 
         # Load defaults and settings
         par_config, adduct_notation = self.load_config()
-        if par_config['par_data_source'] == 'lubw':  # mzVault version 2.3.45.15
-            par_regex = par_regex_mzvault_old()
-            defaults = defaults_mzvault_old()
-        else:  # mzVault version 2.3.64.0
-            par_regex = par_regex_mzvault()
-            defaults = defaults_mzvault()
+
+        # Probe a file to check for mzVault version
+        file_paths = get_file_paths(self.path_data)
+        with open(file_paths[0], 'r') as file:
+            content = file.read()
+            if 'MS:1009003|Name' in content: # mzVault version 2.3.45.15
+                par_regex = par_regex_mzvault_old()
+                defaults = defaults_mzvault_old()
+            else:  # mzVault version 2.3.64.0
+                par_regex = par_regex_mzvault()
+                defaults = defaults_mzvault()
 
         # Read files
         logger.info('Reading file(s)')
