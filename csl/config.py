@@ -14,7 +14,7 @@ DEFAULT_PAIRS_DSOURCE_CHROM = {
     'uba': 'uba_nts_rp1',
     'lfuby': 'lfuby_nts_rp1',
     'lanuk': 'lanuk_nts_rp1',
-    # 'lubw': 'lubw_nts_rp1'  # Todo: activate once RT model is implemented
+    'lubw': 'lubw_nts_rp1'
 }
 
 # Dictionary with pairs of instrument name and instrument type as they should appear in the CSL
@@ -25,5 +25,6 @@ WHITELIST_INSTR_NAME_TYPE = {
     'QExactive Thermo': 'LC-ESI-Orbitrap',
     'Agilent 6500 Series Q-TOF': 'LC-ESI-QTOF',
     'TripleTOF X500R SCIEX': 'LC-ESI-QTOF',
-    'ZenoTOF 7600 SCIEX': 'LC-ESI-QTOF'
+    'ZenoTOF 7600 SCIEX': 'LC-ESI-QTOF',
+    'Exploris 240 Thermo': 'LC-ESI-Orbitrap'
 }
