@@ -392,22 +392,23 @@ def get_peaks(data_peak):
 
 def get_compound_group(data_compgroup):
     """
-    Extracts the compound groups. Assumes separation of multiple compound groups with ';'.
+    Extracts the compound groups. Assumes separation of multiple compound groups with ';' or ','.
 
     Args:
-        data_compgroup (str) : Compound group(s) separated by ';'.
+        data_compgroup (str) : Compound group(s) separated by ';' or ','.
 
     Returns:
         compgroup_i (str)    : Formatted compound group name(s). Returns None, if the input is invalid or empty.
     """
-    if data_compgroup:
-        parts = data_compgroup.split(';')
-        compgroup_i = []
-        for part in parts:
-            compgroup_i.append(part.strip())
-    else:
-        compgroup_i = None
-    return compgroup_i
+    import re
+
+    if not data_compgroup:
+        return None
+
+    parts = re.split(r"[;,]", data_compgroup)
+    compgroup_i = [p.strip() for p in parts if p.strip()]
+
+    return compgroup_i or None
 
 
 def get_collision_type(data_col_type):
