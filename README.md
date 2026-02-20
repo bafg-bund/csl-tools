@@ -16,6 +16,8 @@ The CSL is built collaboratively and currently includes reference spectra provid
 - [Federal Institute of Hydrology](https://www.bafg.de) (Bundesanstalt für Gewässerkunde, BfG), Koblenz, Germany
 - [Bavarian Environment Agency](https://www.lfu.bayern.de) (Bayerisches Landesamt für Umwelt, LfU Bayern), Augsburg, Germany
 - [German Environment Agency](https://www.umweltbundesamt.de) (Umweltbundesamt, UBA), Berlin, Germany
+- [Baden-Württemberg State Institute for the Environment](https://www.lubw.baden-wuerttemberg.de) (Landesanstalt für Umwelt Baden-Württemberg), Karlsruhe, Germany
+- [North Rhine-Westphalia Office of Nature, Environment and Climate](https://www.lanuk.nrw.de/) (Landesamt für Natur, Umwelt und Klima Nordrhein-Westfalen), Düsseldorf, Germany
 
 The CSL enables retrospective screening of environmental samples as part of Non-Target Screening (NTS) efforts. 
 It is integrated into the open analysis workflow [ntsworkflow](https://github.com/bafg-bund/ntsworkflow) <sup>[1]</sup>, 
@@ -149,9 +151,11 @@ Choose from:
 - `path_csl`: Path to the CSL file.
 - `path_out`: Path to the directory where the exported file(s) will be saved.
 - `subset`: (Optional) Data source(s) for subsetting the CSL data before exporting. Choose one or more from:
-  - `bfg`: BfG (Federal Institute of Hydrology)
-  - `lfuby`: LfU Bayern (Bavarian Environment Agency)
-  - `uba`: UBA (German Environment Agency)
+  - `bfg`: Federal Institute of Hydrology
+  - `lfuby`: Bavarian Environment Agency
+  - `uba`: German Environment Agency
+  - `lubw`: Baden-Württemberg State Institute for the Environment
+  - `lanuk`: North Rhine-Westphalia Office of Nature, Environment and Climate
   - `all`: No subsetting (Default)
 
 #### Example
@@ -211,6 +215,7 @@ scan_rt(operation='update', path_csl='path/CSL.db')
 Ole Lessmann, BfG, lessmann@bafg.de  
 Björn Ehlig, BfG, ehlig@bafg.de  
 Kevin S. Jewell, BfG, jewell@bafg.de  
+Arne Wick, BfG, wick@bafg.de
 
 ## License
 Copyright 2025 Federal Institute of Hydrology (Bundesanstalt für Gewässerkunde).
