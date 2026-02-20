@@ -34,13 +34,15 @@ Example configuration file with all possible parameters:
 par_config:
   par_isotope: 'monoisotopic'             # Type of molecular mass
   par_ionization: 'ESI'                   # Ionization type
-  par_col_type: 'HCD'                     # Collision type
+  par_col_type: 'Q'                       # Collision type
   par_ce_unit: 'V'                        # Unit for collision energy
-  par_instrument: 'QExactive Thermo'      # Instrument name
-  par_instrument_type: 'LC-ESI-Orbitrap'  # Instrument type
-  par_data_source: 'data_source_id'       # Data source identifier (needs to be whitelisted in config.py)
+  par_instrument: 'TripleTOF 5600 SCIEX'  # Instrument name
+  par_instrument_type: 'LC-ESI-QTOF '     # Instrument type
+  par_data_source: 'bfg'                  # Data source identifier (needs to be whitelisted in config.py)
+  par_authors: 'Ole Lessmann; Kevin S. Jewell; Björn Ehlig; Arne Wick'  # Author name(s)
+  par_affiliation: 'Federal Institute of Hydrology (Bundesanstalt für Gewässerkunde), Koblenz, Germany'  # Author affiliation
 
-# Special adduct notation rules (leave curly brackets empty if no special cases are needed).
+# Special adduct notation rules (leave curly brackets empty if no special cases needed).
 adduct_notation: {
   'cation': '[M]+',
   'Ethylamin': '[M+C2H7N+H]+',
@@ -71,8 +73,8 @@ Bezafibrate;11.03300
 | Parameter description                 | Required        | Subsection                                                           |
 |---------------------------------------|-----------------|----------------------------------------------------------------------|
 | Data source                           | Yes             | [Data source](#data-source)                                          |
-| Author name(s)                        | Yes             | [Authors](#authors)<br> _not implemented yet_                        |
-| Author affiliation                    | Yes             | [Author affiliation](#author-affiliation)<br> _not implemented yet_  |
+| Author name(s)                        | Yes             | [Authors](#authors)                                                  |
+| Author affiliation                    | Yes             | [Author affiliation](#author-affiliation)                            |
 | Compound name                         | Yes             | [Compound name](#compound-name)                                      |
 | Special adduct / source fragment      | No<sup>1</sup>  | [Special adduct / Source fragment](#adducts-and-in-source-fragments) |
 | Compound class / category             | No              | [Compound class](#compound-class)                                    |
@@ -113,11 +115,9 @@ par_data_source: 'bfg'
 Contributor name(s).
 - Names separated by `;` &rarr; `<FirstName LastName>; <FirstName LastName>;`
 
-_not implemented yet_
-
 Example: 
 ```yaml
-
+par_authors: 'Ole Lessmann; Kevin S. Jewell; Björn Ehlig; Arne Wick'
 ```
 
 [go back](#parameter-requirements)
@@ -127,11 +127,9 @@ Example:
 ### Author affiliation
 Full name of contributors affiliation.
 
-_not implemented yet_
-
 Example in configuration file: 
 ```yaml
-
+par_affiliation: 'Federal Institute of Hydrology (Bundesanstalt für Gewässerkunde), Koblenz, Germany'
 ```
 
 [go back](#parameter-requirements)
@@ -209,20 +207,23 @@ the associated entry must include the molecular formula, CAS number, SMILES code
 
 ### Compound class
 Classification or use category of the compound.
-- Multiple compound classes are separated by `;` &rarr; `<CompoundClass1>; <CompoundClass2>;`
-- If left empty the default compound class will be the [data source id](#data-source)
+- Multiple compound classes are separated by `;` or `,` &rarr; `<CompoundClass1>; <CompoundClass2>;`
 - Need to match any of the existing compound classes defined in the CSL
+- If left empty the default compound class will be `Uncategorized`
 
-| Compound class                      | Compound class           | Compound class            |
-|-------------------------------------|--------------------------|---------------------------|
-| `Pharmaceutical`                    | `Transformation_product` | `Antimicrobial`           |
-| `Food_additive`                     | `Fungicide`              | `Herbicide`               |
-| `Industrial_process`                | `Insecticide`            | `Metabolite`              |
-| `Natural_product`                   | `Personal_care_product`  | `Pesticide`               |
-| `Pigment`                           | `Surrogate_standard`     | `Diclofenac-lactam`       |
-| `Acaricide`                         | `Biocide`                | `Nitrification_inhibitor` |
-| `PFAS`                              | `Research`               | `Rodenticide`             |
-| `Transformation_product-Metabolite` | `Urease_inhibitor`       |                           |
+| Compound class          | Compound class                      |
+|-------------------------|-------------------------------------|
+| `Acaricide`             | `Personal_care_product`             |
+| `Antimicrobial`         | `Pesticide`                         |
+| `Biocide`               | `PFAS`                              |
+| `Food_additive`         | `Pharmaceutical`                    |
+| `Fungicide`             | `Pigment`                           |
+| `Herbicide`             | `Rodenticide`                       |
+| `Industrial_process`    | `Transformation_product`            |
+| `Insecticide`           | `Transformation_product-Metabolite` |
+| `Metabolite`            | `Surrogate_standard`                |
+| `Natural_product`       |                                     |
+
 >Note: The compound class groups are planned to be reworked in the future.
 
 [go back](#parameter-requirements)
