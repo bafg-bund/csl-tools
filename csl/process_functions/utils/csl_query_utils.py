@@ -151,15 +151,18 @@ def add_exp_to_session(session, entry):
             cg_db = session.query(CompoundGroup).filter(func.lower(CompoundGroup.name) == cg.lower()).one_or_none()
             if cg_db:
                 comp_group.append(cg_db)
+            else:
+                logger.warning(f'Provided compound group "{cg}" not in allowed list of compound groups.')
 
     if not comp_group:
-        existing_cg = session.query(CompoundGroup).filter_by(name=dsrc_csl_def).one_or_none()
+        logger.info(f'No valid compound group provided. Marking as "Uncategorized"')
+
         # Create the default compound group if necessary.
+        existing_cg = session.query(CompoundGroup).filter_by(name="Uncategorized").one_or_none()
         if not existing_cg:
-            logger.info(f'Adding missing default compound group: "{dsrc_csl_def}"')
-            new_cg = CompoundGroup(name=dsrc_csl_def)
+            new_cg = CompoundGroup(name="Uncategorized")
             session.add(new_cg)
-        comp_group = session.query(CompoundGroup).filter_by(name=dsrc_csl_def).one_or_none()
+        comp_group = session.query(CompoundGroup).filter_by(name="Uncategorized").one_or_none()
         if not isinstance(comp_group, list):
             comp_group = [comp_group]
 
