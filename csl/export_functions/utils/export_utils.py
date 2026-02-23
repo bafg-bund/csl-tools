@@ -297,17 +297,25 @@ def get_splash_code(spectrum):
 
 
 def get_compound_classes(compound_groups):
-    """Extracts the non-institute compound classes from a list of compound groups."""
+    """Return unique compound classes as '; ' separated list, excluding 'Uncategorized'."""
+    if not compound_groups:
+        return None
+
+    # Normalize to list[str]
     if not isinstance(compound_groups[0], str):
-        compound_groups = [group.name for group in compound_groups]  # normalize to list of str
+        compound_groups = [group.name for group in compound_groups]
 
-    compound_groups_filtered = [cg for cg in compound_groups if cg not in DEFAULT_PAIRS_DSOURCE_CHROM.keys()]
+    # Remove "Uncategorized" and remove duplicates
+    seen = set()
+    filtered = []
+    for cg in compound_groups:
+        if cg == "Uncategorized":
+            continue
+        if cg not in seen:
+            seen.add(cg)
+            filtered.append(cg)
 
-    if compound_groups_filtered:
-        compound_classes = "; ".join(compound_groups_filtered)
-    else:
-        compound_classes = None
-    return compound_classes
+    return "; ".join(filtered) if filtered else None
 
 
 def get_contributors_copyright(data_src):
