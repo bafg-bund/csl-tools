@@ -2,7 +2,7 @@
 import os
 
 # Python package version
-CSLTOOLS_VERSION = '1.0.0'
+CSLTOOLS_VERSION = '1.1.0'
 
 # Root directory of the project
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
