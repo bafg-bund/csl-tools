@@ -20,7 +20,7 @@ def mock_logger():
 
 
 @pytest.fixture
-def mock_inst_def():
+def mock_dsrc_def():
     """Mocks the data-source-specific defaults used in process workflows."""
     return {
         'def_pol_p': 'mock_pol_p',
@@ -41,28 +41,30 @@ def mock_spec_adduct():
 def mock_extract_data():
     """Mocks the extracted data (DataFrame) used in process workflows."""
     data = [{
-        "var_comp": 'mock_compound',
-        "var_adduct": 'mock_adduct',
-        "var_mz": '900',
-        "var_ce": '40',
-        "var_ionization": 'mock_ionization',
-        "var_ion_mode": 'mock_ion_mode',
-        "var_rt": '22',
-        "var_inchikey": 'mock_inchikey',
-        "var_formula": 'mock_formula',
-        "var_cas": 'mock_cas',
-        "var_smiles": 'mock_smiles',
-        "var_peak": ['9.9 99.9', '7.7 77.7'],
-        "var_compgroup": 'mock_cg1;mock_cg2',
-        "var_inchi": 'mock_inchi',
+        "par_comp": 'mock_compound',
+        "par_adduct": 'mock_adduct',
+        "par_mz": '900',
+        "par_ce": '40',
+        "par_ionization": 'mock_ionization',
+        "par_ion_mode": 'mock_ion_mode',
+        "par_rt": '22',
+        "par_inchikey": 'mock_inchikey',
+        "par_formula": 'mock_formula',
+        "par_cas": 'mock_cas',
+        "par_smiles": 'mock_smiles',
+        "par_peak": ['9.9 99.9', '7.7 77.7'],
+        "par_compgroup": 'mock_cg1;mock_cg2',
+        "par_inchi": 'mock_inchi',
         "file_path": 'mock_file_path',
-        "var_chrom_method": 'mock_chrom_method',
-        "var_instrument": 'mock_instrument',
-        "var_instrument_type": 'mock_instrument_type',
-        "var_isotope": 'mock_isotope',
-        "var_col_type": 'mock_col_type',
-        "var_ce_unit": 'mock_ce_unit',
-        "var_accession": 'mock_accession',
+        "par_chrom_method": 'mock_chrom_method',
+        "par_instrument": 'mock_instrument',
+        "par_instrument_type": 'mock_instrument_type',
+        "par_isotope": 'mock_isotope',
+        "par_col_type": 'mock_col_type',
+        "par_ce_unit": 'mock_ce_unit',
+        "par_accession": 'mock_accession',
+        "par_ces": 'mock_ces',
+        "par_exact_mass": 'mock_exact_mass'
     }]
     return pd.DataFrame(data)
 
@@ -82,25 +84,27 @@ def mock_format_data():
 def mock_entry_df():
     """Mocks the data entry (that includes the formatted data) used in csl queries in process workflows."""
     data = {
-        "var_comp": 'mock_compound',
-        "var_mz": '900',
-        "var_ce": '40',
-        "var_ionization": 'mock_ionization',
-        "var_ion_mode": 'mock_ion_mode',
-        "var_rt": '22',
-        "var_inchikey": 'mock_inchikey',
-        "var_formula": 'mock_formula',
-        "var_cas": 'mock_cas',
-        "var_smiles": 'mock_smiles',
-        "var_peak": ['9.9 99.9', '7.7 77.7'],
+        "par_comp": 'mock_compound',
+        "par_mz": '900',
+        "par_ce": '40',
+        "par_ionization": 'mock_ionization',
+        "par_ion_mode": 'mock_ion_mode',
+        "par_rt": '22',
+        "par_inchikey": 'mock_inchikey',
+        "par_formula": 'mock_formula',
+        "par_cas": 'mock_cas',
+        "par_smiles": 'mock_smiles',
+        "par_peak": ['9.9 99.9', '7.7 77.7'],
         "file_path": 'mock_file_path',
-        "var_chrom_method": 'mock_chrom_method',
-        "var_instrument": 'mock_instrument',
-        "var_instrument_type": 'mock_instrument_type',
-        "var_isotope": 'mock_isotope',
-        "var_col_type": 'mock_col_type',
-        "var_ce_unit": 'mock_ce_unit',
-        "var_accession": 'mock_accession',
+        "par_chrom_method": 'mock_chrom_method',
+        "par_instrument": 'mock_instrument',
+        "par_instrument_type": 'mock_instrument_type',
+        "par_isotope": 'mock_isotope',
+        "par_col_type": 'mock_col_type',
+        "par_ce_unit": 'mock_ce_unit',
+        "par_accession": 'mock_accession',
+        "par_authors": 'mock_authors',
+        "par_affiliation": 'mock_affiliation',
         "pol_i": 'mock_form_pol',
         "comp_i": 'mock_pol_comp',
         "adduct_i": 'mock_pol_adduct',
@@ -118,8 +122,7 @@ def mock_entry_df():
         "spec_i": pd.DataFrame({'mz': [9.9, 7.7], 'int': [99.9, 77.7]}),
         "compgroup_i": ['Pesticide','Herbicide'],
         "col_type_i": "mock_col_type",
-        "var_expg_csl": 'mock_expg',
-        "var_compg_csl": 'mock_compg',
+        "par_data_source": 'mock_dsrc',
         "instrument_i": 'mock_instrument',
         "experiment_id_i": 'mock_experiment_id',
         "form_err_flag": False,
@@ -129,13 +132,13 @@ def mock_entry_df():
 
 
 @pytest.fixture
-def mock_inst_method_pairs():
+def mock_dsrc_method_pairs():
     """Mocks the mapping of data sources to chromatographic methods."""
     return {
-        'inst_a': 'method_a',
-        'inst_b': 'method_b',
-        'inst_c': 'method_c',
-        'inst_d': 'method_d'
+        'dsrc_a': 'method_a',
+        'dsrc_b': 'method_b',
+        'dsrc_c': 'method_c',
+        'dsrc_d': 'method_d'
     }
 
 
@@ -143,8 +146,8 @@ def mock_inst_method_pairs():
 def mock_models_to_bfg():
     """Mocks the models for predicting BfG RTs from other RTs."""
     return {
-        'inst_b': MagicMock(return_value=22.5),
-        'inst_c': MagicMock(return_value=7.0)
+        'dsrc_b': MagicMock(return_value=22.5),
+        'dsrc_c': MagicMock(return_value=7.0)
     }
 
 
@@ -152,8 +155,8 @@ def mock_models_to_bfg():
 def mock_models_from_bfg():
     """Mocks the models for predicting RTs from BfG RTs."""
     return {
-        'inst_b': MagicMock(return_value=12.5),
-        'inst_c': MagicMock(return_value=15.0)
+        'dsrc_b': MagicMock(return_value=12.5),
+        'dsrc_c': MagicMock(return_value=15.0)
     }
 
 
@@ -165,8 +168,8 @@ def mock_formatted_data_mbank():
     mock_f_data.title = 'Compound; Instr; MS2; 140 V'
     mock_f_data.date = '2025.01.09'
     mock_f_data.authors = 'Person A; Person B; Person C'
-    mock_f_data.inst_license = 'dl-de/by-2-0'
-    mock_f_data.inst_copyright = 'Copyright 2025 Data source'
+    mock_f_data.dsrc_license = 'CC BY 4.0'
+    mock_f_data.dsrc_copyright = 'Copyright 2025 Data source'
     mock_f_data.comment_chunk = (f"COMMENT: Information\n"
          f"COMMENT: Additional information\n")
     mock_f_data.compound_name = 'Compound'
@@ -198,16 +201,16 @@ def mock_formatted_data_mbank():
 
 
 @pytest.fixture
-def mock_formatted_data_thermo():
-    """Mocks a FormattedData dataclass required for building final text chunks in the thermo export workflow."""
+def mock_formatted_data_mzvault():
+    """Mocks a FormattedData dataclass required for building final text chunks in the mzvault export workflow."""
     mock_f_data = MagicMock()
     mock_f_data.compound_name = 'Compound'
     mock_f_data.accession = 'BAFG-CSL2501225'
     mock_f_data.title = 'Compound; Instr; MS2; 140 V'
     mock_f_data.date = '2025.01.09'
     mock_f_data.authors = 'Person A; Person B; Person C'
-    mock_f_data.inst_license = 'dl-de/by-2-0'
-    mock_f_data.inst_copyright = 'Copyright 2025 Data source'
+    mock_f_data.dsrc_license = 'dl-de/by-2-0'
+    mock_f_data.dsrc_copyright = 'Copyright 2025 Data source'
     mock_f_data.comment_chunk = (f"COMMENT: Information\n"
          f"COMMENT: Additional information\n")
     mock_f_data.compound_classes = 'Industrial_process; Biocide'
@@ -228,6 +231,7 @@ def mock_formatted_data_thermo():
     mock_f_data.precursor_mz = 123.23
     mock_f_data.adduct = '[M]+'
     mock_f_data.rt = 12.11
+    mock_f_data.pred = 'FALSE'
     mock_f_data.precursor_charge = 1
     mock_f_data.splash_code = 'splash10-0i-900-755'
     mock_f_data.nr_peaks = 2

@@ -31,15 +31,10 @@ class Base(DeclarativeBase):
 
 
 # Define table links with many-to-many relationships
-# compoundGroup <-N-> compound
-compGroupComp = Table('compGroupComp', Base.metadata,
-                      Column('compoundGroup_id', Integer, ForeignKey('compoundGroup.compoundGroup_id')),
+# compound_group <-N-> compound
+CompoundGroupMap = Table('compound_group_map', Base.metadata,
+                      Column('compound_group_id', Integer, ForeignKey('compound_group.compound_group_id')),
                       Column('compound_id', Integer, ForeignKey('compound.compound_id')), extend_existing=True)
-
-# experimentGroup <-N-> experiment
-expGroupExp = Table('expGroupExp', Base.metadata,
-                    Column('experimentGroup_id', Integer, ForeignKey('experimentGroup.experimentGroup_id')),
-                    Column('experiment_id', Integer, ForeignKey('experiment.experiment_id')), extend_existing=True)
 
 
 # Map each table and their respective columns and relationships
@@ -54,10 +49,11 @@ class Experiment(Base):
     # Many-to-one relationship with parameter
     parameter_id = Column(Integer, ForeignKey('parameter.parameter_id'), nullable=False)
     parameter = relationship("Parameter")
-    # Many-to-many relationship with experimentGroup
-    groups = relationship("ExperimentGroup", secondary=expGroupExp, back_populates='experiments')
     # One-to-many relationship with fragment (Each experiment has a certain number of fragments)
     fragments = relationship("Fragment", back_populates='experiment', cascade="save-update, merge, delete")
+    # Many-to-one relationship with data_source
+    data_source_id = Column(Integer, ForeignKey('data_source.data_source_id'))
+    data_source = relationship("DataSource", back_populates="experiments")
     # Other columns
     mz = Column(Float, nullable=False)  # m/z (u)
     time_added = Column(DateTime)
@@ -67,7 +63,7 @@ class Experiment(Base):
     def __repr__(self):  # Define output
         return (f"experiment_id={self.experiment_id}, compound_id={self.compound_id}, compound={self.compound}, "
                 f"parameter_id={self.parameter_id}, parameter={self.parameter}, mz={self.mz}, time={self.time_added}, "
-                f"adduct={self.adduct}, isotope={self.isotope}")
+                f"adduct={self.adduct}, isotope={self.isotope}, data_source_id={self.data_source_id}")
 
 
 class Fragment(Base):
@@ -94,45 +90,44 @@ class Parameter(Base):
     instrument = Column(String, nullable=False)
     polarity = Column(String, nullable=False)
     ionisation = Column(String, nullable=False)
-    CE = Column(Float, nullable=False)  # Collision energy
-    CES = Column(Float)  # Collision energy spread
+    ce = Column(Float, nullable=False)  # Collision energy
+    ces = Column(Float)  # Collision energy spread
     ce_unit = Column(String, nullable=False)  # Collision energy units
-    col_type = Column(String, nullable=False)  # Collision type
+    collision_type = Column(String, nullable=False)  # Collision type
 
     def __repr__(self):
         return (f"parameter_id={self.parameter_id}, instrument={self.instrument}, polarity={self.polarity}, "
-                f"ionisation={self.ionisation}, CE={self.CE}, CES={self.CES}, ce_unit={self.ce_unit}, "
-                f"col_type={self.col_type}")
+                f"ionisation={self.ionisation}, ce={self.ce}, ces={self.ces}, ce_unit={self.ce_unit}, "
+                f"collision_type={self.collision_type}")
 
 
 class Compound(Base):
     __tablename__ = 'compound'
     # Primary key: compound_id
     compound_id = Column(Integer, primary_key=True)
-    # Many-to-many relationship with compoundGroup
-    groups = relationship("CompoundGroup", secondary=compGroupComp, back_populates='compounds')
+    # Many-to-many relationship with compound_group
+    compound_groups = relationship("CompoundGroup", secondary=CompoundGroupMap, back_populates='compounds')
     # One-to-many relationship with experiment
     experiments = relationship("Experiment", back_populates='compound', cascade="save-update, merge, delete")
     # One-to-many relationship with retention_time
     retention_times = relationship('RetentionTime', back_populates='compound', cascade="save-update, merge, delete")
     # Other columns
-    CAS = Column(String)  # CAS (Chemical Abstracts Service) registry number (CAS RN)
+    cas = Column(String)  # CAS (Chemical Abstracts Service) registry number (CAS RN)
     formula = Column(String, nullable=False)
-    SMILES = Column(String)  # SMILES (Simplified Molecular Input Line Entry System) -code
+    smiles = Column(String)  # SMILES (Simplified Molecular Input Line Entry System) -code
     name = Column(String, nullable=False, unique=True)
-    chem_list_id = Column(Integer)
     inchi = Column(String)
     inchikey = Column(String)
 
     def __repr__(self):
-        return (f"compound_id={self.compound_id}, name={self.name}, CAS={self.CAS}, inchikey={self.inchikey}, "
-                f"formula={self.formula}, smiles={self.SMILES}, inchi={self.inchi}, chem_list_id={self.chem_list_id}")
+        return (f"compound_id={self.compound_id}, name={self.name}, cas={self.cas}, inchikey={self.inchikey}, "
+                f"formula={self.formula}, smiles={self.smiles}, inchi={self.inchi}")
 
 
 class RetentionTime(Base):
-    __tablename__ = 'retentionTime'
-    # Primary key: ret_time_id
-    ret_time_id = Column(Integer, primary_key=True)
+    __tablename__ = 'retention_time'
+    # Primary key: retention_time_id
+    retention_time_id = Column(Integer, primary_key=True)
     # Many-to-one relationship with compound
     compound_id = Column(Integer, ForeignKey('compound.compound_id'))
     compound = relationship('Compound', back_populates='retention_times')
@@ -142,33 +137,36 @@ class RetentionTime(Base):
     predicted = Column(String)
 
     def __repr__(self):
-        return (f"ret_time_id={self.ret_time_id}, compound_id={self.compound_id}, compound={self.compound}, rt={self.rt},"
+        return (f"retention_time_id={self.retention_time_id}, compound_id={self.compound_id}, compound={self.compound}, rt={self.rt},"
                 f"chrom_method={self.chrom_method}, predicted={self.predicted}")
 
 
 class CompoundGroup(Base):
-    # This table is for compound groups, e.g. FRAME list, Rhein-Non-target
-    __tablename__ = 'compoundGroup'
-    # Primary key: compoundGroup_id
-    compoundGroup_id = Column(Integer, primary_key=True)
+    # This table is for compound groups, e.g., Pesticide, Pharmaceutical, etc ...
+    __tablename__ = 'compound_group'
+    # Primary key: compound_group_id
+    compound_group_id = Column(Integer, primary_key=True)
     # Many-to-many relationship with compound
-    compounds = relationship("Compound", secondary=compGroupComp, back_populates='groups')
+    compounds = relationship("Compound", secondary=CompoundGroupMap, back_populates='compound_groups')
     # Other columns
     name = Column(String, nullable=False)
 
     def __repr__(self):
-        return f"compoundGroup_id={self.compoundGroup_id}, name={self.name}, no. of compounds={len(self.compounds)}"
+        return f"compound_group_id={self.compound_group_id}, name={self.name}, no. of compounds={len(self.compounds)}"
 
 
-class ExperimentGroup(Base):
-    # This table is for experiment groups, e.g. BfG, MassBank, Stoff-Ident
-    __tablename__ = 'experimentGroup'
-    # Primary key: experimentGroup_id
-    experimentGroup_id = Column(Integer, primary_key=True)
-    # Many-to-many relationship with experiment
-    experiments = relationship("Experiment", secondary=expGroupExp, back_populates='groups')
+class DataSource(Base):
+    # This table is for data sources, e.g. bfg, uba, lfuby, ...
+    __tablename__ = 'data_source'
+    # Primary key: data_source_id
+    data_source_id = Column(Integer, primary_key=True)
+    # One-to-many relationship with experiment
+    experiments = relationship("Experiment", back_populates='data_source')
     # Other columns
     name = Column(String, nullable=False)
+    long_name = Column(String)
+    authors = Column(String)
 
     def __repr__(self):
-        return f"experimentGroup_id={self.experimentGroup_id}, name={self.name}, no. of experiments={len(self.experiments)}"
+        return (f"data_source_id={self.data_source_id}, name={self.name}, long_name={self.long_name}, "
+                f"authors={self.authors}, no. of experiments={len(self.experiments)}")

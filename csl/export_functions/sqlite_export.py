@@ -5,7 +5,6 @@ from csl.utils.sql_utils import *
 class SqliteExport(FormatExport):
     def export(self):
         """Workflow to export a subset of the CSL data to a new sqlite file."""
-
         import logging
         from pathlib import Path
         import os.path
@@ -24,7 +23,7 @@ class SqliteExport(FormatExport):
         session_source = create_session(self.path_csl)
 
         # Get experiment IDs
-        experiment_ids = get_experiment_ids_by_exp_group(session=session_source, data_source=self.subset)
+        experiment_ids = get_experiment_ids_by_data_src(session=session_source, data_source=self.subset)
         logger.info(f"Found {len(experiment_ids)} experiment ID's for subset: {self.subset}")
 
         # Copy the sqlite file
@@ -42,44 +41,34 @@ class SqliteExport(FormatExport):
         # Delete all other experiments and related information
         if exp_to_keep:
             # Delete all other experiments
-            session.query(Experiment).filter(~Experiment.experiment_id.in_(experiment_ids)).delete(
-                synchronize_session=False)
+            (session.query(Experiment)
+            .filter(~Experiment.experiment_id.in_(experiment_ids))
+            .delete(synchronize_session=False))
 
             # Delete parameters
-            session.query(Parameter).filter(~Parameter.parameter_id.in_(
-                session.query(Experiment.parameter_id)
-            )).delete(synchronize_session=False)
+            (session.query(Parameter)
+            .filter(~Parameter.parameter_id.in_(session.query(Experiment.parameter_id)))
+            .delete(synchronize_session=False))
 
             # Delete compounds
-            session.query(Compound).filter(~Compound.compound_id.in_(
-                session.query(Experiment.compound_id)
-            )).delete(synchronize_session=False)
+            (session.query(Compound)
+            .filter(~Compound.compound_id.in_(session.query(Experiment.compound_id)))
+            .delete(synchronize_session=False))
 
             # Delete fragments
-            session.query(Experiment.fragments.property.mapper.class_).filter(
-                ~Experiment.fragments.property.mapper.class_.experiment_id.in_(
-                    session.query(Experiment.experiment_id)
-                )
-            ).delete(synchronize_session=False)
+            (session.query(Experiment.fragments.property.mapper.class_)
+             .filter(~Experiment.fragments.property.mapper.class_.experiment_id.in_(session.query(Experiment.experiment_id)))
+             .delete(synchronize_session=False))
 
             # Delete retention times
-            session.query(RetentionTime).filter(~RetentionTime.compound_id.in_(
-                session.query(Experiment.compound_id)
-            )).delete(synchronize_session=False)
-
-            # Delete experiment group information
-            session.query(expGroupExp).filter(
-                ~expGroupExp.c.experiment_id.in_(
-                    session.query(Experiment.experiment_id)
-                )
-            ).delete(synchronize_session=False)
+            (session.query(RetentionTime)
+             .filter(~RetentionTime.compound_id.in_(session.query(Experiment.compound_id)))
+             .delete(synchronize_session=False))
 
             # Delete compound group information
-            session.query(compGroupComp).filter(
-                ~compGroupComp.c.compound_id.in_(
-                    session.query(Compound.compound_id)
-                )
-            ).delete(synchronize_session=False)
+            (session.query(CompoundGroupMap)
+             .filter(~CompoundGroupMap.c.compound_id.in_(session.query(Compound.compound_id)))
+             .delete(synchronize_session=False))
 
             # Commit changes to session
             session.commit()

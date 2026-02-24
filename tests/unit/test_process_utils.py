@@ -4,6 +4,7 @@ from unittest.mock import patch
 import os
 import tempfile
 import pandas as pd
+import math
 
 
 @pytest.mark.parametrize("mock_data_paths, mock_isfile, expected_file_paths",
@@ -98,23 +99,24 @@ def test_format_adduct(adduct_name, pol_i, expected_adduct_i):
     assert adduct_i == expected_adduct_i
 
 
-@pytest.mark.parametrize("data_ce, expected_ce_i, expected_ces_i, expected_ces_warn", [
-    ('10', 10, 0, False),
-    ('20, 40, 60', 40, 20, False),
-    ('-10', 10, 0, False),              # Negative input values are transformed to positive values
-    ('-20, -40, -60', 40, 20, False),
-    ('20.00,40.00,60.00', 40, 20, False),
-    ('10, 20, 30', 20, 10, True),       # Warning when CES is not 20
-    ('10, 20, 50', None, None, False),  # Non-equal difference in CES
-    ('20, 40', None, None, False),      # Unexpected number of CE
-    ('', None, None, False)             # No data
+@pytest.mark.parametrize("data_ce, data_ces, expected_ce_i, expected_ces_i", [
+    ('10', '0', 10, 0),                 # CE/CES values are correctly formatted
+    ('20, 40, 60', [], 40, 20),         # CES is calculated from multiple CE values
+    ('60, 20, 40', [], 40, 20),         # Different order of inputs
+    ('-30', '-15', 30, 15),             # Negative input values are transformed to positive values
+    ('-20, -40, -60', [], 40, 20),
+    ('20.00,40.00,60.00', [], 40, 20),  # Different input format works
+    ([],'10', None, None),              # No CE input value
+    ('10, 20, 50', [], None, None),     # Non-equal difference in CES
+    ('20, 40', [], None, None),         # Unexpected number of CE
+    ('', '', None, None),               # No data
+    ([], [], None, None)
 ])
-def test_get_collision_energy(data_ce, expected_ce_i, expected_ces_i, expected_ces_warn):
+def test_get_collision_energy(data_ce, data_ces, expected_ce_i, expected_ces_i):
     """Tests the function with parametrized inputs."""
-    ce_i, ces_i, ces_warn = get_collision_energy(data_ce)
+    ce_i, ces_i = get_collision_energy(data_ce, data_ces)
     assert ce_i == expected_ce_i
     assert ces_i == expected_ces_i
-    assert ces_warn == expected_ces_warn
 
 
 @pytest.mark.parametrize("data_ionization, expected_ionization_i",
@@ -208,7 +210,11 @@ def test_get_collision_type(data_col_type, expected_col_type_i):
 @pytest.mark.parametrize("data_instrument, data_instrument_type, expected_instrument_i",
                          [('TripleTOF 5600 SCIEX', 'LC-ESI-QTOF', 'LC-ESI-QTOF TripleTOF 5600 SCIEX'),
                           ('LC-ESI-QTOF TripleTOF 5600 SCIEX', None, 'LC-ESI-QTOF TripleTOF 5600 SCIEX'),
-                          ('QExactive','LC-ESI-Orbitrap','LC-ESI-Orbitrap QExactive')])
+                          ('QExactive Thermo', None, 'LC-ESI-Orbitrap QExactive Thermo'),
+                          ('Invalid instrument', None, None),
+                          ('Invalid instrument', 'Invalid type', None),
+                          ('TripleTOF 5600 SCIEX', 'Invalid type', 'LC-ESI-QTOF TripleTOF 5600 SCIEX'),
+                          ('Invalid instrument', 'LC-ESI-QTOF', None)])
 def test_get_instrument(data_instrument, data_instrument_type, expected_instrument_i):
     """Tests the function with parametrized inputs."""
     instrument_i = get_instrument(data_instrument, data_instrument_type)
@@ -221,3 +227,22 @@ def test_get_experiment_id(data_accession, expected_experiment_id_i):
     """Tests the function with parametrized inputs."""
     experiment_id_i = get_experiment_id(data_accession)
     assert experiment_id_i == expected_experiment_id_i
+
+
+@pytest.mark.parametrize("data_exact_mass, smiles_i, data_mz, expected_exact_mass, expected_adduct_mass",
+                         [('90.90', None, '91.90', 90.90, 1.00),
+                          ('60.02', 'CC(=O)O', '61.04', 60.02, 1.02),
+                          (None, 'CC(=O)O', '61.04', 60.02, 1.02),
+                          (None, None, '61.04', None, None),
+                          ('60.02', None, None, 60.02, None)])
+def test_get_exact_mass_adduct_mass(data_exact_mass, smiles_i, data_mz, expected_exact_mass, expected_adduct_mass):
+    """Tests the function with parametrized inputs."""
+    exact_mass, adduct_mass = get_exact_mass_adduct_mass(data_exact_mass, smiles_i, data_mz)
+    if exact_mass is None:
+        assert expected_exact_mass is None
+    else:
+        assert math.isclose(exact_mass, expected_exact_mass, rel_tol=1e-2)
+    if adduct_mass is None:
+        assert expected_adduct_mass is None
+    else:
+        assert math.isclose(adduct_mass, expected_adduct_mass, rel_tol=1e-2)

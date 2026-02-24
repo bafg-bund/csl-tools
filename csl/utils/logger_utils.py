@@ -5,7 +5,6 @@ This module provides utilities for customizing logging behavior, such as
 defining custom log levels, applying colors to log messages, and adding
 console handlers to the logger.
 """
-
 import logging
 
 # Define custom log levels and their associated colors
@@ -20,17 +19,13 @@ custom_levels = {
 
 # Define a custom formatter
 class ColoredFormatter(logging.Formatter):
-    """
-    A custom log formatter that adds color to log messages based on their
-    severity level.
-    """
+    """A custom log formatter that adds color to log messages based on their severity level."""
     def format(self, record):
         """
         Format the log message with color based on the log level.
 
         Args:
-            record (logging.LogRecord): The log record containing the log
-            message and associated metadata.
+            record (logging.LogRecord): The log record containing the log message and associated metadata.
 
         Returns:
             str: The formatted log message with the appropriate color.
@@ -43,7 +38,6 @@ class ColoredFormatter(logging.Formatter):
 
 def setup_logger(log_fpath):
     """Add a console handler to the root logger with a colored log formatter."""
-
     # Get the logger
     logger = logging.getLogger()
 
