@@ -1,13 +1,13 @@
 from csl.main_functions.rtscan import scan_rt
 from csl.utils.sql_utils import create_session, RetentionTime
-from csl.config import ROOT_DIR, DEFAULT_PAIRS_INST_CHROM
+from csl.config import ROOT_DIR, DEFAULT_PAIRS_DSOURCE_CHROM
 import os
 import shutil
 from pathlib import Path
 from unittest import mock
 
 
-def test_rtscan_check():
+def test_rtscan_update():
     """
     Tests prediction of retention times (RTs) and correction of incorrect or missing "predicted" flags.
 
@@ -36,9 +36,9 @@ def test_rtscan_check():
     # Copy the database file
     shutil.copy(csl_template_path, csl_copy_path)
 
-    # Rtscan check workflow
+    # Rtscan workflow
     with mock.patch('builtins.input', return_value='yes'):  # Mocks user input
-        scan_rt(operation='check', path_csl=csl_copy_path)
+        scan_rt(operation='update', path_csl=csl_copy_path)
 
     # Assert that new CSL file was created
     name, ext = os.path.splitext(os.path.basename(csl_copy_path))
@@ -49,21 +49,21 @@ def test_rtscan_check():
     session = create_session(path_csl=csl_new_path)
 
     # Assert that there is one RT-entry for each method per compound (4 compounds in this database)
-    assert len(session.query(RetentionTime).all()) == 4*len(DEFAULT_PAIRS_INST_CHROM), \
-        (f"Expected {4*len(DEFAULT_PAIRS_INST_CHROM)} entries, but found {len(session.query(RetentionTime).all())}. "
+    assert len(session.query(RetentionTime).all()) == 4*len(DEFAULT_PAIRS_DSOURCE_CHROM), \
+        (f"Expected {4*len(DEFAULT_PAIRS_DSOURCE_CHROM)} entries, but found {len(session.query(RetentionTime).all())}. "
          f"Check methods in config.py")
 
     # Assert that for the compound id 1443 the experimental lfuby-RT is now FALSE (was empty)
     assert session.query(RetentionTime.predicted).filter_by(
-        compound_id=1443, chrom_method=DEFAULT_PAIRS_INST_CHROM['lfuby']).one_or_none()[0] == 'FALSE'
+        compound_id=1443, chrom_method=DEFAULT_PAIRS_DSOURCE_CHROM['lfuby']).one_or_none()[0] == 'FALSE'
 
     # Assert that for the compound id 1672 the experimental uba-RT is now 'FALSE' (was 'TRUE')
     assert session.query(RetentionTime.predicted).filter_by(
-        compound_id=1672, chrom_method=DEFAULT_PAIRS_INST_CHROM['uba']).one_or_none()[0] == 'FALSE'
+        compound_id=1672, chrom_method=DEFAULT_PAIRS_DSOURCE_CHROM['uba']).one_or_none()[0] == 'FALSE'
 
     # Assert that for the compound id 1670 the predicted bfg-RT is now 'TRUE' (was 'FALSE')
     assert session.query(RetentionTime.predicted).filter_by(
-        compound_id=1670, chrom_method=DEFAULT_PAIRS_INST_CHROM['bfg']).one_or_none()[0] == 'TRUE'
+        compound_id=1670, chrom_method=DEFAULT_PAIRS_DSOURCE_CHROM['bfg']).one_or_none()[0] == 'TRUE'
 
     # Cleanup
     session.close()

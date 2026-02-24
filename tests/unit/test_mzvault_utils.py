@@ -1,8 +1,8 @@
-from csl.export_functions.utils.thermo_export_utils import *
+from csl.export_functions.utils.mzvault_export_utils import *
 import pytest
 
 
-def test_build_export_chunk_thermo(mock_formatted_data_thermo):
+def test_build_export_chunk_mzvault(mock_formatted_data_mzvault):
     """Tests assembly of the export chunk."""
     # Prepare data
     expected_export_chunk = (
@@ -31,6 +31,7 @@ def test_build_export_chunk_thermo(mock_formatted_data_thermo):
         "FRAGMENTATION_MODE: Q\n"
         "IONIZATION: ESI\n"
         "RETENTIONTIME: 12.11\n"
+        "PREDICTED_RT: FALSE\n"
         "PRECURSORMZ: 123.23\n"
         "PRECURSORTYPE: [M]+\n"
         "PRECURSOR_CHARGE: 1\n"
@@ -40,33 +41,33 @@ def test_build_export_chunk_thermo(mock_formatted_data_thermo):
         "200.0 250.0\n")
 
     # Call the function
-    export_chunk = build_export_chunk_thermo(mock_formatted_data_thermo)
+    export_chunk = build_export_chunk_mzvault(mock_formatted_data_mzvault)
 
     # Assert
     assert export_chunk == expected_export_chunk
 
 
-def test_format_spectrum_thermo():
+def test_format_spectrum_mzvault():
     """Tests if the spectrum is correctly formatted."""
     # Prepare data
     spectrum =  [(87.0441, 0.0326), (101.060643, 0.04768), (723.468001, 23.0), (233.4, 0.0)]
     expected_formatted_spectrum = [(87.0441, 0.0326), (101.0606, 0.0477), (723.468, 23.0)]
 
     # Call the function
-    formatted_spectrum = format_spectrum_thermo(spectrum)
+    formatted_spectrum = format_spectrum_mzvault(spectrum)
 
     # Assert
     assert formatted_spectrum == expected_formatted_spectrum
 
 
 @pytest.mark.parametrize("pol, expected_ion_mode",[('pos','Positive'),('neg','Negative')])
-def test_get_ion_mode_thermo(pol, expected_ion_mode):
+def test_get_ion_mode_mzvault(pol, expected_ion_mode):
     """Tests if the function returns the expected MassBank-specific ion mode strings."""
-    ion_mode = get_ion_mode_thermo(pol)
+    ion_mode = get_ion_mode_mzvault(pol)
     assert ion_mode == expected_ion_mode
 
-def test_get_ion_mode_thermo_error():
+def test_get_ion_mode_mzvault_error():
     """Tests if the function returns an error when input is not valid."""
     pol = 'non_valid_input'
     with pytest.raises(ValueError, match=f"Unknown polarity format {pol}."):
-        get_ion_mode_thermo(pol)
+        get_ion_mode_mzvault(pol)

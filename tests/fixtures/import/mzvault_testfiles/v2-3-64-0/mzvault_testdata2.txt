@@ -1,0 +1,39 @@
+﻿Name: NewSubstance_NH4
+PrecursorMz: 999
+Precursor_type: 
+Collision_energy: 40.00
+Ionization: ESI
+IonMode: positive
+RetentionTime: 99
+InChiKey: WZJZMXBKUWKXTQ-UHFFFAOYSA-N
+Formula: C16H16N2O4
+CASNo: 13684-56-5
+Smiles: CCOC(=O)Nc1cccc(c1)OC(=O)Nc2ccccc2
+CompoundClass: Herbicide;Pesticide
+Comment: 
+Num peaks: 4
+9.9 99
+9.9 99
+9.9 99
+9.9 99
+
+
+Name: NewSubstance_NH4
+PrecursorMz: 999
+Precursor_type: 
+Collision_energy: 50.00
+Ionization: ESI
+IonMode: positive
+RetentionTime: 99
+InChiKey: WZJZMXBKUWKXTQ-UHFFFAOYSA-N
+Formula: C16H16N2O4
+CASNo: 13684-56-5
+Smiles: CCOC(=O)Nc1cccc(c1)OC(=O)Nc2ccccc2
+CompoundClass: Herbicide;Pesticide
+Comment: 
+Num peaks: 5
+9.9 99
+9.9 99
+9.9 99
+9.9 99
+9.9 99

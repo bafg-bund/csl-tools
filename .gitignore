@@ -6,6 +6,7 @@ __pycache__/
 *$py.class
 
 # Distribution / packaging
+dist/
 build/
 *.egg-info/
 
@@ -16,6 +17,7 @@ build/
 # Environments
 .env
 .venv
+.testenv
 
 # Pycharm settings
 .idea/

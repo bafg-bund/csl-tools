@@ -1,5 +1,5 @@
 from csl.main_functions.export import export_data
-from csl.config import ROOT_DIR, DEFAULT_PAIRS_INST_CHROM
+from csl.config import ROOT_DIR, DEFAULT_PAIRS_DSOURCE_CHROM
 import os
 import shutil
 import glob
@@ -25,11 +25,11 @@ def test_export_envi():
         except PermissionError as e:
             print(f"Could not delete {f}: {e}")
 
-    # Export envi workflow
+    # Export workflow
     export_data(format='envi', path_csl=csl_path, path_out=out_path)
 
     # Assert that the correct number of files were produced
-    all_methods = DEFAULT_PAIRS_INST_CHROM
+    all_methods = DEFAULT_PAIRS_DSOURCE_CHROM
     files = glob.glob(os.path.join(out_path, '*'))  # List all files in the output folder
     assert len(files) == len(all_methods), f"Expected {len(all_methods)} file(s), but found {len(files)}: {files}"
 

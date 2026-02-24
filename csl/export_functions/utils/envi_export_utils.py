@@ -32,8 +32,8 @@ def sql_query_with_filters_envi(session, chrom_method):
         .join(RetentionTime, RetentionTime.compound_id == Compound.compound_id)
         .filter(
             and_(
-                Parameter.CE.between(ce_filter[0], ce_filter[1]),
-                Parameter.CES.between(ces_filter[0], ces_filter[1]),
+                Parameter.ce.between(ce_filter[0], ce_filter[1]),
+                Parameter.ces.between(ces_filter[0], ces_filter[1]),
                 # Parameter.instrument.in_(instrument_filter),  # Filtering by instrument currently not needed
                 RetentionTime.chrom_method == chrom_method,
             )
@@ -68,16 +68,17 @@ def process_data_entry_envi(csl_data, chrom_method):
     adduct, restrict_adduct = get_adduct_info_envi(csl_data.adduct)
     ion_mode = get_ion_mode_envi(csl_data.parameter.polarity)
     fragments = get_fragments_int_cutoff(csl_data.fragments, fragment_cutoff_percent)
-    cas = get_cas_envi(csl_data.compound.CAS)
-    smiles = get_smiles_envi(csl_data.compound.SMILES)
+    cas = get_cas_envi(csl_data.compound.cas)
+    smiles = get_smiles_envi(csl_data.compound.smiles)
     inchi = csl_data.compound.inchi
 
     # Build row entry in correct order using extracted data and default values for additional rows
     dv = additional_columns_with_def_values_envi()  # Additional columns with default values
     processed_entry = list([compound_name, formula, rt, dv['RTI'], dv['RT_tolerance'], dv['ID_internal_standard'], adduct, ion_mode,
          dv['use_for_recalibration'], dv['use_for_screening'], restrict_adduct, fragments, dv['Remark'], dv['tag1'],
-         dv['tag2'], dv['tag3'], dv['from'], dv['to'], dv['warn_1'], dv['warn_2'], dv['Quant_adduct'], dv['Quant_peak'],
-         dv['Quant_rule'], dv['homol_units'], cas, inchi, smiles, dv['NIST'] ])
+         dv['tag2'], dv['tag3'], dv['from_date'], dv['from_time'], dv['to_date'], dv['to_time'], dv['warn_1'],
+         dv['warn_2'], dv['Quant_adduct'], dv['Quant_peak'], dv['Quant_rule'], dv['homol_units'], cas, inchi, smiles,
+         dv['NIST'], dv['identified_by'], dv['identified_when'], dv['CL'] ])
 
     return processed_entry
 
@@ -134,9 +135,9 @@ def get_fragments_int_cutoff(csl_fragments, cutoff_percent):
         csl_fragments (utils.sql_utils.Fragment) : List of Fragments with the following attributes:
                                                    - mz (float): The mass-to-charge ratio of the fragment.
                                                    - intensity (float): The intensity of the fragment.
-        cutoff_percent (int or float)            : The intensity cutoff as a percentage of the maximum intensity.
-                                                   Only fragments with an intensity above this percentage of the maximum
-                                                   intensity will be included in the result.
+        cutoff_percent (int or float) : The intensity cutoff as a percentage of the maximum intensity.
+                                        Only fragments with an intensity above this percentage of the maximum intensity
+                                        will be included in the result.
 
     Returns:
         fragments_cutoff (list[tuple[float, float]]) : List of fragments as tuples (mz, intensity) that meet or exceed
@@ -172,7 +173,7 @@ def deduplicate_fragments_envi(frags):
     Removes duplicates of fragments by comparing mz values within a tolerance (specified in envi_export_config).
 
     Args:
-        frags (list[tuple[float, float]]): Fragments (list of tuples with mz and intensity values).
+        frags (list[tuple[float, float]]) : Fragments (list of tuples with mz and intensity values).
 
     Returns:
         frag_str_deduped (str) : Formatted fragments (comma-separated mz-values) without duplicates.

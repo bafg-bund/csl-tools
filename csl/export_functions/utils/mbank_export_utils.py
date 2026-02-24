@@ -1,5 +1,5 @@
 from csl.export_functions.utils import *
-from csl.config import DEFAULT_PAIRS_INST_CHROM
+from csl.config import DEFAULT_PAIRS_DSOURCE_CHROM
 
 from dataclasses import dataclass
 from typing import Optional, Union, List
@@ -7,7 +7,7 @@ from typing import Optional, Union, List
 
 def get_exp_ids_mbank(path_mbank_files):
     """
-    Retrieve current MassBank experiment IDs (=accession numbers).
+    Retrieve current MassBank experiment IDs (= accession numbers).
 
     Args:
         path_mbank_files (str) : Path to directory with existing MassBank files.
@@ -32,24 +32,25 @@ def get_exp_ids_mbank(path_mbank_files):
     }
     return dict_mbank_exp_id_fn
 
-def extract_experiment_chunk_mbank(session, exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, dict_mbank_exp_id_fn):
+def extract_experiment_chunk_mbank(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, sql_data_dict, dict_mbank_exp_id_fn):
     """
-    Extracts data for a specific experiment id and formats data for MassBank requirements.
+    Extracts data for a specific experiment id and formats data for MassBank documents (.txt).
 
     Args:
-        session (obj)               : SQLAlchemy session object connected to the CSL database.
         exp_id (int)                : Experiment ID used to query the database.
         chrom_method (str)          : Chromatographic method identifier.
         csl_version (str)           : Current version of the CSL database.
         CSLTOOLS_VERSION (str)      : Current version of the python package.
+        sql_data_dict (dict[int, SqlQueryResult(dataclass)]) : Mapping of exp_id to SqlQueryResult
         dict_mbank_exp_id_fn (dict) : Pairs of existing of accession strings and experiment IDs.
 
     Returns:
-        export_chunk (str) : Text chunk formatted to MassBank requirements for a single txt file.
+        export_chunk (str) : Text chunk formatted for a single MassBank entry.
     """
-
-    # SQL queries based on experiment ID and chromatographic method
-    SqlQueryResult = sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method)
+    # SQL queries based on experiment ID
+    SqlQueryResult = sql_data_dict.get(exp_id)
+    if not SqlQueryResult:
+        return None
 
     # Skip internal standards
     skip_comp = skip_compounds_mbank()
@@ -59,7 +60,7 @@ def extract_experiment_chunk_mbank(session, exp_id, chrom_method, csl_version, C
     # Format data to meet MassBank format requirements
     FormattedData = extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, SqlQueryResult, dict_mbank_exp_id_fn)
 
-    # Assemble text chunk for the MassBank document
+    # Assemble text chunk for the MassBank entry
     export_chunk = build_export_chunk_mbank(FormattedData)
 
     return export_chunk
@@ -84,8 +85,8 @@ class FormattedDataMbank:
     frag_mode: str
     inchi: str
     inchikey: str
-    inst_copyright: str
-    inst_license: Optional[str]
+    dsrc_copyright: str
+    dsrc_license: Optional[str]
     instrument_name: str
     instrument_type: str
     ion_mode: str
@@ -111,8 +112,7 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VE
         dict_mbank_exp_id_fn (dict) : Pairs of existing of accession strings and experiment IDs.
 
     Returns:
-          FormattedData (dataclass) : Dataclass containing the formatted data required for constructing the MassBank
-                                      document.
+          FormattedData (dataclass) : Dataclass containing the formatted data required for constructing the document.
     """
     from datetime import datetime
     from rdkit import Chem
@@ -129,13 +129,13 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VE
     adduct = sql_data.experiment.adduct
 
     # Compute exact mass using RDKit
-    mol = Chem.MolFromSmiles(sql_data.compound.SMILES)
+    mol = Chem.MolFromSmiles(sql_data.compound.smiles)
     exact_mass = round(Descriptors.ExactMolWt(mol), 4)
 
     # Compound related
     compound_name = sql_data.compound.name
-    cas = sql_data.compound.CAS
-    smiles = sql_data.compound.SMILES
+    cas = sql_data.compound.cas
+    smiles = sql_data.compound.smiles
     inchi = sql_data.compound.inchi
     inchikey = sql_data.compound.inchikey
     formula = format_formula_mbank(adduct, sql_data.compound.formula)
@@ -145,24 +145,18 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VE
     rt = sql_data.retention_time.rt
 
     # Parameter related
-    ce = int(sql_data.parameter.CE)
+    ce = int(sql_data.parameter.ce)
     instrument_type = sql_data.parameter.instrument.split()[0]
     instrument_name = " ".join(sql_data.parameter.instrument.split()[1:])
     ionization = sql_data.parameter.ionisation
     ce_unit = sql_data.parameter.ce_unit
     ion_mode = get_ion_mode_mbank(sql_data.parameter.polarity)
-    frag_mode = get_fragmentation_mode_mbank(sql_data.parameter.col_type)
-
-    # Experiment groups
-    exp_groups = [group.name for group in sql_data.exp_groups]
-    if len(exp_groups) > 1:
-        raise ValueError(
-            f"Experiment groups > 1 not allowed. Check experiment ID {exp_id}")
+    frag_mode = get_fragmentation_mode_mbank(sql_data.parameter.collision_type)
 
     # Legal stuff
-    authors, inst_copyright, contrib_prefix, inst_license = get_contributors_copyright(exp_groups[0])
+    authors, dsrc_copyright, contrib_prefix, dsrc_license = get_contributors_copyright(sql_data.data_src)
     if not authors:
-        raise ValueError(f"Unknown contributor for experiment ID {exp_id}")
+        raise ValueError(f"Unknown contributor for experiment ID {exp_id}. Check link to table data_source in CSL.")
 
     # Construct title
     def_mslevel = 'MS2'
@@ -175,12 +169,12 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VE
     date = datetime.now().strftime('%Y.%m.%d')
 
     # Comments
-    all_methods = DEFAULT_PAIRS_INST_CHROM
+    all_methods = DEFAULT_PAIRS_DSOURCE_CHROM
     comment_chunk = \
         (f"COMMENT: CONFIDENCE Reference Standard (Level 1)\n"
          f"COMMENT: Chromatography method: {chrom_method}\n"
          )
-    if 'bfg' in sql_data.exp_groups:
+    if sql_data.data_src.name == 'bfg':
         comment_chunk += f"COMMENT: Acquisition method: 10.1002/rcm.8541\n"
 
     # Chromatography
@@ -201,13 +195,13 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VE
 
     return FormattedDataMbank(accession, adduct, authors, cas, ce, comment_chunk, compound_classes, compound_name,
                               chrom_chunk, data_proc_chunk, date, def_mslevel, exact_mass, formula, frag_mode, inchi,
-                              inchikey, inst_copyright, inst_license, instrument_name, instrument_type, ion_mode,
+                              inchikey, dsrc_copyright, dsrc_license, instrument_name, instrument_type, ion_mode,
                               ionization, nr_peaks, precursor_mz, spectrum, splash_code, smiles, title)
 
 
 def build_export_chunk_mbank(f_data: FormattedDataMbank):
     """
-    Assembles the text chunk for the MassBank document in the required order.
+    Assembles the text chunk in the required order.
 
     Args:
         f_data (dataclass) : Dataclass containing the relevant formatted data.
@@ -215,15 +209,14 @@ def build_export_chunk_mbank(f_data: FormattedDataMbank):
     Returns:
         export_chunk (str) : Formatted text chunk for the MassBank document.
     """
-
     # Format export chunk in the correct order
     export_chunk = "".join(filter(None, [
         f"ACCESSION: {f_data.accession}\n",
         f"RECORD_TITLE: {f_data.title}\n",
         f"DATE: {f_data.date}\n",
         f"AUTHORS: {f_data.authors}\n",
-        f"LICENSE: {f_data.inst_license}\n",
-        f"COPYRIGHT: {f_data.inst_copyright}\n",
+        f"LICENSE: {f_data.dsrc_license}\n",
+        f"COPYRIGHT: {f_data.dsrc_copyright}\n",
         f"{f_data.comment_chunk}" if f_data.comment_chunk else None,
         f"CH$NAME: {f_data.compound_name}\n",
         f"CH$COMPOUND_CLASS: {f_data.compound_classes}\n" if f_data.compound_classes else None,
@@ -261,11 +254,10 @@ def build_export_chunk_mbank(f_data: FormattedDataMbank):
 
 def format_spectrum_mbank(spectrum):
     """Removes entries with intensity-values of zero and rounding values for m/z and intensity."""
-
     # Remove zeros in intensity
     spectrum_nozero = [entry for entry in spectrum if entry[1] != 0]
-
     intensities = [spec[1] for spec in spectrum_nozero]
+
     # Calculate relative intensities
     max_intensity = max(intensities)
     relative_intensities = [int((intensity / max_intensity) * 999) for intensity in intensities]
@@ -278,8 +270,8 @@ def format_spectrum_mbank(spectrum):
 
 def format_formula_mbank(adduct, formula):
     """
-    Returns MassBank-specific format for formula in case of permanent cations / anions
-    based on CSL-specific adduct format.
+    Returns MassBank-specific format for formula in case of permanent cations / anions based on CSL-specific adduct
+    format.
     """
     if adduct == '[M]+':
         formula = f'[{formula}]+'
@@ -299,14 +291,14 @@ def get_ion_mode_mbank(pol):
     return ion_mode
 
 
-def get_fragmentation_mode_mbank(col_type):
+def get_fragmentation_mode_mbank(collision_type):
     """Returns the MassBank-specific format for fragmentation mode based on the CSL-specific format."""
-    if col_type == 'Q':
+    if collision_type == 'Q':
         frag_mode = 'CID'
-    elif col_type == 'HCD':
+    elif collision_type == 'HCD':
         frag_mode = 'HCD'
     else:
-        raise ValueError(f"Unknown fragmentation mode {col_type}")
+        raise ValueError(f"Unknown fragmentation mode {collision_type}")
     return frag_mode
 
 

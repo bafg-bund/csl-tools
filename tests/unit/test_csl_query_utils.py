@@ -36,8 +36,8 @@ def test_check_duplicate_inchikey_cas_variants(mock_session, mock_entry_df, inch
     assert mock_query.all.call_count == expected_all_callcount
 
 
-def test_add_exp_to_session_exp_group_not_exists(mock_session, mock_entry_df, mock_inst_def):
-    """Tests if call is made to add missing experiment group."""
+def test_add_exp_to_session_data_src_not_exists(mock_session, mock_entry_df):
+    """Tests if call is made to add missing data source."""
     # Mock query calls
     mock_query = MagicMock()
     mock_query.query.return_value = mock_query
@@ -46,8 +46,8 @@ def test_add_exp_to_session_exp_group_not_exists(mock_session, mock_entry_df, mo
     mock_session.query.return_value = mock_query
 
     # Call the function
-    add_exp_to_session(mock_session, mock_entry_df, mock_inst_def)
+    add_exp_to_session(mock_session, mock_entry_df)
 
-    # Assert that the expected string ('mock_expg') is in any of the calls
+    # Assert that the expected string ('mock_dsrc') is in any of the calls
     calls = mock_session.add.call_args_list  # List of calls made
-    assert any(call[0][0].name == mock_entry_df['var_expg_csl'] for call in calls)
+    assert any(call[0][0].name == mock_entry_df['par_data_source'] for call in calls)

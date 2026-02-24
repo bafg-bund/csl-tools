@@ -1,0 +1,77 @@
+#PSI Spectral Library Format
+MS:1009003|Name = NewSubstance
+MS:1009001|Spectrum index = 99
+MS:1000894|RetentionTime = 99
+MS:1000864|Formula = C21H23F2NO2
+MS:1002894|InChiKey = IXSZQYVWNJNRAL-UHFFFAOYNA-N
+MS:1009100|CASNo = 153233-91-1
+MS:1000868|Smiles = CCOc1cc(C(C)(C)C)ccc1C1COC(c2c(F)cccc2F)=N1
+MS:1009101|CompoundClass = pesticide; acaricide
+MS:1000744|Selected Ion m/z = 999
+MS:1000045|Collision_energy = 20.00
+Precursor_type = 
+MS:1000073|Electrosprary ionization
+MS:1000130|Positive scan
+MS:1009006|number of peaks = 2
+9.9 99
+9.9 99
+
+#PSI Spectral Library Format
+MS:1009003|Name = NewSubstance
+MS:1009001|Spectrum index = 99
+MS:1000894|RetentionTime = 99
+MS:1000864|Formula = C21H23F2NO2
+MS:1002894|InChiKey = IXSZQYVWNJNRAL-UHFFFAOYNA-N
+MS:1009100|CASNo = 153233-91-1
+MS:1000868|Smiles = CCOc1cc(C(C)(C)C)ccc1C1COC(c2c(F)cccc2F)=N1
+MS:1009101|CompoundClass = pesticide; acaricide
+MS:1000744|Selected Ion m/z = 999
+MS:1000045|Collision_energy = 30.00
+Precursor_type = 
+MS:1000073|Electrosprary ionization
+MS:1000130|Positive scan
+MS:1009006|number of peaks = 3
+9.9 99
+9.9 99
+9.9 99
+
+#PSI Spectral Library Format
+MS:1009003|Name = NewSubstance
+MS:1009001|Spectrum index = 99
+MS:1000894|RetentionTime = 99
+MS:1000864|Formula = C21H23F2NO2
+MS:1002894|InChiKey = IXSZQYVWNJNRAL-UHFFFAOYNA-N
+MS:1009100|CASNo = 153233-91-1
+MS:1000868|Smiles = CCOc1cc(C(C)(C)C)ccc1C1COC(c2c(F)cccc2F)=N1
+MS:1009101|CompoundClass = pesticide; acaricide
+MS:1000744|Selected Ion m/z = 999
+MS:1000045|Collision_energy = 40.00
+Precursor_type = 
+MS:1000073|Electrosprary ionization
+MS:1000130|Positive scan
+MS:1009006|number of peaks = 4
+9.9 99
+9.9 99
+9.9 99
+9.9 99
+
+#PSI Spectral Library Format
+MS:1009003|Name = NewSubstance
+MS:1009001|Spectrum index = 99
+MS:1000894|RetentionTime = 99
+MS:1000864|Formula = C21H23F2NO2
+MS:1002894|InChiKey = IXSZQYVWNJNRAL-UHFFFAOYNA-N
+MS:1009100|CASNo = 153233-91-1
+MS:1000868|Smiles = CCOc1cc(C(C)(C)C)ccc1C1COC(c2c(F)cccc2F)=N1
+MS:1009101|CompoundClass = pesticide; acaricide
+MS:1000744|Selected Ion m/z = 999
+MS:1000045|Collision_energy = 50.00
+Precursor_type = 
+MS:1000073|Electrosprary ionization
+MS:1000130|Positive scan
+MS:1009006|number of peaks = 5
+9.9 99
+9.9 99
+9.9 99
+9.9 99
+9.9 99
