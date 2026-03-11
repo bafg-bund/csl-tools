@@ -328,8 +328,8 @@ def get_contributors_copyright(data_src):
     Returns:
         authors (str)        : Names of authors/contributors.
         dsrc_copyright (str) : Copyright statement.
-        contrib_prefix (str) : Contributor prefix in MassBank format.
-        dsrc_license (str)   : Type of licence for the data.
+        contrib_prefix (str) : Contributor prefix (only for MassBank).
+        dsrc_license (str)   : Type of license for the data.
     """
     from datetime import datetime
 

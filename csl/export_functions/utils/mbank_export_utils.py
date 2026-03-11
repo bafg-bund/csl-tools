@@ -154,6 +154,7 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VE
 
     # Legal stuff
     authors, dsrc_copyright, contrib_prefix, dsrc_license = get_contributors_copyright(sql_data.data_src)
+    dsrc_license = 'CC BY'  # Only for MassBank
     if not authors:
         raise ValueError(f"Unknown contributor for experiment ID {exp_id}. Check link to table data_source in CSL.")
 
@@ -223,7 +224,7 @@ def build_export_chunk_mbank(f_data: FormattedDataMbank):
         f"CH$EXACT_MASS: {f_data.exact_mass}\n",
         f"CH$SMILES: {f_data.smiles}\n",
         f"CH$IUPAC: {f_data.inchi}\n",
-        f"CH$LINK: CAS {f_data.cas}\n",
+        f"CH$LINK: CAS {f_data.cas}\n" if f_data.cas else None,
         f"CH$LINK: INCHIKEY {f_data.inchikey}\n",
         f"AC$INSTRUMENT: {f_data.instrument_name}\n",
         f"AC$INSTRUMENT_TYPE: {f_data.instrument_type}\n",
