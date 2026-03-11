@@ -3,7 +3,6 @@ from .export_utils import (SqlQueryResult, get_chrom_methods, get_experiment_ids
                             sql_bulk_queries_by_exp_ids,
                            get_experiment_ids_by_chrom_method, get_precursor_charge, get_spectrum, get_splash_code,
                            get_compound_classes, get_contributors_copyright)
-from .mbank_export_config import skip_compounds_mbank
 from .mbank_export_utils import (get_exp_ids_mbank, extract_experiment_chunk_mbank, build_export_chunk_mbank,
                                  format_spectrum_mbank, format_formula_mbank, get_ion_mode_mbank,
                                  get_fragmentation_mode_mbank, get_accession_mbank)
@@ -28,8 +27,6 @@ __all__ = [
     "get_splash_code",
     "get_compound_classes",
     "get_contributors_copyright",
-    # mbank config
-    "skip_compounds_mbank",
     # mbank utils
     "get_exp_ids_mbank",
     "extract_experiment_chunk_mbank",

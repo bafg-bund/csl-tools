@@ -53,8 +53,7 @@ def extract_experiment_chunk_mbank(exp_id, chrom_method, csl_version, CSLTOOLS_V
         return None
 
     # Skip internal standards
-    skip_comp = skip_compounds_mbank()
-    if SqlQueryResult.compound.name in skip_comp:
+    if 'Surrogate_standard' in SqlQueryResult.compound_groups:
         return None
 
     # Format data to meet MassBank format requirements
