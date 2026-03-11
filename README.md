@@ -49,13 +49,21 @@ To contribute to the development or to run the project in development mode:
     git clone https://github.com/bafg-bund/csl-tools.git
     cd csl-tools
     ```
-2. Create and activate a virtual environment (recommended)
+2. Create a virtual environment
+    ```
+    python -m venv .venv
+    ```
+3. Activate the virtual environment
+    - Windows (Git Bash): `source .venv/Scripts/activate`
+    - Windows (cmd.exe): `.venv\Scripts\activate.bat`
+    - Windows (PowerShell): `.venv\Scripts\Activate.ps1`
+    - Linux / macOS: `source .venv/bin/activate`
 
-3. Install the package and dependencies in editable mode
+4. Install the package and dependencies in editable mode
     ```
-    pip install -e .
+    pip install -e ".[dev]"
     ```
-4. Run tests
+5. Run tests
     ```
     pytest
     ```
