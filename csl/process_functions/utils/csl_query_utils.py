@@ -134,8 +134,9 @@ def add_exp_to_session(session, entry):
     affiliation = entry['par_affiliation']
 
     # Log entry information for reference
-    logger.info(f'Compound: {entry['par_comp']}; Instr.: {entry['par_instrument']}; '
-                f'Ion mode: {entry['par_ion_mode']}; CE: {entry['par_ce']}; File path: {entry['file_path']}')
+    logger.info(f'Compound: {entry['par_comp']}; Adduct: {entry['par_adduct']}; '
+                f'Instr.: {entry['par_instrument']}; Ion mode: {entry['par_ion_mode']}; CE: {entry['par_ce']}; '
+                f'CES: {entry['par_ces']}; File path: {entry['file_path']}')
 
     # Check if the data source exists (search by name and authors; !assumes correct spelling!) in the CSL and add it if necessary.
     data_src = session.query(DataSource).filter_by(name=dsrc_csl_def, authors=authors).one_or_none()
