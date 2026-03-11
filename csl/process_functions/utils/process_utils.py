@@ -160,7 +160,8 @@ def get_collision_energy(data_ce, data_ces):
     """
     Formats collision energy (CE) and collision energy spread (CES) values according to CSL requirements.
     - In case of a single CE value: CES is formatted or set to 0 if input is empty.
-    - In case of multiple CE values: CES is calculated and middle CE value is selected.
+    - In case of three CE values: CES is calculated and middle CE value is selected.
+    - Checks for MassBank-specific format.
     - Negative CE/CES value inputs are converted to positive values
 
     Args:
@@ -168,7 +169,7 @@ def get_collision_energy(data_ce, data_ces):
         data_ces (str or None) : Collision energy spread from the data.
 
     Returns:
-        ce_i (int)      : Primary collision energy (CE) value. If multiple CE values are provided, `ce_i` will be the
+        ce_i (int)      : Primary collision energy (CE) value. If three CE values are provided, `ce_i` will be the
                           value from the middle position.
         ces_i (int)     : Collision energy spread (CES). CES is calculated if multiple CE values are provided.
     """
@@ -192,7 +193,7 @@ def get_collision_energy(data_ce, data_ces):
             else:
                 ces_i = 0
 
-        # In case of multiple CE values: calculate CES and select representative CE value
+        # In case of three CE values: calculate CES and select representative CE value
         elif len(int_nrs_real) == 3:  # Three CE
             int_nrs_real.sort()
             ce_i = int_nrs_real[1]  # Middle CE
@@ -204,9 +205,13 @@ def get_collision_energy(data_ce, data_ces):
             else:  # Non-equal difference in CES
                 ce_i = None  # Set to `None` even though CE might be ok.
                 ces_i = None
-        else:  # Unexpected number of CE
-            ce_i = None
-            ces_i = None
+        else:  # Unexpected number of CE or MassBank format
+            if 'V +/-' in data_ce and len(int_nrs_real) == 2:  # MassBank format
+                ce_i = int_nrs_real[0]
+                ces_i = int_nrs_real[1]
+            else:
+                ce_i = None
+                ces_i = None
 
     return ce_i, ces_i
 

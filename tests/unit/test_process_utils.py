@@ -110,7 +110,8 @@ def test_format_adduct(adduct_name, pol_i, expected_adduct_i):
     ('10, 20, 50', [], None, None),     # Non-equal difference in CES
     ('20, 40', [], None, None),         # Unexpected number of CE
     ('', '', None, None),               # No data
-    ([], [], None, None)
+    ([], [], None, None),
+    ('40 V +/- 15', [], 40, 15)         # MassBank format
 ])
 def test_get_collision_energy(data_ce, data_ces, expected_ce_i, expected_ces_i):
     """Tests the function with parametrized inputs."""
