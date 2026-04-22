@@ -38,6 +38,7 @@ class FormattedDataLibview:
     ces: int
     comment_chunk: str
     compound_name: str
+    csl_version: str
     exact_mass: float
     formula: str
     instrument_name: str
@@ -155,7 +156,7 @@ def extract_and_format_libview_data(exp_id, chrom_method, csl_version, CSLTOOLS_
         f"Copyright: {dsrc_copyright}\n",
         ]))
 
-    return FormattedDataLibview(authors, cas, ce, ces, comment_chunk, compound_name, exact_mass, formula,
+    return FormattedDataLibview(authors, cas, ce, ces, comment_chunk, compound_name, csl_version, exact_mass, formula,
                                instrument_name, instrument_type, ion_mode, ionization, molblock, nr_peaks, precursor_mz,
                                 spectrum, time_spectrum)
 
@@ -192,7 +193,7 @@ def build_export_chunk_libview(f_data: FormattedDataLibview):
          f">  <SPECTRUM CREATED DATE>\n{f_data.time_spectrum}\n\n",
          f">  <CONTRIBUTOR>\n{f_data.authors}\n\n",
          f">  <REGION-NAMES>\n\n\n",
-         f">  <LIBRARYNAME>\n\n\n",
+         f">  <LIBRARYNAME>\nCSL_v{f_data.csl_version}\n\n",
          f">  <COMMENT>\n{f_data.comment_chunk}\n\n" if f_data.comment_chunk else None,
          f">  <NUM PEAKS>\n{f_data.nr_peaks}\n\n",
          ]))
