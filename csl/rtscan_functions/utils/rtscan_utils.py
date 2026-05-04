@@ -34,10 +34,24 @@ def load_rt_models():
     def pred_rt_bfg_lubw(rt_bfg): return round(float(model_blu(rt_bfg)), 3)
     def pred_rt_lubw_bfg(rt_lubw): return round(float(model_lub(rt_lubw)), 3)
 
+    # MONDE (spline regression)
+    model_bm = joblib.load(DEFAULT_MODEL_BFG_TO_MONDE_PATH)  # Model for predicting Monde RTs from BfG RTs
+    model_mb = joblib.load(DEFAULT_MODEL_MONDE_TO_BFG_PATH)  # Model for predicting BfG RTs from Monde RTs
+    def pred_rt_bfg_monde(rt_bfg): return round(float(model_bm(rt_bfg)), 3)
+    def pred_rt_monde_bfg(rt_monde): return round(float(model_mb(rt_monde)), 3)
+
+    # LUX (spline regression)
+    model_blux = joblib.load(DEFAULT_MODEL_BFG_TO_LUX_PATH)  # Model for predicting Lux RTs from BfG RTs
+    model_luxb = joblib.load(DEFAULT_MODEL_LUX_TO_BFG_PATH)  # Model for predicting BfG RTs from Lux RTs
+    def pred_rt_bfg_lux(rt_bfg): return round(float(model_blux(rt_bfg)), 3)
+    def pred_rt_lux_bfg(rt_lux): return round(float(model_luxb(rt_lux)), 3)
+
     models_from_bfg_to_x = {'uba': pred_rt_bfg_uba, 'lfuby': pred_rt_bfg_lfu,
-                       'lanuk': pred_rt_bfg_lanuk, 'lubw': pred_rt_bfg_lubw}
+                            'lanuk': pred_rt_bfg_lanuk, 'lubw': pred_rt_bfg_lubw,
+                            'monde': pred_rt_bfg_monde, 'lux': pred_rt_bfg_lux}
     models_from_x_to_bfg = {'uba': pred_rt_uba_bfg, 'lfuby': pred_rt_lfu_bfg,
-                     'lanuk': pred_rt_lanuk_bfg, 'lubw': pred_rt_lubw_bfg}
+                            'lanuk': pred_rt_lanuk_bfg, 'lubw': pred_rt_lubw_bfg,
+                            'monde': pred_rt_monde_bfg, 'lux': pred_rt_lux_bfg}
 
     return models_from_bfg_to_x, models_from_x_to_bfg
 

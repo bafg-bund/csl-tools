@@ -14,7 +14,9 @@ DEFAULT_PAIRS_DSOURCE_CHROM = {
     'uba': 'uba_nts_rp1',
     'lfuby': 'lfuby_nts_rp1',
     'lanuk': 'lanuk_nts_rp1',
-    'lubw': 'lubw_nts_rp1'
+    'lubw': 'lubw_nts_rp1',
+    'monde': 'bfg_nts_rp2',
+    'lux': 'lux_nts_rp1'
 }
 
 # Dictionary with pairs of instrument name and instrument type as they should appear in the CSL
