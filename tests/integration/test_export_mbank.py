@@ -27,7 +27,7 @@ def test_export_mbank_bfg():
         except PermissionError as e:
             print(f"Could not delete {f}: {e}")
 
-    # Export mbank workflow
+    # Export workflow
     export_data(format='mbank', path_csl=csl_path, path_out=out_path, subset='bfg')
 
     # Assert that only one file was produced (CSL subset contains only one bfg experiment, that is not an internal standard)

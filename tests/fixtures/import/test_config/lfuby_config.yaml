@@ -1,0 +1,18 @@
+# Configuration for lfuby
+par_config:
+  par_isotope: 'monoisotopic'             # Type of molecular mass
+  par_col_type: 'HCD'                     # Collision type
+  par_ce_unit: 'V'                        # Unit for collision energy
+  par_instrument: 'QExactive Thermo'      # Instrument name
+  par_instrument_type: 'LC-ESI-Orbitrap'  # Instrument type
+  par_data_source: 'lfuby'                # Data source identifier (needs to be whitelisted in config.py)
+  par_authors: 'Name'                     # Author name(s)
+  par_affiliation: 'Affiliation'          # Author affiliation
+
+# Special adduct notation rules (optional).
+adduct_notation: {
+  'cation': '[M]+',
+  'Ethylamin': '[M+C2H7N+H]+',
+  'FA': '[M+HCOO-]-',
+  'NaFA': '[M+NaCOO-]-',
+}

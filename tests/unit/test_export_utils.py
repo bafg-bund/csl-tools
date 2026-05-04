@@ -63,31 +63,31 @@ def test_get_splash_code():
 
 
 def test_get_compound_classes():
-    """Tests if the function returns only non-institutional compound classes in the MassBank specific format."""
+    """Tests if the function removes "Uncategorized" and duplicate compound classes in the MassBank specific format."""
     # Mock objects with a 'name' attribute
     compound_groups = [
-        Mock(name="bfg"),
-        Mock(name="Industrial_process"),
+        Mock(name="Biocide"),
+        Mock(name="Biocide"),
         Mock(name="Pharmaceutical"),
+        Mock(name="Uncategorized"),
     ]
-    for mock, value in zip(compound_groups, ["bfg", "Industrial_process", "Pharmaceutical"]):
+    for mock, value in zip(compound_groups, ["Biocide", "Biocide", "Pharmaceutical", "Uncategorized"]):
         mock.name = value
 
     # Call the function
     compound_classes = get_compound_classes(compound_groups)
 
     # Assert that the expected compound classes are returned
-    assert compound_classes == 'Industrial_process; Pharmaceutical'
+    assert compound_classes == 'Biocide; Pharmaceutical'
 
 
 def test_get_compound_classes_none():
-    """Tests if the function returns None when input consists only of institutional compound classes."""
+    """Tests if the function returns None when input compound class is only "Uncategorized"."""
     # Mock objects with a 'name' attribute
     compound_groups = [
-        Mock(name="bfg"),
-        Mock(name="lfuby"),
+        Mock(name="Uncategorized"),
     ]
-    for mock, value in zip(compound_groups, ["bfg", "lfuby"]):
+    for mock, value in zip(compound_groups, ["Uncategorized"]):
         mock.name = value
 
     # Call the function
@@ -138,6 +138,7 @@ def test_get_experiment_ids_by_data_src(data_source, expected_exp_id):
                          [('bfg_nts_rp1', None, [34030, 12249, 14224, 31447]),
                           ('bfg_nts_rp1', False, [34030, 12249, 14224]),
                           ('bfg_nts_rp1', True, [31447]),
+                          ('bfg_nts_rp1', "True", [31447]),
                           ('lfuby_nts_rp1', False, [34030, 14224]),
                           ('uba_nts_rp1', False, [31447]),
                           ('lanuk_nts_rp1', False, []),

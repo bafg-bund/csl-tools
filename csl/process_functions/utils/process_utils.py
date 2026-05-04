@@ -1,3 +1,5 @@
+from csl.config import WHITELIST_INSTR_NAME_TYPE
+
 def get_file_paths(data_path):
     """
     Returns file paths in correct format.
@@ -54,36 +56,6 @@ def match_file_paths(path_dir, fstr_id=None):
     for file in files:
         logger.info(file)
     return files
-
-
-def get_user_choice(options, message):
-    """
-    Lets user choose between options and returns the choice. User can manually enter string.
-
-    Args:
-        options (list of str) : Options
-        message (str) : Custom message for presenting the options.
-
-    Returns:
-        str : Chosen string
-    """
-
-    print(f"{message}:")
-
-    for idx, key in enumerate(options, 1):
-        print(f"{idx}. {key}")
-    print(f"{len(options) + 1}. Enter string manually")
-
-    while True:
-        choice = input("Enter number: ").strip()
-        if choice.isdigit():
-            choice = int(choice)
-            if 1 <= choice <= len(options):
-                return options[choice - 1]
-            elif choice == len(options) + 1:
-                return input("Enter your string: ").strip()
-
-        print("Invalid choice. Please enter a valid number.")
 
 
 def get_polarity(data_ionmode, pol_p_def, pol_n_def):
@@ -184,55 +156,64 @@ def format_adduct(adduct_name, spec_adduct, qf_def, pol_i):
     return adduct_i
 
 
-def get_collision_energy(data_ce):
+def get_collision_energy(data_ce, data_ces):
     """
-    Determines the collision energy (CE) and collision energy spread (CES) according to CSL requirements.
-    - For a single CE input value, the function returns that value as `ce_i` and sets `ces_i` to None (no spread).
-    - For multiple CE input values, the function calculates the CES and identifies the middle CE value as `ce_i`.
-    - If the CES calculation is unexpected or non-standard, a warning is issued by setting `ces_warn` to True.
-    - Negative CE value inputs are converted to positive values
+    Formats collision energy (CE) and collision energy spread (CES) values according to CSL requirements.
+    - In case of a single CE value: CES is formatted or set to 0 if input is empty.
+    - In case of three CE values: CES is calculated and middle CE value is selected.
+    - Checks for MassBank-specific format.
+    - Negative CE/CES value inputs are converted to positive values
 
     Args:
-        data_ce (str) : One or more collision energy values from the data.
+        data_ce (str or None)  : One or more collision energy values from the data.
+        data_ces (str or None) : Collision energy spread from the data.
 
     Returns:
-        ce_i (int)      : Primary collision energy (CE) value. If multiple CE values are provided, `ce_i` will be the
-                          value from the middle position. Returns None, if the input is invalid.
-        ces_i (int)     : Collision energy spread (CES). CES is calculated only if multiple CE values are provided.
-                          Returns None, if the input is invalid or unexpected.
-        ces_warn (bool) : A flag indicating whether a warning should be issued due to unexpected CES calculations.
-                          True if a warning is issued, False otherwise.
+        ce_i (int)      : Primary collision energy (CE) value. If three CE values are provided, `ce_i` will be the
+                          value from the middle position.
+        ces_i (int)     : Collision energy spread (CES). CES is calculated if multiple CE values are provided.
     """
     import re
     import numpy as np
 
-    ces_warn = False
-    if data_ce:
+    if not data_ce:
+        ce_i = None
+        ces_i = None
+        return ce_i, ces_i
+    else: # Format CE
         str_nrs = re.findall(r'\d+', data_ce)  # Find numbers in string
         int_nrs = list(map(int, str_nrs))  # Convert to list of int
-        int_nrs_real = [int_nr for int_nr in int_nrs if int_nr > 0]  # Remove zeros
+        int_nrs_real = [int_nr for int_nr in int_nrs if int_nr > 0]  # Remove zero
+
+        # In case of a single CE value: formats CES or set to 0 if input is None
         if len(int_nrs_real) == 1:  # One CE
             ce_i = int_nrs_real[0]
-            ces_i = 0  # Spread
+            if data_ces:
+                ces_i = abs(int(data_ces))
+            else:
+                ces_i = 0
+
+        # In case of three CE values: calculate CES and select representative CE value
         elif len(int_nrs_real) == 3:  # Three CE
-            ce_i = int_nrs_real[1]  # Assuming correct positions!
-            # Calculating CES. Checking for equal difference in CES.
+            int_nrs_real.sort()
+            ce_i = int_nrs_real[1]  # Middle CE
+            # Calculate CES. Check for equal difference in CES.
             ce_diff = np.diff(int_nrs_real)
             ce_diff_unique = np.unique(ce_diff)
             if len(ce_diff_unique) == 1:
-                ces_i = abs(int(ce_diff_unique[0]))  # Assuming correct positions!
-                if ces_i != 20:  # Equal difference in CES, but value not expected
-                    ces_warn = True
+                ces_i = abs(int(ce_diff_unique[0]))
             else:  # Non-equal difference in CES
-                ce_i = None  # Setting to `None` even though CE might be ok.
+                ce_i = None  # Set to `None` even though CE might be ok.
                 ces_i = None
-        else:  # Unexpected number of CE
-            ce_i = None
-            ces_i = None
-    else:  # No data found
-        ce_i = None
-        ces_i = None
-    return ce_i, ces_i, ces_warn
+        else:  # Unexpected number of CE or MassBank format
+            if 'V +/-' in data_ce and len(int_nrs_real) == 2:  # MassBank format
+                ce_i = int_nrs_real[0]
+                ces_i = int_nrs_real[1]
+            else:
+                ce_i = None
+                ces_i = None
+
+    return ce_i, ces_i
 
 
 def get_ionization_type(data_ionization):
@@ -375,15 +356,19 @@ def get_retention_time(data_rt):
     Retrieves and returns the retention time as a float.
 
     Args:
-        data_rt (str): Retention time from the data.
+        data_rt (str, float, int): Retention time from the data.
 
     Returns:
-        rt_i (float): Retention time as a float. Returns None, if the input is invalid.
+        rt_i (float): Retention time as a float. Returns None, if the input is empty.
     """
     if data_rt:
-        rt_i = float(data_rt.split()[0])
+        if isinstance(data_rt, str):
+            rt_i = float(data_rt.split()[0])
+        else:
+            rt_i = float(data_rt)
     else:
         rt_i = None
+
     return rt_i
 
 
@@ -412,22 +397,23 @@ def get_peaks(data_peak):
 
 def get_compound_group(data_compgroup):
     """
-    Extracts the compound groups. Assumes separation of multiple compound groups with ';'.
+    Extracts the compound groups. Assumes separation of multiple compound groups with ';' or ','.
 
     Args:
-        data_compgroup (str) : Compound group(s) separated by ';'.
+        data_compgroup (str) : Compound group(s) separated by ';' or ','.
 
     Returns:
         compgroup_i (str)    : Formatted compound group name(s). Returns None, if the input is invalid or empty.
     """
-    if data_compgroup:
-        parts = data_compgroup.split(';')
-        compgroup_i = []
-        for part in parts:
-            compgroup_i.append(part.strip())
-    else:
-        compgroup_i = None
-    return compgroup_i
+    import re
+
+    if not data_compgroup:
+        return None
+
+    parts = re.split(r"[;,]", data_compgroup)
+    compgroup_i = [p.strip() for p in parts if p.strip()]
+
+    return compgroup_i or None
 
 
 def get_collision_type(data_col_type):
@@ -450,21 +436,45 @@ def get_collision_type(data_col_type):
     return col_type_i
 
 
-def get_instrument(data_instrument, data_instrument_type):
+def get_instrument(data_instrument=None, data_instrument_type=None):
     """
     Returns a string representing the instrument identifier.
 
     Args:
         data_instrument (str) : Instrument name or instrument type + name.
-        data_instrument_type (str or None) : Instrument type.
+        data_instrument_type (str) : Instrument type.
 
     Returns:
         instrument_i (str) : Formatted instrument identifier.
     """
-    if data_instrument and data_instrument_type:
-        instrument_i = f"{data_instrument_type} {data_instrument}"
-    elif data_instrument:
-        instrument_i = data_instrument
+    # Normalize inputs
+    instr = data_instrument or ""
+    instr_type = data_instrument_type or ""
+    instr = instr.strip()
+    instr_type = instr_type.strip()
+
+    # Check if instrument name contains type
+    detected_type = None
+    for t in set(WHITELIST_INSTR_NAME_TYPE.values()):
+        if instr.startswith(t+" "):
+            detected_type = t
+            instr = instr[len(t):].strip()
+
+    # Set instrument name
+    instr_name = instr if instr in WHITELIST_INSTR_NAME_TYPE.keys() else None
+
+    # Set instrument type
+    if detected_type:
+        instr_type_final = detected_type
+    else:
+        instr_type_final = instr_type if instr_type else None
+    instr_type_final = instr_type_final if instr_type_final in WHITELIST_INSTR_NAME_TYPE.values() else None
+
+    # Construct full instrument identifier
+    if instr_name and instr_type_final:
+        instrument_i = f"{instr_type_final} {instr_name}"
+    elif instr_name:
+        instrument_i = f"{WHITELIST_INSTR_NAME_TYPE[instr_name]} {instr_name}"
     else:
         instrument_i =  None
     return instrument_i
@@ -490,3 +500,26 @@ def get_experiment_id(data_accession):
     else:
         experiment_id_i = None
     return experiment_id_i
+
+
+def get_exact_mass_adduct_mass(data_exact_mass, smiles_i, data_mz):
+    """Returns exact mass and adduct mass. Calculates exact mass from SMILES if necessary."""
+    from rdkit import Chem
+    from rdkit.Chem import Descriptors
+
+    # Get exact mass from extracted data or calculate via smiles
+    if data_exact_mass:
+        exact_mass = float(data_exact_mass)
+    elif smiles_i:
+        mol = Chem.MolFromSmiles(smiles_i)
+        exact_mass = Descriptors.ExactMolWt(mol)
+    else:
+        exact_mass = None
+
+    # Calculate adduct mass
+    if exact_mass and data_mz:
+        adduct_mass = float(data_mz) - exact_mass
+    else:
+        adduct_mass = None
+
+    return exact_mass, adduct_mass

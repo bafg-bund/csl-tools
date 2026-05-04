@@ -6,10 +6,10 @@ import glob
 from pathlib import Path
 
 
-def test_export_thermo():
-    """Tests export of CSL entries as MSP/NIST documents."""
+def test_export_libview():
+    """Tests export of CSL entries as LibraryView documents."""
     # Prepare paths
-    csl_path = os.path.join(ROOT_DIR,'tests/fixtures/export/CSL_v0_export_thermo_1bfg_1uba.db')
+    csl_path = os.path.join(ROOT_DIR,'tests/fixtures/export/CSL_v0_export_mzvault_1bfg_1uba.db')
     out_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 
     # Create out_path folder if necessary
@@ -25,8 +25,8 @@ def test_export_thermo():
         except PermissionError as e:
             print(f"Could not delete {f}: {e}")
 
-    # Export thermo workflow
-    export_data(format='thermo', path_csl=csl_path, path_out=out_path)
+    # Export workflow
+    export_data(format='libview', path_csl=csl_path, path_out=out_path)
 
     # Assert that the correct number of files were produced
     all_methods = DEFAULT_PAIRS_DSOURCE_CHROM
@@ -39,12 +39,12 @@ def test_export_thermo():
         content = f.read()
 
     # Assert the correct number of entries
-    num_entries = len(content.split('NAME: ')) - 1
+    num_entries = len(content.split('$$$$')) - 1
     assert num_entries == 2, f"Expected 2 entries in {files[0]}, but found {num_entries}"
 
     # Assert that there is one experimental and one predicted RT for one chrom. method
-    assert content.count("PREDICTED_RT: FALSE") == 1
-    assert content.count("PREDICTED_RT: TRUE") == 1
+    assert content.count("Predicted RT: FALSE") == 1
+    assert content.count("Predicted RT: TRUE") == 1
     assert content.count("bfg_nts_rp1") == 2
 
     # Assert that the LfU-method (lfuby_nts_rp1) file content is as expected (no experimental data)
@@ -53,7 +53,7 @@ def test_export_thermo():
         content = f.read()
 
     # Assert that both of the entries have predicted RTs
-    assert content.count("PREDICTED_RT: TRUE") == 2
+    assert content.count("Predicted RT: TRUE") == 2
     assert content.count("lfuby_nts_rp1") == 2
 
     # Cleanup temp directory

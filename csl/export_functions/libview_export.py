@@ -5,17 +5,16 @@ from csl.utils.sql_utils import create_session
 from csl.utils.file_utils import get_csl_version
 from csl.config import CSLTOOLS_VERSION
 
-class ThermoExport(FormatExport):
+class LibviewExport(FormatExport):
     def export(self):
         """Workflow to export CSL data to a text file."""
         import os.path
-        from collections import defaultdict
         from datetime import datetime
         from tqdm import tqdm
         import logging
 
         logger = logging.getLogger(__name__)
-        logger.info('Executing export workflow for MSP/NIST documents (thermo workflow)')
+        logger.info('Executing export workflow for LibraryView documents')
 
         # Connect to the CSL database
         session = create_session(self.path_csl)
@@ -41,7 +40,7 @@ class ThermoExport(FormatExport):
             # Generate the output file name based on the CSL version and the current date
             csl_version = get_csl_version(self.path_csl)
             date_code = datetime.now().strftime("%Y%m%d")
-            fname = f"thermo-{chrom_method}-CSLv{csl_version}-{date_code}.msp"
+            fname = f"libview-{chrom_method}-CSLv{csl_version}-{date_code}.sdf"
             fpath_out = os.path.join(self.path_out, fname)
 
             # Initialize a list to accumulate data for batch writing
@@ -53,13 +52,13 @@ class ThermoExport(FormatExport):
                 # Process each experiment ID
                 for i, exp_id in tqdm(enumerate(exp_ids), total=len(exp_ids), ncols=77):
                     try:
-                        export_data = extract_experiment_chunk_thermo(
+                        export_data = extract_experiment_chunk_libview(
                             exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, sql_data_dict
                         )
                         if not export_data:
                             logger.info(f'Skipping {exp_id}')
                             continue
-                        export_data_list.append(export_data + "\n\n")
+                        export_data_list.append(export_data)
 
                         if (i + 1) % 100 == 0 or (i + 1) == len(exp_ids):
                             f.writelines(export_data_list)
@@ -75,4 +74,4 @@ class ThermoExport(FormatExport):
         # Close the session after processing all experiments
         session.close()
 
-        logger.info('End of thermo export workflow')
+        logger.info('End of libview export workflow')

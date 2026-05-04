@@ -26,7 +26,7 @@ def test_export_sqlite_bfg():
         except PermissionError as e:
             print(f"Could not delete {f}: {e}")
 
-    # Export sqlite workflow
+    # Export workflow
     export_data(format='sqlite', path_csl=csl_path, path_out=out_path, subset='bfg')
 
     # Assert that the file was produced

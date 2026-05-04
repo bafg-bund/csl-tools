@@ -34,7 +34,7 @@ def get_exp_ids_mbank(path_mbank_files):
 
 def extract_experiment_chunk_mbank(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, sql_data_dict, dict_mbank_exp_id_fn):
     """
-    Extracts data for a specific experiment id and formats data for MassBank requirements.
+    Extracts data for a specific experiment id and formats data for MassBank documents (.txt).
 
     Args:
         exp_id (int)                : Experiment ID used to query the database.
@@ -45,7 +45,7 @@ def extract_experiment_chunk_mbank(exp_id, chrom_method, csl_version, CSLTOOLS_V
         dict_mbank_exp_id_fn (dict) : Pairs of existing of accession strings and experiment IDs.
 
     Returns:
-        export_chunk (str) : Text chunk formatted to MassBank requirements for a single txt file.
+        export_chunk (str) : Text chunk formatted for a single MassBank entry.
     """
     # SQL queries based on experiment ID
     SqlQueryResult = sql_data_dict.get(exp_id)
@@ -53,14 +53,13 @@ def extract_experiment_chunk_mbank(exp_id, chrom_method, csl_version, CSLTOOLS_V
         return None
 
     # Skip internal standards
-    skip_comp = skip_compounds_mbank()
-    if SqlQueryResult.compound.name in skip_comp:
+    if 'Surrogate_standard' in SqlQueryResult.compound_groups:
         return None
 
     # Format data to meet MassBank format requirements
     FormattedData = extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, SqlQueryResult, dict_mbank_exp_id_fn)
 
-    # Assemble text chunk for the MassBank document
+    # Assemble text chunk for the MassBank entry
     export_chunk = build_export_chunk_mbank(FormattedData)
 
     return export_chunk
@@ -112,8 +111,7 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VE
         dict_mbank_exp_id_fn (dict) : Pairs of existing of accession strings and experiment IDs.
 
     Returns:
-          FormattedData (dataclass) : Dataclass containing the formatted data required for constructing the MassBank
-                                      document.
+          FormattedData (dataclass) : Dataclass containing the formatted data required for constructing the document.
     """
     from datetime import datetime
     from rdkit import Chem
@@ -156,6 +154,7 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VE
 
     # Legal stuff
     authors, dsrc_copyright, contrib_prefix, dsrc_license = get_contributors_copyright(sql_data.data_src)
+    dsrc_license = 'CC BY'  # Only for MassBank
     if not authors:
         raise ValueError(f"Unknown contributor for experiment ID {exp_id}. Check link to table data_source in CSL.")
 
@@ -202,7 +201,7 @@ def extract_and_format_mbank_data(exp_id, chrom_method, csl_version, CSLTOOLS_VE
 
 def build_export_chunk_mbank(f_data: FormattedDataMbank):
     """
-    Assembles the text chunk for the MassBank document in the required order.
+    Assembles the text chunk in the required order.
 
     Args:
         f_data (dataclass) : Dataclass containing the relevant formatted data.
@@ -225,7 +224,7 @@ def build_export_chunk_mbank(f_data: FormattedDataMbank):
         f"CH$EXACT_MASS: {f_data.exact_mass}\n",
         f"CH$SMILES: {f_data.smiles}\n",
         f"CH$IUPAC: {f_data.inchi}\n",
-        f"CH$LINK: CAS {f_data.cas}\n",
+        f"CH$LINK: CAS {f_data.cas}\n" if f_data.cas else None,
         f"CH$LINK: INCHIKEY {f_data.inchikey}\n",
         f"AC$INSTRUMENT: {f_data.instrument_name}\n",
         f"AC$INSTRUMENT_TYPE: {f_data.instrument_type}\n",
@@ -257,8 +256,8 @@ def format_spectrum_mbank(spectrum):
     """Removes entries with intensity-values of zero and rounding values for m/z and intensity."""
     # Remove zeros in intensity
     spectrum_nozero = [entry for entry in spectrum if entry[1] != 0]
-
     intensities = [spec[1] for spec in spectrum_nozero]
+
     # Calculate relative intensities
     max_intensity = max(intensities)
     relative_intensities = [int((intensity / max_intensity) * 999) for intensity in intensities]

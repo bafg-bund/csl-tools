@@ -19,25 +19,25 @@ def load_rt_models():
     def pred_rt_uba_bfg(rt_uba): return round(1.12 * rt_uba + 0.75, 3)
 
     # LANUK (spline regression)
-    model_bl = joblib.load(DEFAULT_MODEL_BFG_TO_LANUK_PATH)  # Model for predicting LANUK RTs from BfG RTs
-    model_lb = joblib.load(DEFAULT_MODEL_LANUK_TO_BFG_PATH)  # Model for predicting BfG RTs from LANUK RTs
-    def pred_rt_bfg_lanuk(rt_bfg): return round(float(model_bl(rt_bfg)), 3)
-    def pred_rt_lanuk_bfg(rt_lanuk): return round(float(model_lb(rt_lanuk)), 3)
+    model_bla = joblib.load(DEFAULT_MODEL_BFG_TO_LANUK_PATH)  # Model for predicting LANUK RTs from BfG RTs
+    model_lab = joblib.load(DEFAULT_MODEL_LANUK_TO_BFG_PATH)  # Model for predicting BfG RTs from LANUK RTs
+    def pred_rt_bfg_lanuk(rt_bfg): return round(float(model_bla(rt_bfg)), 3)
+    def pred_rt_lanuk_bfg(rt_lanuk): return round(float(model_lab(rt_lanuk)), 3)
 
     # LfU (same method)
     def pred_rt_bfg_lfu(rt_bfg): return rt_bfg
     def pred_rt_lfu_bfg(rt_lfu): return rt_lfu
 
-    # BfG_monde (spline regression)  # Todo: Temporary
-    model_b_bm = joblib.load(DEFAULT_MODEL_BFG_TO_BFGMONDE_PATH)  # Model for predicting BfG_monde RTs from BfG RTs  # Todo: Temporary
-    model_bm_bb = joblib.load(DEFAULT_MODEL_BFGMONDE_TO_BFG_PATH)  # Model for predicting BfG RTs from BfG_monde RTs  # Todo: Temporary
-    def pred_rt_bfg_bfgmonde(rt_bfg): return round(float(model_b_bm(rt_bfg)), 3)  # Todo: Temporary
-    def pred_rt_bfgmonde_bfg(rt_bfgmonde): return round(float(model_bm_bb(rt_bfgmonde)), 3)  # Todo: Temporary
+    # LUBW (spline regression)
+    model_blu = joblib.load(DEFAULT_MODEL_BFG_TO_LUBW_PATH)  # Model for predicting LUBW RTs from BfG RTs
+    model_lub = joblib.load(DEFAULT_MODEL_LUBW_TO_BFG_PATH)  # Model for predicting BfG RTs from LUBW RTs
+    def pred_rt_bfg_lubw(rt_bfg): return round(float(model_blu(rt_bfg)), 3)
+    def pred_rt_lubw_bfg(rt_lubw): return round(float(model_lub(rt_lubw)), 3)
 
     models_from_bfg_to_x = {'uba': pred_rt_bfg_uba, 'lfuby': pred_rt_bfg_lfu,
-                       'lanuk': pred_rt_bfg_lanuk, 'bfgmonde': pred_rt_bfg_bfgmonde}
+                       'lanuk': pred_rt_bfg_lanuk, 'lubw': pred_rt_bfg_lubw}
     models_from_x_to_bfg = {'uba': pred_rt_uba_bfg, 'lfuby': pred_rt_lfu_bfg,
-                     'lanuk': pred_rt_lanuk_bfg, 'bfgmonde': pred_rt_bfgmonde_bfg}
+                     'lanuk': pred_rt_lanuk_bfg, 'lubw': pred_rt_lubw_bfg}
 
     return models_from_bfg_to_x, models_from_x_to_bfg
 

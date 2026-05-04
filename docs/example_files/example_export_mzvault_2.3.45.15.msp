@@ -1,0 +1,54 @@
+#PSI Spectral Library Format
+MS:1009003|Name = Bezafibrate
+MS:1009001|Spectrum index = 586
+MS:1000894|RetentionTime = 11.03300
+MS:1000864|Formula = C19H20ClNO4
+MS:1002894|InChiKey = IIBYAHWJQTYFKB-UHFFFAOYSA-N
+MS:1009100|CASNo = 41859-67-0
+MS:1000868|Smiles = CC(C)(Oc1ccc(CCNC(=O)c2ccc(Cl)cc2)cc1)C(O)=O
+MS:1009101|CompoundClass = Pharmaceutical
+MS:1000744|Selected Ion m/z = 362.11540
+MS:1000045|Collision_energy = 40.00
+Precursor_type = [M+H]+
+MS:1000073|Electrospray ionization
+MS:1000130|Positive scan
+MS:1009006|number of peaks = 11
+77.0415 8.60
+87.0463 6.90
+91.0552 9.20
+93.0713 14.20
+103.0546 10.40
+110.9996 30.30
+121.0654 255.30
+138.9949 487.80
+161.0959 37.90
+276.0773 5.70
+316.1087 5.40
+
+MS:1009003|Name = 3,6-Dimethyl-4-octyne-3,6-diol
+MS:1009001|Spectrum index = 1080
+MS:1000894|RetentionTime = 7.70700
+MS:1000864|Formula = C10H18O2
+MS:1002894|InChiKey = NUYADIDKTLPDGG-UHFFFAOYSA-N
+MS:1009100|CASNo = 78-66-0
+MS:1000868|Smiles = CCC(C)(C#CC(C)(CC)O)O
+MS:1009101|CompoundClass = 
+MS:1000744|Selected Ion m/z = 188.16860
+MS:1000045|Collision_energy = 40.00
+Precursor_type = [M+NH4]+
+MS:1000073|Electrospray ionization
+MS:1000130|Positive scan
+MS:1009006|number of peaks = 12
+39.0225 2.20
+41.0378 5.10
+43.0177 11.60
+55.0538 3.10
+65.0379 1.30
+67.0530 1.90
+77.0376 10.10
+79.0534 4.80
+91.0533 20.70
+105.0693 8.60
+109.0639 7.20
+123.0795 1.50
+

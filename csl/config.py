@@ -2,18 +2,29 @@
 import os
 
 # Python package version
-CSLTOOLS_VERSION = '1.0.0'
+CSLTOOLS_VERSION = '1.1.0'
 
 # Root directory of the project
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Dictionary with pairs of data source and chromatographic method
-# If data sources are added or modified, the respective mappings need to be changed here and in rtscan_functions.
+# If data sources are added or modified, the respective mappings need to be changed here and in rtscan_functions
 DEFAULT_PAIRS_DSOURCE_CHROM = {
     'bfg': 'bfg_nts_rp1',
     'uba': 'uba_nts_rp1',
     'lfuby': 'lfuby_nts_rp1',
     'lanuk': 'lanuk_nts_rp1',
-    'bfgmonde': 'bfg_nts_rp2'  # Todo: Temporary for model creation
-    # 'lubw': 'lubw_nts_rp1'  # Todo: activate once RT model is implemented
+    'lubw': 'lubw_nts_rp1'
+}
+
+# Dictionary with pairs of instrument name and instrument type as they should appear in the CSL
+# Functions as whitelist when importing data
+WHITELIST_INSTR_NAME_TYPE = {
+    'TripleTOF 5600 SCIEX': 'LC-ESI-QTOF',
+    'TripleTOF 6600 SCIEX': 'LC-ESI-QTOF',
+    'QExactive Thermo': 'LC-ESI-Orbitrap',
+    'Agilent 6500 Series Q-TOF': 'LC-ESI-QTOF',
+    'TripleTOF X500R SCIEX': 'LC-ESI-QTOF',
+    'ZenoTOF 7600 SCIEX': 'LC-ESI-QTOF',
+    'Exploris 240 Thermo': 'LC-ESI-Orbitrap'
 }

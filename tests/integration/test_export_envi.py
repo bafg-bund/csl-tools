@@ -25,7 +25,7 @@ def test_export_envi():
         except PermissionError as e:
             print(f"Could not delete {f}: {e}")
 
-    # Export envi workflow
+    # Export workflow
     export_data(format='envi', path_csl=csl_path, path_out=out_path)
 
     # Assert that the correct number of files were produced

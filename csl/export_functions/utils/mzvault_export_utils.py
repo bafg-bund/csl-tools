@@ -3,9 +3,9 @@ from dataclasses import dataclass
 from typing import Optional, Union, List
 
 
-def extract_experiment_chunk_thermo(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, sql_data_dict):
+def extract_experiment_chunk_mzvault(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, sql_data_dict):
     """
-    Extracts data for a specific experiment id and formats data for MSP/NIST documents (mzVault/ThermoFisher).
+    Extracts data for a specific experiment id and formats data for mzVault (ThermoFisher) documents (.msp).
 
     Args:
         exp_id (int)           : Experiment ID used to query the database.
@@ -15,24 +15,24 @@ def extract_experiment_chunk_thermo(exp_id, chrom_method, csl_version, CSLTOOLS_
         sql_data_dict (dict[int, SqlQueryResult(dataclass)]) : Mapping of exp_id to SqlQueryResult
 
     Returns:
-        export_chunk (str) : Text chunk formatted for a single MSP/NIST document.
+        export_chunk (str) : Text chunk formatted for a single mzVault entry.
     """
     # SQL queries based on experiment ID
     SqlQueryResult = sql_data_dict.get(exp_id)
     if not SqlQueryResult:
         return None
 
-    # Format data to meet MSP/NIST format requirements
-    FormattedDataThermo = extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, SqlQueryResult)
+    # Format data to meet mzVault format requirements
+    FormattedDataMzvault = extract_and_format_mzvault_data(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, SqlQueryResult)
 
-    # Assemble text chunk for the MSP/NIST document
-    export_chunk = build_export_chunk_thermo(FormattedDataThermo)
+    # Assemble text chunk for the mzVault entry
+    export_chunk = build_export_chunk_mzvault(FormattedDataMzvault)
 
     return export_chunk
 
 
 @dataclass
-class FormattedDataThermo:
+class FormattedDataMzvault:
     accession: str
     adduct: str
     authors: str
@@ -66,9 +66,9 @@ class FormattedDataThermo:
     title: str
 
 
-def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, sql_data: SqlQueryResult):
+def extract_and_format_mzvault_data(exp_id, chrom_method, csl_version, CSLTOOLS_VERSION, sql_data: SqlQueryResult):
     """
-    Extracts, processes, and formats experimental data into a structured format for MSP/NIST documents.
+    Extracts, processes, and formats experimental data into a structured format for mzVault documents.
 
     Args:
         exp_id (int)           : Experiment ID used to query the database.
@@ -78,8 +78,7 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_V
         sql_data (dataclass)   : Dataclass containing experiment data and metadata.
 
     Returns:
-          FormattedData (dataclass) : Dataclass containing the formatted data required for constructing the MassBank
-                                      document.
+          FormattedData (dataclass) : Dataclass containing the formatted data required for constructing the entry.
     """
     from datetime import datetime
     from rdkit import Chem
@@ -91,7 +90,7 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_V
 
     # Fragmentation data / Spectrum
     spectrum = get_spectrum(sql_data.fragments)  # Includes rel. intensities
-    spectrum = format_spectrum_thermo(spectrum)  # Rounding and removing zeros in intensity (adjusting to MassBank Format)
+    spectrum = format_spectrum_mzvault(spectrum)  # Rounding and removing zeros in intensity
     nr_peaks = len(spectrum)
     splash_code = get_splash_code(spectrum)
 
@@ -127,7 +126,7 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_V
     instrument_name = " ".join(sql_data.parameter.instrument.split()[1:])
     ionization = sql_data.parameter.ionisation
     ce_unit = sql_data.parameter.ce_unit
-    ion_mode = get_ion_mode_thermo(sql_data.parameter.polarity)
+    ion_mode = get_ion_mode_mzvault(sql_data.parameter.polarity)
     frag_mode = sql_data.parameter.collision_type
 
     # Legal stuff
@@ -152,21 +151,21 @@ def extract_and_format_thermo_data(exp_id, chrom_method, csl_version, CSLTOOLS_V
         f"COMMENT: Export with csl-tools {CSLTOOLS_VERSION} and CSL_v{csl_version}\n"
         ]))
 
-    return FormattedDataThermo(accession, adduct, authors, cas, ce, comment_chunk, compound_classes, compound_name,
+    return FormattedDataMzvault(accession, adduct, authors, cas, ce, comment_chunk, compound_classes, compound_name,
                                date, def_centroided, def_mslevel, exact_mass, formula, frag_mode, inchi, inchikey,
                                dsrc_copyright, dsrc_license, instrument_name, instrument_type, ion_mode, ionization,
                                nr_peaks, precursor_charge, precursor_mz, rt, pred, spectrum, splash_code, smiles, title)
 
 
-def build_export_chunk_thermo(f_data: FormattedDataThermo):
+def build_export_chunk_mzvault(f_data: FormattedDataMzvault):
     """
-    Assembles the text chunk for the MSP/NIST document in the required order.
+    Assembles the text chunk in the required order.
 
     Args:
         f_data (dataclass) : Dataclass containing the relevant formatted data.
 
     Returns:
-        export_chunk (str) : Formatted text chunk for the MSP/NIST document.
+        export_chunk (str) : Formatted text chunk for the mzVault document.
     """
     # Creating export text chunk
     export_chunk = "".join(filter(None, [
@@ -210,7 +209,7 @@ def build_export_chunk_thermo(f_data: FormattedDataThermo):
     return export_chunk
 
 
-def format_spectrum_thermo(spectrum):
+def format_spectrum_mzvault(spectrum):
     """Removes entries with intensity-values of zero and rounding values for m/z and intensity."""
     # Remove zeros in intensity
     spectrum_nozero = [entry for entry in spectrum if entry[1] != 0]
@@ -219,8 +218,8 @@ def format_spectrum_thermo(spectrum):
     return formatted_spectrum
 
 
-def get_ion_mode_thermo(pol):
-    """Returns the MSP/NIST-specific format for polarity information based on the CSL-specific format."""
+def get_ion_mode_mzvault(pol):
+    """Returns the mzVault-specific format for polarity information based on the CSL-specific format."""
     if pol == 'pos':
         ion_mode = 'Positive'
     elif pol == 'neg':

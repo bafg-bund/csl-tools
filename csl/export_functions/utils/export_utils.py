@@ -102,43 +102,6 @@ def get_experiment_ids_by_chrom_method(session, chrom_method, predicted=None):
     return experiment_ids
 
 
-def sql_queries_by_exp_id_chrom_method(session, exp_id, chrom_method):
-    """
-    Queries the CSL database for experiment data and related metadata based on the experiment ID and method.
-
-    Args:
-        session (obj)      : SQLAlchemy session object connected to the CSL database.
-        exp_id (int)       : Experiment ID used to query the database.
-        chrom_method (str) : Chromatographic method identifier.
-
-    Returns:
-        SqlQueryResult (dataclass) : Dataclass containing the queried experiment data and metadata.
-    """
-    from sqlalchemy.orm import joinedload
-
-    # Get experiment table and preload related tables
-    experiment = session.query(Experiment).filter_by(experiment_id=exp_id) \
-        .options(joinedload(Experiment.compound),
-                 joinedload(Experiment.parameter),
-                 joinedload(Experiment.fragments),
-                 joinedload(Experiment.data_source)) \
-        .one()
-    compound = experiment.compound
-    parameter = experiment.parameter
-    fragments = experiment.fragments
-    data_source = experiment.data_source
-
-    # Get compound groups
-    compound_groups = session.query(CompoundGroup.name).join(CompoundGroupMap) \
-        .filter(CompoundGroupMap.c.compound_id == compound.compound_id).all()
-
-    # Get retention times
-    retention_time = session.query(RetentionTime).filter_by(compound_id=compound.compound_id,
-                                                            chrom_method=chrom_method).first()
-
-    return SqlQueryResult(experiment, compound, parameter, fragments, data_source, compound_groups, retention_time)
-
-
 def sql_bulk_queries_by_exp_ids_chrom_method(session, exp_ids, chrom_method):
     """
     Queries the CSL for experiment data and related metadata based on experiment IDs. Includes retention times only for
@@ -334,17 +297,25 @@ def get_splash_code(spectrum):
 
 
 def get_compound_classes(compound_groups):
-    """Extracts the non-institute compound classes from a list of compound groups."""
+    """Return unique compound classes as '; ' separated list, excluding 'Uncategorized'."""
+    if not compound_groups:
+        return None
+
+    # Normalize to list[str]
     if not isinstance(compound_groups[0], str):
-        compound_groups = [group.name for group in compound_groups]  # normalize to list of str
+        compound_groups = [group.name for group in compound_groups]
 
-    compound_groups_filtered = [cg for cg in compound_groups if cg not in DEFAULT_PAIRS_DSOURCE_CHROM.keys()]
+    # Remove "Uncategorized" and remove duplicates
+    seen = set()
+    filtered = []
+    for cg in compound_groups:
+        if cg == "Uncategorized":
+            continue
+        if cg not in seen:
+            seen.add(cg)
+            filtered.append(cg)
 
-    if compound_groups_filtered:
-        compound_classes = "; ".join(compound_groups_filtered)
-    else:
-        compound_classes = None
-    return compound_classes
+    return "; ".join(filtered) if filtered else None
 
 
 def get_contributors_copyright(data_src):
@@ -357,8 +328,8 @@ def get_contributors_copyright(data_src):
     Returns:
         authors (str)        : Names of authors/contributors.
         dsrc_copyright (str) : Copyright statement.
-        contrib_prefix (str) : Contributor prefix in MassBank format.
-        dsrc_license (str)   : Type of licence for the data.
+        contrib_prefix (str) : Contributor prefix (only for MassBank).
+        dsrc_license (str)   : Type of license for the data.
     """
     from datetime import datetime
 

@@ -36,7 +36,7 @@ def test_rtscan_recalc():
     pred_rt_entries_template =  [rt for (rt,) in session_template.query(RetentionTime.rt).filter(RetentionTime.predicted == "TRUE").all()]
     session_template.close()
 
-    # Rtscan recalc workflow
+    # Rtscan workflow
     with mock.patch('builtins.input', return_value='yes'):  # Mocks user input
         scan_rt(operation='recalc', path_csl=csl_copy_path)
 

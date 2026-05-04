@@ -50,4 +50,4 @@ def test_add_exp_to_session_data_src_not_exists(mock_session, mock_entry_df):
 
     # Assert that the expected string ('mock_dsrc') is in any of the calls
     calls = mock_session.add.call_args_list  # List of calls made
-    assert any(call[0][0].name == mock_entry_df['var_dsrc_csl'] for call in calls)
+    assert any(call[0][0].name == mock_entry_df['par_data_source'] for call in calls)

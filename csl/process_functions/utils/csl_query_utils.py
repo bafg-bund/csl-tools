@@ -31,14 +31,14 @@ def check_duplicate(session, entry):
         join(Parameter, Experiment.parameter_id == Parameter.parameter_id)
 
     qry = qry.filter(Experiment.adduct == entry['adduct_i'],
-                     Experiment.isotope == entry['var_isotope'],
+                     Experiment.isotope == entry['par_isotope'],
                      Parameter.instrument == entry['instrument_i'],
                      Parameter.ionisation == entry['ionization_i'],
                      Parameter.polarity == entry['pol_i'],
                      Parameter.ce == entry['ce_i'],
                      Parameter.ces == entry['ces_i'],
                      Parameter.collision_type == entry['col_type_i'],
-                     Parameter.ce_unit == entry['var_ce_unit'])
+                     Parameter.ce_unit == entry['par_ce_unit'])
 
     inchikey_main_i = entry['inchikey_main_i']
     cas_i = entry['cas_i']
@@ -98,7 +98,8 @@ def add_exp_to_session(session, entry):
         entry (pandas.series) : Data of one entry (pandas.core.series.Series)
 
     Returns:
-        (No return variables, but the session object is updated)
+        exp_added (bool) : True: No issues, session object is updated
+                           False: Issues found, record skipped and session object reset
     """
     from datetime import datetime
     from sqlalchemy import func
@@ -107,39 +108,41 @@ def add_exp_to_session(session, entry):
     logger = logging.getLogger(__name__)
 
     # Prepare all variables
-    dsrc_csl_def = entry['var_dsrc_csl']
-    compg_csl_def = entry['var_compg_csl']
+    dsrc_csl_def = entry['par_data_source']
     comp_i = entry['comp_i']
     formula_i = entry['formula_i']
     smiles_i = entry['smiles_i']
     inchikey_i = entry['inchikey_i']
     inchi_i = entry['inchi_i']
-    chrom_method = entry['var_chrom_method']
+    chrom_method = entry['par_chrom_method']
     rt_i = entry['rt_i']
-    instrument = entry['var_instrument']
+    instrument = entry['instrument_i']
     pol_i = entry['pol_i']
     ce_i = entry['ce_i']
     ces_i = entry['ces_i']
-    ce_unit = entry['var_ce_unit']
+    ce_unit = entry['par_ce_unit']
     col_type_i = entry['col_type_i']
     ionization_i = entry['ionization_i']
     mz_i = entry['mz_i']
     adduct_i = entry['adduct_i']
-    isotope = entry['var_isotope']
+    isotope = entry['par_isotope']
     spec_i = entry['spec_i']
     inchikey_main_i = entry['inchikey_main_i']
     cas_i = entry['cas_i']
     compgroup_i = entry['compgroup_i']
-    file_path = entry['file_path']
+    authors = entry['par_authors']
+    affiliation = entry['par_affiliation']
 
-    # Log compound name, adduct and file path for reference
-    logger.info(f"Compound: {comp_i}; CE: {ce_i}; File path: {file_path}")
+    # Log entry information for reference
+    logger.info(f'Compound: {entry['par_comp']}; Adduct: {entry['par_adduct']}; '
+                f'Instr.: {entry['par_instrument']}; Ion mode: {entry['par_ion_mode']}; CE: {entry['par_ce']}; '
+                f'CES: {entry['par_ces']}; File path: {entry['file_path']}')
 
-    # Check if the data source exists (e.g., 'UBA', 'BfG') in the CSL and add it if necessary.
-    data_src = session.query(DataSource).filter_by(name=dsrc_csl_def).one_or_none()
+    # Check if the data source exists (search by name and authors; !assumes correct spelling!) in the CSL and add it if necessary.
+    data_src = session.query(DataSource).filter_by(name=dsrc_csl_def, authors=authors).one_or_none()
     if not data_src:
-        logger.info(f'Adding missing default data source: "{dsrc_csl_def}"')
-        data_src = DataSource(name=dsrc_csl_def)
+        logger.info(f'Adding new data source. Name: {dsrc_csl_def}; Authors: {authors}; Affiliation: {affiliation}')
+        data_src = DataSource(name=dsrc_csl_def, long_name=affiliation, authors=authors)
         session.add(data_src)
 
     # Match compound groups with existing ones in the CSL. Collect the matches. If no matches are found, use the default.
@@ -149,15 +152,18 @@ def add_exp_to_session(session, entry):
             cg_db = session.query(CompoundGroup).filter(func.lower(CompoundGroup.name) == cg.lower()).one_or_none()
             if cg_db:
                 comp_group.append(cg_db)
+            else:
+                logger.warning(f'Provided compound group "{cg}" not in allowed list of compound groups.')
 
     if not comp_group:
-        existing_cg = session.query(CompoundGroup).filter_by(name=compg_csl_def).one_or_none()
+        logger.info(f'No valid compound group provided. Marking as "Uncategorized"')
+
         # Create the default compound group if necessary.
+        existing_cg = session.query(CompoundGroup).filter_by(name="Uncategorized").one_or_none()
         if not existing_cg:
-            logger.info(f'Adding missing default compound group: "{compg_csl_def}"')
-            new_cg = CompoundGroup(name=compg_csl_def)
+            new_cg = CompoundGroup(name="Uncategorized")
             session.add(new_cg)
-        comp_group = session.query(CompoundGroup).filter_by(name=compg_csl_def).one_or_none()
+        comp_group = session.query(CompoundGroup).filter_by(name="Uncategorized").one_or_none()
         if not isinstance(comp_group, list):
             comp_group = [comp_group]
 
@@ -192,23 +198,36 @@ def add_exp_to_session(session, entry):
         # Run query
         comp_res = get_single_compound_entry(base_query, refine_query)
     else:
-        comp_res = None
+        return False
 
     if comp_res:  # If the compound exists in the CSL
+        # Check if the compound name of the record and the compound name of the CSL match
+        if not comp_i == comp_res.name:
+            logger.warning(f'Current compound "{comp_i}" shares the same InChIkey (main layer) and/or CAS with compound "{comp_res.name}" in the CSL. \n'
+                           f'Please check the compound name (different spelling?). Note that the CSL currently does not support synonyms yet. \n'
+                           f'Current record will be skipped.')  # Todo: Implement synonym support
+            return False
+
         # Add compound groups that do not exist yet for this compound
         for cg in comp_group:
             if cg.name not in [group.name for group in comp_res.compound_groups]:
                 logger.info(f'Adding compound group "{cg.name}" to the compound "{comp_i}"')
                 comp_res.compound_groups.append(cg)
     else:  # If the compound was not found in the CSL
+        # First check if the compound name already exists in the CSL (inchikey missmatch)
+        if session.query(Compound).filter(Compound.name == comp_i).all():
+            logger.warning(f'Compound name exists in the CSL, but InChIkey (main layer) differs. \n'
+                           f'Please adjust the record data if possible. \n'
+                           f'Current record will be skipped.')
+            return False
+
         logger.info(f'Compound "{comp_i}" not found in CSL. Adding entry.')
         comp_res = Compound(formula=formula_i, cas=cas_i, smiles=smiles_i, name=comp_i,
                             compound_groups=comp_group, inchikey=inchikey_i, inchi=inchi_i)
         # Add compound entry to session
         session.add(comp_res)
 
-    # Check for existing retention time (filter by compound_id and chrom. method). Use RT from file if no RT exists,
-    # otherwise prefer existing RT. Also check for RT inconsistency (warning at difference >10 s).
+    # Check for existing retention time and update if necessary
     rt_res = session.query(RetentionTime).filter_by(compound_id=comp_res.compound_id, chrom_method=chrom_method
                                                      ).one_or_none()
     if not rt_res:
@@ -217,8 +236,14 @@ def add_exp_to_session(session, entry):
         rt_res = RetentionTime(chrom_method=chrom_method, rt=rt_i, compound=comp_res, predicted='FALSE')
         session.add(rt_res)
     else:
-        if abs(rt_res.rt-rt_i)*60 > 10:
-            logger.warning(f'Retention times from file ({rt_i}) and CSL ({rt_res.rt}) differ by more than 10 s.')
+        # If existing RT is modeled, update its value and metadata
+        if rt_res.predicted == 'TRUE':
+            rt_res.rt = rt_i
+            rt_res.predicted = 'FALSE'
+        else:
+            # Check for RT inconsistency (warning at difference >10 s)
+            if abs(rt_res.rt-rt_i)*60 > 10:
+                logger.warning(f'Retention times from file ({rt_i}) and CSL ({rt_res.rt}) differ by more than 10 s.')
 
     # Search experimental parameters and add them from the file if they don't exist
     para_res = session.query(Parameter).filter_by(instrument=instrument, polarity=pol_i, ce=ce_i, ces=ces_i,
@@ -239,3 +264,5 @@ def add_exp_to_session(session, entry):
     for frag in spec_i.itertuples():
         frag_i = Fragment(mz=frag.mz, int=frag.int, experiment=exp)
         session.add(frag_i)
+
+    return True
