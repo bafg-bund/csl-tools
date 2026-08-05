@@ -6,7 +6,8 @@ csl-tools
 ## Description
 Import, export, and curate spectral data for the Collective Spectral Library (CSL).
 
-![Image](https://github.com/user-attachments/assets/0e511e6c-89d6-4f8c-9f45-81a549f0bdb5)
+![Image](https://github.com/user-attachments/assets/fb01cb25-f658-4ae6-8c52-87c0eb80a7ff)
+
 
 ## Background
 The Collective Spectral Library (CSL) is a database containing a collection of reference spectra generated using tandem 
@@ -16,8 +17,8 @@ The CSL is built collaboratively and currently includes reference spectra provid
 - [Federal Institute of Hydrology](https://www.bafg.de) (Bundesanstalt für Gewässerkunde, BfG), Koblenz, Germany
 - [Bavarian Environment Agency](https://www.lfu.bayern.de) (Bayerisches Landesamt für Umwelt, LfU Bayern), Augsburg, Germany
 - [German Environment Agency](https://www.umweltbundesamt.de) (Umweltbundesamt, UBA), Berlin, Germany
-- [Baden-Württemberg State Institute for the Environment](https://www.lubw.baden-wuerttemberg.de) (Landesanstalt für Umwelt Baden-Württemberg), Karlsruhe, Germany
-- [North Rhine-Westphalia Office of Nature, Environment and Climate](https://www.lanuk.nrw.de/) (Landesamt für Natur, Umwelt und Klima Nordrhein-Westfalen), Düsseldorf, Germany
+- [Baden-Württemberg State Institute for the Environment](https://www.lubw.baden-wuerttemberg.de) (Landesanstalt für Umwelt Baden-Württemberg, LUBW), Karlsruhe, Germany
+- [North Rhine-Westphalia Office of Nature, Environment and Climate](https://www.lanuk.nrw.de/) (Landesamt für Natur, Umwelt und Klima Nordrhein-Westfalen, LANUK), Düsseldorf, Germany
 
 The CSL enables retrospective screening of environmental samples as part of Non-Target Screening (NTS) efforts. 
 It is integrated into the open analysis workflow [ntsworkflow](https://github.com/bafg-bund/ntsworkflow) <sup>[1]</sup>, 
@@ -25,17 +26,19 @@ which supports matching of experimental MS² data with verified reference spectr
 [NTSPortal](https://ntsportal.bafg.de) <sup>[2]</sup>, a platform for processing, archiving and visualizing NTS data to 
 support the identification and assessment of trace contaminants in surface waters.
 
-We continuously expand the CSL to improve its utility, for instance in the retrospective analysis 
-of historical data in NTSPortal <sup>[3]</sup>.
+We continuously expand the CSL to improve its utility. 
+The latest CSL file is available at: https://doi.org/10.5281/zenodo.16901589.
 
 For more information or to contribute spectral reference data, check out the section [Contribution (spectral data)](#contribution-spectral-data)
 and feel free to contact us at `ntsportal@bafg.de`.
 
-The latest CSL file is available at: https://doi.org/10.5281/zenodo.16901589.
-
-><sup>**[1]** Jewell, K. S., et al. (2020). Rapid Commun. Mass Spectrom., 34, e8541. [https://doi.org/10.1002/rcm.8541](https://doi.org/10.1002/rcm.8541)  
-**[2]** Jewell, K. S., et al. (2025). Online-Portal „Non-Target Screening für die Umweltüberwachung der Zukunft“, Umweltbundesamt, Dessau-Roßlau. [https://www.umweltbundesamt.de/sites/default/files/medien/11850/publikationen/21_2025_texte.pdf](https://www.umweltbundesamt.de/sites/default/files/medien/11850/publikationen/21_2025_texte.pdf)  
-**[3]** Lessmann, O., et al. (2025, May). Development and Application of a Collective Spectral Library for Collaborative Non-Target Screening [Poster presentation], Wasser 2025, Münster, Germany. [Poster Download](https://github.com/user-attachments/files/20883434/poster_wasser_lessmann.pdf)</sup>
+><sup>**[1]** Jewell KS, Kunkel U, Ehlig B, et al. Comparing mass, retention time and tandem mass spectra as criteria 
+> for the automated screening of small molecules in aqueous environmental samples analyzed by liquid 
+> chromatography/quadrupole time-of-flight tandem mass spectrometry. Rapid Commun Mass Spectrom. 2020; 34:e8541. 
+> [https://doi.org/10.1002/rcm.8541](https://doi.org/10.1002/rcm.8541)  
+**[2]** Jewell, K.S., Hermes, N., Prodöhl, F. et al. Development of a retrospective processing and data aggregation 
+> platform for non-target screening of surface waters. Environ Sci Eur (2026). 
+> [https://doi.org/10.1186/s12302-026-01477-7](https://doi.org/10.1186/s12302-026-01477-7)
 
 ## Installation
 ```
@@ -220,12 +223,9 @@ scan_rt(operation='update', path_csl='path/CSL.db')
 - Use the --help/--h flag with any command to see additional usage information, e.g., `csl export --help`
 
 ## Authors
-Ole Lessmann, BfG, lessmann@bafg.de  
-Björn Ehlig, BfG, ehlig@bafg.de  
-Kevin S. Jewell, BfG, jewell@bafg.de  
-Arne Wick, BfG, wick@bafg.de
+Ole Lessmann, Björn Ehlig, Kevin S. Jewell, Arne Wick
 
 ## License
-Copyright 2025 Federal Institute of Hydrology (Bundesanstalt für Gewässerkunde).
+Copyright 2026 Federal Institute of Hydrology (Bundesanstalt für Gewässerkunde).
 
 This package is licensed under the [GNU General Public License v3.0](LICENSE).

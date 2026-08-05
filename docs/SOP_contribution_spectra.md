@@ -21,7 +21,7 @@ A [supplementary file](#supplementary-rt-file) is necessary that links compound 
 Full list of [required parameters](#parameter-requirements) with detailed description
 
 >If your software is not supported, we are happy to implement a new workflow or find a solution. 
-Feel free to reach out: `ntsportal@bafg.de`.
+Feel free to contact us at `ntsportal@bafg.de`.
 
 
 # Configuration file
@@ -39,7 +39,7 @@ par_config:
   par_instrument: 'TripleTOF 5600 SCIEX'  # Instrument name
   par_instrument_type: 'LC-ESI-QTOF '     # Instrument type
   par_data_source: 'bfg'                  # Data source identifier (needs to be whitelisted in config.py)
-  par_authors: 'Ole Lessmann; Kevin S. Jewell; Björn Ehlig; Arne Wick'  # Author name(s)
+  par_authors: 'Björn Ehlig; Kevin S. Jewell; Ole Lessmann; Arne Wick'  # Author name(s)
   par_affiliation: 'Federal Institute of Hydrology (Bundesanstalt für Gewässerkunde), Koblenz, Germany'  # Author affiliation
 
 # Special adduct notation rules (leave curly brackets empty if no special cases needed).
@@ -117,7 +117,7 @@ Contributor name(s).
 
 Example: 
 ```yaml
-par_authors: 'Ole Lessmann; Kevin S. Jewell; Björn Ehlig; Arne Wick'
+par_authors: 'Björn Ehlig; Kevin S. Jewell; Ole Lessmann; Arne Wick'
 ```
 
 [go back](#parameter-requirements)
@@ -219,9 +219,8 @@ Classification or use category of the compound.
 | `Food_additive`         | `Pharmaceutical`                    |
 | `Fungicide`             | `Pigment`                           |
 | `Herbicide`             | `Rodenticide`                       |
-| `Industrial_process`    | `Transformation_product`            |
-| `Insecticide`           | `Transformation_product-Metabolite` |
-| `Metabolite`            | `Surrogate_standard`                |
+| `Industrial_process`    | `Transformation_product-Metabolite` |
+| `Insecticide`           | `Surrogate_standard`                |
 | `Natural_product`       |                                     |
 
 >Note: The compound class groups are planned to be reworked in the future.
