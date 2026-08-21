@@ -249,13 +249,14 @@ def predict_rt(uq_comp_id, session, models_from_bfg, dsrc_str, dsrc_method_pairs
     return rt_pred
 
 
-def recalculate_pred_rt(uq_comp_id, session, dsrc_pred_rt, dsrc_method_pairs):
+def recalculate_pred_rt(uq_comp_id, session, dsrc_exp_rt, dsrc_pred_rt, dsrc_method_pairs):
     """
     Predicts missing retention time (RT) for a given compound ID based on an available experimental or predicted BfG RT.
 
     Args:
         uq_comp_id (int)         : Compound ID used to query the CSL database.
         session (obj)            : SQLAlchemy session object connected to the database.
+        dsrc_exp_rt (str)        : Data sources with experimental RT entry.
         dsrc_pred_rt (str)       : Data sources with predicted RT entry.
         dsrc_method_pairs (dict) : Mapping of data sources to chromatographic methods.
 
@@ -275,8 +276,11 @@ def recalculate_pred_rt(uq_comp_id, session, dsrc_pred_rt, dsrc_method_pairs):
     recalc_comp_id = []
 
     if bfg_str in dsrc_pred_rt:
-        # Recalculate bfg RT first based on available data (in order of importance), then predict all other non-experimental RTs.
-        for check_dsrc in check_order:
+        # Recalculate bfg RT first based on available data; then predict all other non-experimental RTs.
+        # Prefer experimental data > Prefer from first to last in check order
+        exp_rt = list(set(dsrc_exp_rt) & set(check_order))  # Existing experimental RT sources (in check order)
+        check_order_extended = exp_rt + check_order  # Prioritize sources with experimental RTs; If empty, goes through modeled RTs in check order
+        for check_dsrc in check_order_extended:
                 rt_dsrc = session.query(RetentionTime.rt).filter_by(
                     compound_id=uq_comp_id, chrom_method=dsrc_method_pairs[check_dsrc]).one_or_none()
                 if rt_dsrc:

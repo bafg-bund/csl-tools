@@ -39,10 +39,10 @@ class RecalcRtscan(OperationRtscan):
             for uq_comp_id in tqdm(uq_comp_ids):
 
                 # Get data sources linked to predicted retention time data in the CSL for each compound ID
-                _, _, dsrc_pred_rt = get_dsrc_rt_info(uq_comp_id, session, DEFAULT_PAIRS_DSOURCE_CHROM)
+                _, dsrc_exp_rt, dsrc_pred_rt = get_dsrc_rt_info(uq_comp_id, session, DEFAULT_PAIRS_DSOURCE_CHROM)
 
                 # Recalculate the RTs for all data sources with predicted RT
-                recalc_comp_id = recalculate_pred_rt(uq_comp_id, session, dsrc_pred_rt, DEFAULT_PAIRS_DSOURCE_CHROM)
+                recalc_comp_id = recalculate_pred_rt(uq_comp_id, session, dsrc_exp_rt, dsrc_pred_rt, DEFAULT_PAIRS_DSOURCE_CHROM)
                 recalc_comp_id_all.append(recalc_comp_id)
 
             # Summarize the result
