@@ -48,7 +48,7 @@ def extract_data_regex_mbank(file_path, par_regex):
         return data_extract_dict
 
     # Main function logic
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="utf-8") as file:
         content = file.read()
 
     # Split content into chunks based on an identifier
