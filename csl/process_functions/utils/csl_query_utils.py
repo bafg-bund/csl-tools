@@ -26,19 +26,23 @@ def check_duplicate(session, entry):
         Compound.cas, Experiment.isotope, Parameter.instrument, Parameter.ionisation,
         Parameter.ce, Parameter.ces, Parameter.collision_type, Parameter.ce_unit,
         Parameter.polarity, Experiment.adduct
+        Compound.cas, Experiment.adduct, Experiment.isotope, Parameter.instrument, Parameter.ionisation,
+        Parameter.polarity, Parameter.collision_type, Parameter.ce, Parameter.ces, Parameter.ce_unit,
     ). \
         join(Experiment, Compound.compound_id == Experiment.compound_id). \
         join(Parameter, Experiment.parameter_id == Parameter.parameter_id)
 
     qry = qry.filter(Experiment.adduct == entry['adduct_i'],
-                     Experiment.isotope == entry['par_isotope'],
+                     Experiment.isotope == entry['isotope_i'],
                      Parameter.instrument == entry['instrument_i'],
                      Parameter.ionisation == entry['ionization_i'],
                      Parameter.polarity == entry['pol_i'],
+                     Parameter.collision_type == entry['col_type_i'],
                      Parameter.ce == entry['ce_i'],
                      Parameter.ces == entry['ces_i'],
                      Parameter.collision_type == entry['col_type_i'],
                      Parameter.ce_unit == entry['par_ce_unit'])
+                     Parameter.ce_unit == entry['ce_unit_i'],
 
     inchikey_main_i = entry['inchikey_main_i']
     cas_i = entry['cas_i']
@@ -121,11 +125,12 @@ def add_exp_to_session(session, entry):
     ce_i = entry['ce_i']
     ces_i = entry['ces_i']
     ce_unit = entry['par_ce_unit']
+    ce_unit_i = entry['ce_unit_i']
     col_type_i = entry['col_type_i']
     ionization_i = entry['ionization_i']
     mz_i = entry['mz_i']
     adduct_i = entry['adduct_i']
-    isotope = entry['par_isotope']
+    isotope_i = entry['isotope_i']
     spec_i = entry['spec_i']
     inchikey_main_i = entry['inchikey_main_i']
     cas_i = entry['cas_i']
@@ -247,17 +252,17 @@ def add_exp_to_session(session, entry):
 
     # Search experimental parameters and add them from the file if they don't exist
     para_res = session.query(Parameter).filter_by(instrument=instrument, polarity=pol_i, ce=ce_i, ces=ces_i,
-                                                  ce_unit=ce_unit, collision_type=col_type_i, ionisation=ionization_i
-                                                  ).one_or_none()
+                                                  ce_unit=ce_unit_i, collision_type=col_type_i,
+                                                  ionisation=ionization_i).one_or_none()
     if not para_res:
         logger.info('Experimental parameters not found in CSL. Adding parameters from data entry.')
-        para_res = Parameter(instrument=instrument, polarity=pol_i, ce=ce_i, ces=ces_i, ce_unit=ce_unit,
+        para_res = Parameter(instrument=instrument, polarity=pol_i, ce=ce_i, ces=ces_i, ce_unit=ce_unit_i,
                              collision_type=col_type_i, ionisation=ionization_i)
         session.add(para_res)
 
     # Create a new experiment entry in the CSL at the current time
     exp = Experiment(mz=mz_i, compound=comp_res, parameter=para_res, adduct=adduct_i, data_source=data_src,
-                     time_added=datetime.today(), isotope=isotope)
+                     time_added=datetime.today(), isotope=isotope_i)
     session.add(exp)
 
     # Add the spectrum to the experiment

@@ -3,6 +3,8 @@ from .process_utils import (get_polarity, get_compound_and_adduct_name, format_a
                             get_ionization_type, get_formula, get_inchikey, get_cas, get_smiles, get_inchi_from_smiles,
                             get_precursor_mz, get_retention_time, get_peaks, get_compound_group, get_collision_type,
                             get_instrument, get_experiment_id, get_exact_mass_adduct_mass)
+                            get_inchi_from_smiles, get_precursor_mz, get_retention_time, get_peaks, get_compound_group,
+                            get_collision_type, get_instrument, get_experiment_id, get_isotope, get_exact_mass_adduct_mass)
 from .csl_query_utils import check_duplicate, add_exp_to_session
 from .mzvault_process_utils import extract_data_regex_mzvault
 from .mzvault_process_config import par_regex_mzvault, par_regex_mzvault_old, defaults_mzvault, defaults_mzvault_old
@@ -33,6 +35,8 @@ __all__ = [
     "get_collision_type",
     "get_instrument",
     "get_experiment_id",
+    "get_isotope",
+    "get_pubchem_id",
     "get_exact_mass_adduct_mass",
     # csl_query_utils
     "check_duplicate",

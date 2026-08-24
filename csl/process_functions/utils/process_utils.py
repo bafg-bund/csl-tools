@@ -1,4 +1,5 @@
-from csl.config import WHITELIST_INSTR_NAME_TYPE
+from csl.config import (WHITELIST_INSTR_NAME_TYPE, WHITELIST_IONIZATION_TYPE, WHITELIST_COLLISION_TYPE,
+                        WHITELIST_ISOTOPE, WHITELIST_CE_UNIT)
 
 def get_file_paths(data_path):
     """
@@ -95,6 +96,7 @@ def get_compound_and_adduct_name(data_comp):
         adduct_name (str) : Formatted adduct name. Returns None, if the input is invalid.
     """
     if data_comp:
+        data_comp = data_comp.replace("′", "'").replace("`", "'")
         parts = data_comp.split('_')
         if len(parts) == 1:
             comp_i = parts[0].strip()
@@ -156,31 +158,32 @@ def format_adduct(adduct_name, spec_adduct, qf_def, pol_i):
     return adduct_i
 
 
-def get_collision_energy(data_ce, data_ces):
+def get_collision_energy(data_ce, data_ces, data_ce_unit):
     """
     Formats collision energy (CE) and collision energy spread (CES) values according to CSL requirements.
     - In case of a single CE value: CES is formatted or set to 0 if input is empty.
     - In case of three CE values: CES is calculated and middle CE value is selected.
     - Checks for MassBank-specific format.
-    - Negative CE/CES value inputs are converted to positive values
+    - Negative CE/CES value inputs are converted to positive values.
+    - CE unit is matched with whitelist.
 
     Args:
         data_ce (str or None)  : One or more collision energy values from the data.
         data_ces (str or None) : Collision energy spread from the data.
+        data_ce_unit (str or None) : Collision energy unit from the data.
 
     Returns:
         ce_i (int)      : Primary collision energy (CE) value. If three CE values are provided, `ce_i` will be the
                           value from the middle position.
         ces_i (int)     : Collision energy spread (CES). CES is calculated if multiple CE values are provided.
+        ce_unit_i (str) : Collision energy unit.
     """
     import re
     import numpy as np
 
-    if not data_ce:
-        ce_i = None
-        ces_i = None
-        return ce_i, ces_i
-    else: # Format CE
+    if data_ce and data_ce_unit.strip() in WHITELIST_CE_UNIT:
+        ce_unit_i = data_ce_unit.strip()
+        # Format CE
         str_nrs = re.findall(r'\d+', data_ce)  # Find numbers in string
         int_nrs = list(map(int, str_nrs))  # Convert to list of int
         int_nrs_real = [int_nr for int_nr in int_nrs if int_nr > 0]  # Remove zero
@@ -205,6 +208,7 @@ def get_collision_energy(data_ce, data_ces):
             else:  # Non-equal difference in CES
                 ce_i = None  # Set to `None` even though CE might be ok.
                 ces_i = None
+                ce_unit_i = None
         else:  # Unexpected number of CE or MassBank format
             if 'V +/-' in data_ce and len(int_nrs_real) == 2:  # MassBank format
                 ce_i = int_nrs_real[0]
@@ -212,6 +216,13 @@ def get_collision_energy(data_ce, data_ces):
             else:
                 ce_i = None
                 ces_i = None
+                ce_unit_i = None
+    else:  # No ce data or ce unit not on whitelist
+        ce_i = None
+        ces_i = None
+        ce_unit_i = None
+
+    return ce_i, ces_i, ce_unit_i
 
     return ce_i, ces_i
 
@@ -219,6 +230,7 @@ def get_collision_energy(data_ce, data_ces):
 def get_ionization_type(data_ionization):
     """
     Retrieves and returns the ionization type from the provided data.
+    - Needs to match the whitelist
 
     Args:
         data_ionization (str) : Ionization type from the data.
@@ -226,8 +238,8 @@ def get_ionization_type(data_ionization):
     Returns:
         ionization_i (str) : Ionization type. Returns None, if the input is invalid.
     """
-    if data_ionization:
-        ionization_i = data_ionization
+    if data_ionization and data_ionization.strip() in WHITELIST_IONIZATION_TYPE:
+        ionization_i = data_ionization.strip()
     else:
         ionization_i = None
     return ionization_i
@@ -296,7 +308,8 @@ def get_cas(data_cas):
 
 def get_smiles(data_smiles):
     """
-    Retrieves and returns the SMILES-string (Simplified Molecular Input Line Entry System) from the provided data.
+    Retrieves, validates, and returns the SMILES-string (Simplified Molecular Input Line Entry System) from the
+    provided data.
 
     Args:
         data_smiles (str): SMILES-string from the data.
@@ -304,10 +317,16 @@ def get_smiles(data_smiles):
     Returns:
         smiles_i (str): SMILES-string. Returns None, if the input is invalid.
     """
-    if data_smiles:
-        smiles_i = data_smiles
-    else:
-        smiles_i = None
+    from rdkit import Chem
+
+    if not data_smiles:
+        return None
+
+    mol = Chem.MolFromSmiles(data_smiles)
+    if mol is None:
+        return None
+
+    smiles_i = data_smiles
     return smiles_i
 
 
@@ -336,7 +355,7 @@ def get_inchi_from_smiles(smiles_i):
 
 def get_precursor_mz(data_mz):
     """
-    Retrieves and returns the precursor mass-to-charge ratio (m/z) as a float.
+    Retrieves the precursor mass-to-charge ratio (m/z) and returns it as a float.
 
     Args:
         data_mz (str): Precursor mass-to-charge ratio (m/z) as a string from the data.
@@ -344,9 +363,9 @@ def get_precursor_mz(data_mz):
     Returns:
         mz_i (float): Precursor mass-to-charge ratio (m/z) as a float. Returns None, if the input is invalid.
     """
-    if data_mz:
+    try:
         mz_i = float(data_mz)
-    else:
+    except (TypeError, ValueError):
         mz_i = None
     return mz_i
 
@@ -418,7 +437,9 @@ def get_compound_group(data_compgroup):
 
 def get_collision_type(data_col_type):
     """
-    Checks the collision type format.
+    Retrieves and returns the collision type from the provided data.
+    - MassBank notation is converted
+    - Needs to match the whitelist
 
     Args:
         data_col_type (str) : Collision type.
@@ -426,11 +447,11 @@ def get_collision_type(data_col_type):
     Returns:
         col_type_i (str) : Formatted collision type.
     """
-    if data_col_type:
+    if data_col_type and data_col_type.strip() in WHITELIST_COLLISION_TYPE:
         if data_col_type == 'CID':  # MassBank notation
             col_type_i = 'Q'
         else:
-            col_type_i = data_col_type
+            col_type_i = data_col_type.strip()
     else:
         col_type_i = None
     return col_type_i
@@ -503,22 +524,42 @@ def get_experiment_id(data_accession):
 
 
 def get_exact_mass_adduct_mass(data_exact_mass, smiles_i, data_mz):
+def get_isotope(data_isotope):
+    """
+    Retrieves and returns the isotope / type of molecular mass from the provided data.
+    - Needs to match the whitelist
+
+    Args:
+        data_isotope (str) : Type of molecular mass.
+
+    Returns:
+        isotope_i (str) : Formatted string.
+    """
+    if data_isotope and data_isotope.strip() in WHITELIST_ISOTOPE:
+        isotope_i = data_isotope.strip()
+    else:
+        isotope_i = None
+    return isotope_i
+
+
+def get_exact_mass_adduct_mass(data_exact_mass, smiles_i, mz_i):
     """Returns exact mass and adduct mass. Calculates exact mass from SMILES if necessary."""
     from rdkit import Chem
     from rdkit.Chem import Descriptors
 
     # Get exact mass from extracted data or calculate via smiles
-    if data_exact_mass:
+    try:
         exact_mass = float(data_exact_mass)
-    elif smiles_i:
-        mol = Chem.MolFromSmiles(smiles_i)
-        exact_mass = Descriptors.ExactMolWt(mol)
-    else:
+    except (TypeError, ValueError):
         exact_mass = None
 
+    if not exact_mass and smiles_i:
+        mol = Chem.MolFromSmiles(smiles_i)
+        exact_mass = Descriptors.ExactMolWt(mol)
+
     # Calculate adduct mass
-    if exact_mass and data_mz:
-        adduct_mass = float(data_mz) - exact_mass
+    if exact_mass and mz_i:
+        adduct_mass = mz_i - exact_mass
     else:
         adduct_mass = None
 

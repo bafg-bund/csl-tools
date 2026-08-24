@@ -28,3 +28,9 @@ WHITELIST_INSTR_NAME_TYPE = {
     'ZenoTOF 7600 SCIEX': 'LC-ESI-QTOF',
     'Exploris 240 Thermo': 'LC-ESI-Orbitrap'
 }
+
+# Whitelists for various parameters (simple quality assurance)
+WHITELIST_IONIZATION_TYPE = ['ESI', 'EI']
+WHITELIST_COLLISION_TYPE = ['HCD', 'Q', 'CID', 'in-source']
+WHITELIST_ISOTOPE = ['monoisotopic', 'polyisotopic']
+WHITELIST_CE_UNIT = ['V']

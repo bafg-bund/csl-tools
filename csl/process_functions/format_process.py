@@ -85,6 +85,8 @@ class FormatProcess(ABC):
             'par_instrument_type': None,  # Instrument type
             'par_authors': None,          # Author name(s)
             'par_affiliation': None,      # Author affiliation
+            'par_ce': None,               # Collision energy
+            'par_ce_unit': None,          # Collision energy unit
         }
         fixed_par = par_fix | par_config  # Combine
 
@@ -175,12 +177,14 @@ class FormatProcess(ABC):
                 entry_err = True
 
             # Collision energy (CE) and collision energy spread (CES)
-            ce_i, ces_i = get_collision_energy(entry['par_ce'], entry['par_ces'])
-            if not ce_i:
+            ce_i, ces_i, ce_unit_i = get_collision_energy(entry['par_ce'], entry['par_ces'], entry['par_ce_unit'])
+            if not ce_i and entry['par_ce']:
                 logger.warning(
                     f'No collision energy (CE) or unexpected number of CE or non-equal difference in CE spread. '
                     f'Check field for collision energy.')
                 entry_err = True
+                    f'Invalid collision energy (CE), e.g., unexpected number of CE or non-equal difference in CE spread.')
+                entry_warn = True
 
 
             # Ionization type
@@ -255,6 +259,13 @@ class FormatProcess(ABC):
 
             # Get exact mass and adduct mass (not for CSL, but for checking)
             exact_mass, adduct_mass = get_exact_mass_adduct_mass(entry['par_exact_mass'], smiles_i, entry['par_mz'])
+            exact_mass, adduct_mass = get_exact_mass_adduct_mass(entry['par_exact_mass'], smiles_i, mz_i)
+
+            # Get isotope / type of molecular mass
+            isotope_i = get_isotope(entry['par_isotope'])
+            if not isotope_i:
+                logger.warning('Isotope (type of molecular mass) not detected.')
+                entry_err = True
 
             # Organize formatted data from one entry in dictionary
             form_data_entry = {
@@ -263,6 +274,7 @@ class FormatProcess(ABC):
                 'adduct_i': adduct_i,
                 'ce_i': ce_i,
                 'ces_i': ces_i,
+                'ce_unit_i': ce_unit_i,
                 'ionization_i': ionization_i,
                 'formula_i': formula_i,
                 'inchikey_i': inchikey_i,
@@ -279,6 +291,7 @@ class FormatProcess(ABC):
                 'experiment_id_i': experiment_id_i,
                 'exact_mass': exact_mass,
                 'adduct_mass': adduct_mass,
+                'isotope_i': isotope_i,
                 'form_err_flag': entry_err,
                 'form_warn_flag': entry_warn
             }
