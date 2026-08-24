@@ -74,7 +74,8 @@ def test_get_polarity(data_ionmode, expected_pol_i):
     ('CompoundName_AdductName_AdditionalString', None, None),
     ('CompoundName_', None, None),
     ('', None, None),
-    ('_', None, None)
+    ('_', None, None),
+    ("Comp′ound`Name", "Comp'ound'Name", "H"),  # Test replacing "′" and "`" with "'" in compound name
 ])
 def test_get_compound_and_adduct_name(data_comp, expected_comp_i, expected_adduct_name):
     """Tests the function with parametrized inputs."""
@@ -99,29 +100,32 @@ def test_format_adduct(adduct_name, pol_i, expected_adduct_i):
     assert adduct_i == expected_adduct_i
 
 
-@pytest.mark.parametrize("data_ce, data_ces, expected_ce_i, expected_ces_i", [
-    ('10', '0', 10, 0),                 # CE/CES values are correctly formatted
-    ('20, 40, 60', [], 40, 20),         # CES is calculated from multiple CE values
-    ('60, 20, 40', [], 40, 20),         # Different order of inputs
-    ('-30', '-15', 30, 15),             # Negative input values are transformed to positive values
-    ('-20, -40, -60', [], 40, 20),
-    ('20.00,40.00,60.00', [], 40, 20),  # Different input format works
-    ([],'10', None, None),              # No CE input value
-    ('10, 20, 50', [], None, None),     # Non-equal difference in CES
-    ('20, 40', [], None, None),         # Unexpected number of CE
-    ('', '', None, None),               # No data
-    ([], [], None, None),
-    ('40 V +/- 15', [], 40, 15)         # MassBank format
+@pytest.mark.parametrize("data_ce, data_ces, data_ce_unit, expected_ce_i, expected_ces_i, expected_ce_unit", [
+    ('10', '0', 'V', 10, 0, 'V'),          # Data is correctly formatted
+    ('20, 40, 60', [], 'V', 40, 20, 'V'),  # CES is calculated from multiple CE values
+    ('60, 20, 40', [], 'V', 40, 20, 'V'),  # Different order of CE input
+    ('-30', '-15', 'V', 30, 15, 'V'),      # Negative input values are converted to positive values
+    ('-20, -40, -60', [], 'V', 40, 20, 'V'),
+    ('20.00,40.00,60.00', [], 'V', 40, 20, 'V'),  # Different input format works
+    ([],'10', 'V', None, None, None),              # No CE input value
+    ('10, 20, 50', [], 'V', None, None, None),     # Non-equal difference in CES
+    ('20, 40', [], 'V', None, None, None),         # Unexpected number of CE
+    ('20', '0', 'invalid', None, None, None),      # CE unit not on whitelist
+    ('', '', '', None, None, None),               # No data
+    ([], [], [], None, None, None),
+    ('40 V +/- 15', [], 'V', 40, 15, 'V')         # MassBank format
 ])
-def test_get_collision_energy(data_ce, data_ces, expected_ce_i, expected_ces_i):
+def test_get_collision_energy(data_ce, data_ces, data_ce_unit, expected_ce_i, expected_ces_i, expected_ce_unit):
     """Tests the function with parametrized inputs."""
-    ce_i, ces_i = get_collision_energy(data_ce, data_ces)
+    ce_i, ces_i, ce_unit_i = get_collision_energy(data_ce, data_ces, data_ce_unit)
     assert ce_i == expected_ce_i
     assert ces_i == expected_ces_i
+    assert ce_unit_i == expected_ce_unit
 
 
 @pytest.mark.parametrize("data_ionization, expected_ionization_i",
-                         [('ESI', 'ESI'), ('', None)])
+                         [(' ESI ', 'ESI'),  # On whitelist; Outer spaces are stripped
+                          ('not_whitelisted', None)])  # Not on whitelist
 def test_get_ionization_type(data_ionization, expected_ionization_i):
     """Tests the function with parametrized inputs."""
     ionization_i = get_ionization_type(data_ionization)
@@ -156,7 +160,7 @@ def test_get_cas(data_cas, expected_cas_i):
 
 
 @pytest.mark.parametrize("data_smiles, expected_smiles_i",
-                         [('CCOC(=O)Nc1cccc(c1)OC(=O)Nc2ccccc2', 'CCOC(=O)Nc1cccc(c1)OC(=O)Nc2ccccc2'), ('', None)])
+                         [('CCOC(=O)Nc1cccc(c1)OC(=O)Nc2ccccc2', 'CCOC(=O)Nc1cccc(c1)OC(=O)Nc2ccccc2'), ('', None), ('None', None)])
 def test_get_smiles(data_smiles, expected_smiles_i):
     """Tests the function with parametrized inputs."""
     smiles_i = get_smiles(data_smiles)
@@ -172,7 +176,7 @@ def test_get_inchi_from_smiles(smiles_i, expected_inchi_i):
 
 
 @pytest.mark.parametrize("data_mz, expected_mz_i",
-                         [('318.45672', 318.45672), ('319', 319.0), ('', None)])
+                         [('318.45672', 318.45672), ('319', 319.0), ('', None), ('None', None)])
 def test_get_precursor_mz(data_mz, expected_mz_i):
     """Tests the function with parametrized inputs."""
     mz_i = get_precursor_mz(data_mz)
@@ -201,7 +205,10 @@ def test_get_peaks(data_peak, expected_spec_i):
     pd.testing.assert_frame_equal(spec_i, expected_spec_i)
 
 
-@pytest.mark.parametrize("data_col_type, expected_col_type_i", [('CID', 'Q'),('HCD', 'HCD')])
+@pytest.mark.parametrize("data_col_type, expected_col_type_i",
+                         [('CID', 'Q'),  # MassBank format is converted
+                          (' HCD ', 'HCD'),  # On whitelist; Outer spaces are stripped
+                          ('not_whitelisted', None)])  # Not on whitelist
 def test_get_collision_type(data_col_type, expected_col_type_i):
     """Tests the function with parametrized inputs."""
     col_type_i = get_collision_type(data_col_type)
@@ -230,12 +237,22 @@ def test_get_experiment_id(data_accession, expected_experiment_id_i):
     assert experiment_id_i == expected_experiment_id_i
 
 
+@pytest.mark.parametrize("data_isotope, expected_isotope_i",
+                         [(' monoisotopic ', 'monoisotopic'),  # On whitelist; Outer spaces are stripped
+                          ('not_whitelisted', None)])  # Not on whitelist
+def test_get_isotope(data_isotope, expected_isotope_i):
+    """Tests the function with parametrized inputs."""
+    isotope_i = get_isotope(data_isotope)
+    assert isotope_i == expected_isotope_i
+
+
 @pytest.mark.parametrize("data_exact_mass, smiles_i, data_mz, expected_exact_mass, expected_adduct_mass",
-                         [('90.90', None, '91.90', 90.90, 1.00),
-                          ('60.02', 'CC(=O)O', '61.04', 60.02, 1.02),
-                          (None, 'CC(=O)O', '61.04', 60.02, 1.02),
-                          (None, None, '61.04', None, None),
-                          ('60.02', None, None, 60.02, None)])
+                         [('90.90', None, 91.90, 90.90, 1.00),
+                          ('60.02', 'CC(=O)O', 61.04, 60.02, 1.02),
+                          (None, 'CC(=O)O', 61.04, 60.02, 1.02),
+                          (None, None, 61.04, None, None),
+                          ('60.02', None, None, 60.02, None),
+                          ('None', None, 61.04, None, None)])
 def test_get_exact_mass_adduct_mass(data_exact_mass, smiles_i, data_mz, expected_exact_mass, expected_adduct_mass):
     """Tests the function with parametrized inputs."""
     exact_mass, adduct_mass = get_exact_mass_adduct_mass(data_exact_mass, smiles_i, data_mz)
