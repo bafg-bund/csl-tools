@@ -23,11 +23,9 @@ def check_duplicate(session, entry):
 
     # Prepare query
     qry = session.query(
-        Compound.cas, Experiment.isotope, Parameter.instrument, Parameter.ionisation,
-        Parameter.ce, Parameter.ces, Parameter.collision_type, Parameter.ce_unit,
-        Parameter.polarity, Experiment.adduct
         Compound.cas, Experiment.adduct, Experiment.isotope, Parameter.instrument, Parameter.ionisation,
         Parameter.polarity, Parameter.collision_type, Parameter.ce, Parameter.ces, Parameter.ce_unit,
+        Parameter.electron_energy, Parameter.electron_energy_unit
     ). \
         join(Experiment, Compound.compound_id == Experiment.compound_id). \
         join(Parameter, Experiment.parameter_id == Parameter.parameter_id)
@@ -40,9 +38,9 @@ def check_duplicate(session, entry):
                      Parameter.collision_type == entry['col_type_i'],
                      Parameter.ce == entry['ce_i'],
                      Parameter.ces == entry['ces_i'],
-                     Parameter.collision_type == entry['col_type_i'],
-                     Parameter.ce_unit == entry['par_ce_unit'])
                      Parameter.ce_unit == entry['ce_unit_i'],
+                     Parameter.electron_energy == entry['ee_i'],
+                     Parameter.electron_energy_unit == entry['ee_unit_i'])
 
     inchikey_main_i = entry['inchikey_main_i']
     cas_i = entry['cas_i']
@@ -120,12 +118,14 @@ def add_exp_to_session(session, entry):
     inchi_i = entry['inchi_i']
     chrom_method = entry['par_chrom_method']
     rt_i = entry['rt_i']
+    rt_ind_kovats = entry['rt_ind_i']
     instrument = entry['instrument_i']
     pol_i = entry['pol_i']
     ce_i = entry['ce_i']
     ces_i = entry['ces_i']
-    ce_unit = entry['par_ce_unit']
     ce_unit_i = entry['ce_unit_i']
+    ee_i = entry['ee_i']
+    ee_unit_i = entry['ee_unit_i']
     col_type_i = entry['col_type_i']
     ionization_i = entry['ionization_i']
     mz_i = entry['mz_i']
@@ -137,6 +137,7 @@ def add_exp_to_session(session, entry):
     compgroup_i = entry['compgroup_i']
     authors = entry['par_authors']
     affiliation = entry['par_affiliation']
+    pc_id_i = entry['pc_id_i']
 
     # Log entry information for reference
     logger.info(f'Compound: {entry['par_comp']}; Adduct: {entry['par_adduct']}; '
@@ -228,7 +229,7 @@ def add_exp_to_session(session, entry):
 
         logger.info(f'Compound "{comp_i}" not found in CSL. Adding entry.')
         comp_res = Compound(formula=formula_i, cas=cas_i, smiles=smiles_i, name=comp_i,
-                            compound_groups=comp_group, inchikey=inchikey_i, inchi=inchi_i)
+                            compound_groups=comp_group, inchikey=inchikey_i, inchi=inchi_i, pubchem_id=pc_id_i)
         # Add compound entry to session
         session.add(comp_res)
 
@@ -240,6 +241,12 @@ def add_exp_to_session(session, entry):
                     f'"{chrom_method}" not found in CSL. Adding retention time from data entry.')
         rt_res = RetentionTime(chrom_method=chrom_method, rt=rt_i, compound=comp_res, predicted='FALSE')
         session.add(rt_res)
+
+        # Special case for GC data
+        if entry.get('rt_ind_i'):
+            rt_res2 = RetentionTime(chrom_method='retention_index_kovats', rt=rt_ind_kovats, compound=comp_res, predicted='TRUE')
+            session.add(rt_res2)
+
     else:
         # If existing RT is modeled, update its value and metadata
         if rt_res.predicted == 'TRUE':
@@ -252,8 +259,8 @@ def add_exp_to_session(session, entry):
 
     # Search experimental parameters and add them from the file if they don't exist
     para_res = session.query(Parameter).filter_by(instrument=instrument, polarity=pol_i, ce=ce_i, ces=ces_i,
-                                                  ce_unit=ce_unit_i, collision_type=col_type_i,
-                                                  ionisation=ionization_i).one_or_none()
+                                                  ce_unit=ce_unit_i, collision_type=col_type_i, ionisation=ionization_i,
+                                                  electron_energy=ee_i, electron_energy_unit=ee_unit_i).one_or_none()
     if not para_res:
         logger.info('Experimental parameters not found in CSL. Adding parameters from data entry.')
         para_res = Parameter(instrument=instrument, polarity=pol_i, ce=ce_i, ces=ces_i, ce_unit=ce_unit_i,

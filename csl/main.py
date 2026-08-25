@@ -50,7 +50,7 @@ subparsers = parser.add_subparsers(dest='command', help='Available commands')
 # Define 'process' command and its arguments
 process_parser = subparsers.add_parser('process', help='Processes MS2 data files from a specified format and imports the data into the CSL')
 
-process_parser.add_argument('format', type=str, choices=['mbank', 'mzvault', 'libview'],
+process_parser.add_argument('format', type=str, choices=['mbank', 'mzvault', 'libview', 'gcdata'],
                             help='Specify format')
 process_parser.add_argument('path_csl', type=str, help='Path to CSL file')
 process_parser.add_argument('path_data', type=str, nargs='?',

@@ -94,11 +94,13 @@ class Parameter(Base):
     ces = Column(Float)  # Collision energy spread
     ce_unit = Column(String, nullable=False)  # Collision energy units
     collision_type = Column(String, nullable=False)  # Collision type
+    electron_energy = Column(Float, nullable=True)  # Electron energy
+    electron_energy_unit = Column(String, nullable=True)  # Collision energy units
 
     def __repr__(self):
         return (f"parameter_id={self.parameter_id}, instrument={self.instrument}, polarity={self.polarity}, "
                 f"ionisation={self.ionisation}, ce={self.ce}, ces={self.ces}, ce_unit={self.ce_unit}, "
-                f"collision_type={self.collision_type}")
+                f"collision_type={self.collision_type}, ee={self.electron_energy}, ee_unit={self.electron_energy_unit}")
 
 
 class Compound(Base):
@@ -118,10 +120,11 @@ class Compound(Base):
     name = Column(String, nullable=False, unique=True)
     inchi = Column(String)
     inchikey = Column(String)
+    pubchem_id = Column(Integer, nullable=True)  # PubChem Identifier
 
     def __repr__(self):
         return (f"compound_id={self.compound_id}, name={self.name}, cas={self.cas}, inchikey={self.inchikey}, "
-                f"formula={self.formula}, smiles={self.smiles}, inchi={self.inchi}")
+                f"formula={self.formula}, smiles={self.smiles}, inchi={self.inchi}, pubchem_id={self.pubchem_id}")
 
 
 class RetentionTime(Base):

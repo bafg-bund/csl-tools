@@ -1,5 +1,5 @@
 from csl.config import (WHITELIST_INSTR_NAME_TYPE, WHITELIST_IONIZATION_TYPE, WHITELIST_COLLISION_TYPE,
-                        WHITELIST_ISOTOPE, WHITELIST_CE_UNIT)
+                        WHITELIST_ISOTOPE, WHITELIST_CE_UNIT, WHITELIST_EE_UNIT)
 
 def get_file_paths(data_path):
     """
@@ -224,7 +224,43 @@ def get_collision_energy(data_ce, data_ces, data_ce_unit):
 
     return ce_i, ces_i, ce_unit_i
 
-    return ce_i, ces_i
+
+def get_electron_energy(data_ee, data_ee_unit):
+    """
+    Formats electron energy (EE) value according to CSL requirements.
+    - Only single values allowed
+    - Negative CE/CES value inputs are converted to positive values
+    - EE unit is matched with whitelist
+
+    Args:
+        data_ee (str or None)      : One electron energy value from the data.
+        data_ee_unit (str or None) : Electron energy unit from the data.
+
+    Returns:
+        ee_i (int)      : Electron energy (EE) value.
+        ee_unit_i (str) : Electron energy unit.
+    """
+    import re
+
+    # Check EE data and EE unit whitelist
+    if not data_ee or not data_ee_unit.strip() in WHITELIST_EE_UNIT:
+        ee_i = None
+        ee_unit_i = None
+        return ee_i, ee_unit_i
+    else:  # Format EE
+        str_nrs = re.findall(r'\d+', data_ee)  # Find numbers in string
+        int_nrs = list(map(int, str_nrs))  # Convert to list of int
+        int_nrs_real = [int_nr for int_nr in int_nrs if int_nr > 0]  # Remove zero
+
+        # Expect a single EE value
+        if len(int_nrs_real) == 1:
+            ee_i = int_nrs_real[0]
+            ee_unit_i = data_ee_unit.strip()
+        else:  # Unexpected number of EE values
+            ee_i = None
+            ee_unit_i = None
+
+    return ee_i, ee_unit_i
 
 
 def get_ionization_type(data_ionization):
@@ -391,6 +427,23 @@ def get_retention_time(data_rt):
     return rt_i
 
 
+def  get_retention_time_index(data_rt_ind):
+    """
+    Retrieves and returns the retention time index as a float.
+
+    Args:
+        data_rt_ind (str, float, int): Retention time index from the data.
+
+    Returns:
+        rt_ind_i (float): Retention time index as a float. Returns None, if the input is empty.
+    """
+    try:
+        rt_ind_i = float(data_rt_ind)
+    except (TypeError, ValueError):
+        rt_ind_i = None
+    return rt_ind_i
+
+
 def get_peaks(data_peak):
     """
     Parses and returns peak data as a pandas DataFrame with columns for m/z and intensity.
@@ -523,7 +576,6 @@ def get_experiment_id(data_accession):
     return experiment_id_i
 
 
-def get_exact_mass_adduct_mass(data_exact_mass, smiles_i, data_mz):
 def get_isotope(data_isotope):
     """
     Retrieves and returns the isotope / type of molecular mass from the provided data.
@@ -540,6 +592,32 @@ def get_isotope(data_isotope):
     else:
         isotope_i = None
     return isotope_i
+
+
+def get_pubchem_id(data_pc_id):
+    """
+    Retrieves and returns the PubChem ID as integer.
+
+    Args:
+        data_pc_id (str): PubChem ID from the data.
+
+    Returns:
+        pc_id_i (int): PubChem ID as integer. Returns None, if the input is empty.
+    """
+    # Convert PubChem ID to integer if possible
+    try:
+        pc_id_i = int(data_pc_id)
+
+        # Reject floats and negative IDs
+        if isinstance(data_pc_id, float):
+            pc_id_i = None
+        elif pc_id_i < 0:
+            pc_id_i = None
+
+    except (TypeError, ValueError):
+        pc_id_i = None
+
+    return pc_id_i
 
 
 def get_exact_mass_adduct_mass(data_exact_mass, smiles_i, mz_i):

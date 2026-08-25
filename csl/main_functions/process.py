@@ -25,6 +25,7 @@ WORKFLOWS = {
     "mbank": MbankProcess,
     "mzvault": MzvaultProcess,
     "libview": LibviewProcess,
+    "gcdata": GcdataProcess,
 }
 
 
@@ -37,6 +38,7 @@ def process_data(format: str, path_csl: str, path_data: str | list[str], path_co
             - 'mbank'   : MassBank documents.
             - 'mzVault' : mzVault-based documents.
             - 'libview' : LibraryView-based documents.
+            - 'gcdata'  : GC data (undefined).
 
         path_csl (str)               : Path to the CSL file.
         path_data (str or list[str]) : File path(s) or directory path containing the MS2 data files to process.

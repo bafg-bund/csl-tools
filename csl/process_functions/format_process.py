@@ -87,6 +87,10 @@ class FormatProcess(ABC):
             'par_affiliation': None,      # Author affiliation
             'par_ce': None,               # Collision energy
             'par_ce_unit': None,          # Collision energy unit
+            'par_ee': None,               # Electron energy
+            'par_ee_unit': None,          # Electron energy unit
+            'par_rt_ind': None,           # Retention time index
+            'par_pc_id': None,            # PubChem ID
         }
         fixed_par = par_fix | par_config  # Combine
 
@@ -100,6 +104,11 @@ class FormatProcess(ABC):
             extract_data_add['par_chrom_method'] = DEFAULT_PAIRS_DSOURCE_CHROM[dsrc]
         except KeyError:
             raise ValueError(f"Chromatographic method for data source '{dsrc}' is not defined (check config.py).")
+
+        # Normalize the data source to its base name
+        fixed_par['par_data_source'] = fixed_par['par_data_source'].split('_')[0]
+        if 'par_data_source' in extract_data_add.columns:
+            extract_data_add['par_data_source'] = fixed_par['par_data_source'].split('_')[0]
 
         # Add each parameter and its value if it is not provided already in the extracted data.
         for par in fixed_par.items():
@@ -186,6 +195,16 @@ class FormatProcess(ABC):
                     f'Invalid collision energy (CE), e.g., unexpected number of CE or non-equal difference in CE spread.')
                 entry_warn = True
 
+            # Electron energy (EE)
+            ee_i, ee_unit_i = get_electron_energy(entry['par_ee'], entry['par_ee_unit'])
+            if not ee_i and entry['par_ee']:
+                logger.warning(f'Invalid electron energy (EE).')
+                entry_warn = True
+
+            # Set error flag to True if no CE and no EE value is found
+            if not ce_i and not ee_i:
+                logger.warning(f'No values for collision energy and electron energy. One type is required.')
+                entry_err = True
 
             # Ionization type
             ionization_i = get_ionization_type(entry['par_ionization'])
@@ -267,6 +286,12 @@ class FormatProcess(ABC):
                 logger.warning('Isotope (type of molecular mass) not detected.')
                 entry_err = True
 
+            # Get retention time index
+            rt_ind_i = get_retention_time_index(entry['par_rt_ind'])
+
+            # Get PubChem ID
+            pc_id_i = get_pubchem_id(entry['par_pc_id'])
+
             # Organize formatted data from one entry in dictionary
             form_data_entry = {
                 'pol_i': pol_i,
@@ -275,6 +300,8 @@ class FormatProcess(ABC):
                 'ce_i': ce_i,
                 'ces_i': ces_i,
                 'ce_unit_i': ce_unit_i,
+                'ee_i': ee_i,
+                'ee_unit_i': ee_unit_i,
                 'ionization_i': ionization_i,
                 'formula_i': formula_i,
                 'inchikey_i': inchikey_i,
@@ -292,6 +319,8 @@ class FormatProcess(ABC):
                 'exact_mass': exact_mass,
                 'adduct_mass': adduct_mass,
                 'isotope_i': isotope_i,
+                'rt_ind_i': rt_ind_i,
+                'pc_id_i': pc_id_i,
                 'form_err_flag': entry_err,
                 'form_warn_flag': entry_warn
             }
