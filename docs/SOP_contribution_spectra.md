@@ -38,7 +38,7 @@ par_config:
   par_ce_unit: 'V'                        # Unit for collision energy
   par_instrument: 'TripleTOF 5600 SCIEX'  # Instrument name
   par_instrument_type: 'LC-ESI-QTOF '     # Instrument type
-  par_data_source: 'bfg'                  # Data source identifier (needs to be whitelisted in config.py)
+  par_data_source: 'bfg'                  # Data source identifier
   par_authors: 'Björn Ehlig; Kevin S. Jewell; Ole Lessmann; Arne Wick'  # Author name(s)
   par_affiliation: 'Federal Institute of Hydrology (Bundesanstalt für Gewässerkunde), Koblenz, Germany'  # Author affiliation
 

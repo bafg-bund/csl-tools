@@ -73,8 +73,9 @@ class FormatProcess(ABC):
         logger = logging.getLogger(__name__)
 
         # List of potential parameters that may not be extracted from the data files and either:
-        # - do not change across data files.
+        # - do not change across data files
         # - are calculated through another parameter
+        # - are unused by one workflow but required by others
         par_fix = {
             'par_compgroup': None,        # Compound group
             'par_adduct': None,           # Adduct
@@ -189,9 +190,6 @@ class FormatProcess(ABC):
             ce_i, ces_i, ce_unit_i = get_collision_energy(entry['par_ce'], entry['par_ces'], entry['par_ce_unit'])
             if not ce_i and entry['par_ce']:
                 logger.warning(
-                    f'No collision energy (CE) or unexpected number of CE or non-equal difference in CE spread. '
-                    f'Check field for collision energy.')
-                entry_err = True
                     f'Invalid collision energy (CE), e.g., unexpected number of CE or non-equal difference in CE spread.')
                 entry_warn = True
 
@@ -258,10 +256,10 @@ class FormatProcess(ABC):
                 logger.warning('Retention time not detected.')
                 entry_err = True
 
-            # Spectra / Peaks
+            # Spectrum / Peaks
             spec_i = get_peaks(entry['par_peak'])
             if spec_i.empty:
-                logger.warning('No spectra detected.')
+                logger.warning('Spectrum not detected.')
                 entry_err = True
 
             # Compound group
@@ -277,7 +275,6 @@ class FormatProcess(ABC):
             experiment_id_i = get_experiment_id(entry['par_accession'])
 
             # Get exact mass and adduct mass (not for CSL, but for checking)
-            exact_mass, adduct_mass = get_exact_mass_adduct_mass(entry['par_exact_mass'], smiles_i, entry['par_mz'])
             exact_mass, adduct_mass = get_exact_mass_adduct_mass(entry['par_exact_mass'], smiles_i, mz_i)
 
             # Get isotope / type of molecular mass

@@ -144,7 +144,7 @@ def add_exp_to_session(session, entry):
                 f'Instr.: {entry['par_instrument']}; Ion mode: {entry['par_ion_mode']}; CE: {entry['par_ce']}; '
                 f'CES: {entry['par_ces']}; File path: {entry['file_path']}')
 
-    # Check if the data source exists (search by name and authors; !assumes correct spelling!) in the CSL and add it if necessary.
+    # Check if the combination of data source and authors exists (assumes correct spelling!) in the CSL and add it if necessary.
     data_src = session.query(DataSource).filter_by(name=dsrc_csl_def, authors=authors).one_or_none()
     if not data_src:
         logger.info(f'Adding new data source. Name: {dsrc_csl_def}; Authors: {authors}; Affiliation: {affiliation}')
