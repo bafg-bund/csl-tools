@@ -26,13 +26,14 @@ def test_rtscan(mock_session, mock_dsrc_method_pairs, mock_dsrc_rt, mock_dsrc_ex
                 mock_dsrc_pred_rt, mock_predict_bfg_rt_called):
     """Tests function and query calls for rtscan update workflow."""
     with patch('csl.rtscan_functions.update_rtscan.DEFAULT_PAIRS_DSOURCE_CHROM') as mock_dsrc_method_pairs, \
-         patch('csl.rtscan_functions.update_rtscan.check_order_pred_bfg_rt') as mock_check_order_pred_bfg_rt, \
-         patch('csl.rtscan_functions.update_rtscan.update_version_filename') as mock_update_version_filename, \
+         patch('csl.rtscan_functions.update_rtscan.check_order_pred_bfg_rt', return_value=['lfuby', 'uba', 'lanuk']), \
+         patch('csl.rtscan_functions.update_rtscan.update_version_filename', return_value='mock_filename'), \
          patch('shutil.copy'), \
          patch('csl.rtscan_functions.update_rtscan.create_session') as mock_create_session, \
+         patch('csl.rtscan_functions.update_rtscan.get_unique_non_gc_comp_ids', return_value=[[1443]]), \
          patch('csl.rtscan_functions.update_rtscan.get_dsrc_rt_info') as mock_get_dsrc_rt_info, \
-         patch('csl.rtscan_functions.update_rtscan.check_experimental_data') as mock_check_exp_data, \
-         patch('csl.rtscan_functions.update_rtscan.check_predicted_flags_pred_data') as mock_check_pred_flags, \
+         patch('csl.rtscan_functions.update_rtscan.check_experimental_data', return_value=([], [], [])), \
+         patch('csl.rtscan_functions.update_rtscan.check_predicted_flags_pred_data', return_value=[]), \
          patch('csl.rtscan_functions.update_rtscan.predict_bfg_rt') as mock_predict_bfg_rt, \
          patch('csl.rtscan_functions.update_rtscan.predict_rt') as mock_predict_rt, \
          patch('csl.rtscan_functions.update_rtscan.summarize_corrections_and_errors'), \
@@ -41,12 +42,7 @@ def test_rtscan(mock_session, mock_dsrc_method_pairs, mock_dsrc_rt, mock_dsrc_ex
 
         # Mock function returns
         mock_create_session.return_value = mock_session
-        mock_session.query(RetentionTime.compound_id).all.return_value = [[1443]]
-        mock_check_order_pred_bfg_rt.return_value = ['lfuby', 'uba', 'lanuk']
-        mock_update_version_filename.return_value = 'mock_filename'
         mock_get_dsrc_rt_info.return_value = (mock_dsrc_rt, mock_dsrc_exp_rt, mock_dsrc_pred_rt)
-        mock_check_exp_data.return_value = ([], [], [])
-        mock_check_pred_flags.return_value = []
         mock_predict_bfg_rt.return_value = True
         mock_predict_rt.return_value = True
 
@@ -56,8 +52,6 @@ def test_rtscan(mock_session, mock_dsrc_method_pairs, mock_dsrc_rt, mock_dsrc_ex
         # Execute the rtscan method
         mock_update_workflow.rtscan()
 
-        # Assert that query was called
-        mock_session.query.assert_called_with(RetentionTime.compound_id)
         # Assert the function call to predict the main RT
         assert mock_predict_bfg_rt.called == mock_predict_bfg_rt_called
         # Assert that the number of times other RTs were predicted is as expected

@@ -51,7 +51,7 @@ def test_rtscan_recalc():
     # Assert that the number of RT-entries have not changed
     assert len(session.query(RetentionTime).all()) == no_rt_entries_template
 
-    # Assert that all predicted RT values have changed (Note: lfuby RTs are not in the CSL file)
+    # Assert that all predicted RT values have changed
     pred_rt_entries = [rt for (rt,) in session.query(RetentionTime.rt).filter(RetentionTime.predicted == "TRUE").all()]
     assert set(pred_rt_entries).isdisjoint(pred_rt_entries_template)
 

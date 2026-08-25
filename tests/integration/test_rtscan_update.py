@@ -48,22 +48,29 @@ def test_rtscan_update():
     # Connect to CSL database
     session = create_session(path_csl=csl_new_path)
 
+    # Filter data source dictionary for non-GC data sources
+    DEFAULT_PAIRS_DSOURCE_CHROM_filtered = {
+        key: value
+        for key, value in DEFAULT_PAIRS_DSOURCE_CHROM.items()
+        if "_gc" not in key and "_gc" not in value
+    }
+
     # Assert that there is one RT-entry for each method per compound (4 compounds in this database)
-    assert len(session.query(RetentionTime).all()) == 4*len(DEFAULT_PAIRS_DSOURCE_CHROM), \
-        (f"Expected {4*len(DEFAULT_PAIRS_DSOURCE_CHROM)} entries, but found {len(session.query(RetentionTime).all())}. "
+    assert len(session.query(RetentionTime).all()) == 4*len(DEFAULT_PAIRS_DSOURCE_CHROM_filtered), \
+        (f"Expected {4*len(DEFAULT_PAIRS_DSOURCE_CHROM_filtered)} entries, but found {len(session.query(RetentionTime).all())}. "
          f"Check methods in config.py")
 
     # Assert that for the compound id 1443 the experimental lfuby-RT is now FALSE (was empty)
     assert session.query(RetentionTime.predicted).filter_by(
-        compound_id=1443, chrom_method=DEFAULT_PAIRS_DSOURCE_CHROM['lfuby']).one_or_none()[0] == 'FALSE'
+        compound_id=1443, chrom_method=DEFAULT_PAIRS_DSOURCE_CHROM_filtered['lfuby']).one_or_none()[0] == 'FALSE'
 
     # Assert that for the compound id 1672 the experimental uba-RT is now 'FALSE' (was 'TRUE')
     assert session.query(RetentionTime.predicted).filter_by(
-        compound_id=1672, chrom_method=DEFAULT_PAIRS_DSOURCE_CHROM['uba']).one_or_none()[0] == 'FALSE'
+        compound_id=1672, chrom_method=DEFAULT_PAIRS_DSOURCE_CHROM_filtered['uba']).one_or_none()[0] == 'FALSE'
 
     # Assert that for the compound id 1670 the predicted bfg-RT is now 'TRUE' (was 'FALSE')
     assert session.query(RetentionTime.predicted).filter_by(
-        compound_id=1670, chrom_method=DEFAULT_PAIRS_DSOURCE_CHROM['bfg']).one_or_none()[0] == 'TRUE'
+        compound_id=1670, chrom_method=DEFAULT_PAIRS_DSOURCE_CHROM_filtered['bfg']).one_or_none()[0] == 'TRUE'
 
     # Cleanup
     session.close()
