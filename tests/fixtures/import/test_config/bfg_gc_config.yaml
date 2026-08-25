@@ -1,0 +1,14 @@
+# Configuration for bfg (GC data)
+par_config:
+  par_isotope: 'polyisotopic'            # Type of molecular mass
+  par_ionization: 'EI'                   # Ionization type
+  par_col_type: 'in-source'              # Collision type
+  par_instrument: 'Exploris 60K Thermo'  # Instrument name
+  par_instrument_type: 'GC-EI-Orbitrap'  # Instrument type
+  par_adduct: '[M]+'                     # Adduct notation
+  par_data_source: 'bfg_gc'              # Data source identifier
+  par_authors: 'Name'                    # Author name(s)
+  par_affiliation: 'Affiliation'         # Author affiliation
+
+# Special adduct notation rules (optional).
+adduct_notation: {}

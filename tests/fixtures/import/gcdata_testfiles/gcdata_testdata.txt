@@ -1,0 +1,65 @@
+Name: Trimethyl phosphate
+PrecursorMZ: 140.0238458
+ID: 1
+Contained_in_raw_files: 20241001_OPFR Mix DK_09.mzML
+IonMode: positive
+Formula: C3H9O4P
+Standard_RT: 6.154
+RetentionTime: 6.153528
+DiagnosticMZs: 110.01269, 80.00214
+RetentionIndex: 1032.77533
+PC_RI: 906
+PC_ID: 10541
+Smiles: COP(=O)(OC)OC
+CASNo: 512-56-1
+InChiKey: WVLBCYQITXONBZ-UHFFFAOYSA-N
+ElectronEnergy: 70
+ElectronEnergyUnit: eV
+Num peaks: 3
+66.978883 7.777
+110.356765 100
+140.358382 999
+
+Name: Trimethyl phosphate
+PrecursorMZ: 140.0238458
+ID: 1
+Contained_in_raw_files: 20241001_OPFR Mix DK_09.mzML
+IonMode: positive
+Formula: C3H9O4P
+Standard_RT: 6.154
+RetentionTime: 6.153528
+DiagnosticMZs: 110.01269, 80.00214
+RetentionIndex: 1032.77533
+PC_RI: 906
+PC_ID: 10541
+Smiles: COP(=O)(OC)OC
+CASNo: 512-56-1
+InChiKey: WVLBCYQITXONBZ-UHFFFAOYSA-N
+ElectronEnergy: 50
+ElectronEnergyUnit: eV
+Num peaks: 3
+66.978883 10.1
+110.356765 50.1
+140.358382 800.1
+
+Name: Aniline
+PrecursorMZ: 93.05784923
+ID: 2
+Contained_in_raw_files: 20241119_MM_QC_500ngmL_2_09.mzML
+IonMode: positive
+Formula: C6H7N
+Standard_RT: 6.796
+RetentionTime: 6.768399
+DiagnosticMZs: 93.05721, 66.0464
+RetentionIndex: 1061.057269
+PC_RI: 968
+PC_ID: 6115
+Smiles: C1=CC=C(C=C1)N
+CASNo: 62-53-3
+InChiKey: PAYRUJLWNCNPSJ-UHFFFAOYSA-N
+ElectronEnergy: 70
+ElectronEnergyUnit: eV
+Num peaks: 3
+51.1111 10
+63.5555 50
+93.8888 80

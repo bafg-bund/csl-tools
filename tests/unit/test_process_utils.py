@@ -123,6 +123,23 @@ def test_get_collision_energy(data_ce, data_ces, data_ce_unit, expected_ce_i, ex
     assert ce_unit_i == expected_ce_unit
 
 
+@pytest.mark.parametrize("data_ee, data_ee_unit, expected_ee_i, expected_ee_unit_i", [
+    ('70', 'eV', 70, 'eV'),         # Data is correctly formatted
+    ('-70', 'eV', 70, 'eV'),        # Negative input value is converted to positive value
+    ('70.00', 'eV', 70, 'eV'),      # Different input format works
+    ('20, 40', 'eV', None, None),   # Unexpected number of EE
+    ([], 'eV', None, None),         # No EE input value
+    ('70', 'invalid', None, None),  # EE unit not on whitelist
+    ('', '', None, None),           # No data
+    ([], [], None, None),
+])
+def test_get_electron_energy(data_ee, data_ee_unit, expected_ee_i, expected_ee_unit_i):
+    """Tests the function with parametrized inputs."""
+    ee_i, ee_unit_i = get_electron_energy(data_ee, data_ee_unit)
+    assert ee_i == expected_ee_i
+    assert ee_unit_i == expected_ee_unit_i
+
+
 @pytest.mark.parametrize("data_ionization, expected_ionization_i",
                          [(' ESI ', 'ESI'),  # On whitelist; Outer spaces are stripped
                           ('not_whitelisted', None)])  # Not on whitelist
@@ -244,6 +261,22 @@ def test_get_isotope(data_isotope, expected_isotope_i):
     """Tests the function with parametrized inputs."""
     isotope_i = get_isotope(data_isotope)
     assert isotope_i == expected_isotope_i
+
+
+@pytest.mark.parametrize("data_rt_ind, expected_rt_ind_i",
+                         [('1032.77', 1032.77), ('10', 10.0), ('', None)])
+def test_get_retention_time_index(data_rt_ind, expected_rt_ind_i):
+    """Tests the function with parametrized inputs."""
+    rt_ind_i = get_retention_time_index(data_rt_ind)
+    assert rt_ind_i == expected_rt_ind_i
+
+
+@pytest.mark.parametrize("data_pc_id, expected_pc_id_i",
+                         [(12, 12), (' 12 ', 12), ('a12', None), ('12.7', None), ('-12', None), (None, None)])
+def test_get_pubchem_id(data_pc_id, expected_pc_id_i):
+    """Tests the function with parametrized inputs."""
+    pc_id_i = get_pubchem_id(data_pc_id)
+    assert pc_id_i == expected_pc_id_i
 
 
 @pytest.mark.parametrize("data_exact_mass, smiles_i, data_mz, expected_exact_mass, expected_adduct_mass",

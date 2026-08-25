@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock
 import pandas as pd
 
 
-# Define a fixture for the TestProcess class
+# Fixture for the TestProcess class
 @pytest.fixture
 def workflow():
     class TestProcess(FormatProcess):
@@ -17,113 +17,98 @@ def workflow():
 
 class TestFormatProcess:
 
-    def test_process_data(self, workflow, mock_extract_data, mock_dsrc_def, mock_spec_adduct):
+    @pytest.fixture
+    # Patch all format_process functions for valid return values
+    def mocked_format_process_functions(self, mocker):
+        mocker.patch('csl.process_functions.format_process.get_instrument', return_value='instrument')
+        mocker.patch('csl.process_functions.format_process.get_polarity', return_value='polarity'),
+        mocker.patch('csl.process_functions.format_process.get_compound_and_adduct_name',
+              return_value=('comp', 'adduct')),
+        mocker.patch('csl.process_functions.format_process.format_adduct', return_value='formatted_adduct'),
+        mocker.patch('csl.process_functions.format_process.get_collision_energy', return_value=(40, 0, 'V')),
+        mocker.patch('csl.process_functions.format_process.get_electron_energy', return_value=(70, 'eV')),
+        mocker.patch('csl.process_functions.format_process.get_ionization_type', return_value='ionization_type'),
+        mocker.patch('csl.process_functions.format_process.get_formula', return_value='formula'),
+        mocker.patch('csl.process_functions.format_process.get_inchikey',
+              return_value=('inchikey', 'inchikey_main')),
+        mocker.patch('csl.process_functions.format_process.get_cas', return_value='cas'),
+        mocker.patch('csl.process_functions.format_process.get_smiles', return_value='smiles'),
+        mocker.patch('csl.process_functions.format_process.get_inchi_from_smiles', return_value='inchi'),
+        mocker.patch('csl.process_functions.format_process.get_precursor_mz', return_value=99),
+        mocker.patch('csl.process_functions.format_process.get_retention_time', return_value=99),
+        mocker.patch('csl.process_functions.format_process.get_peaks',
+              return_value=pd.DataFrame({'peak': [9.9, 9.9, 9.9]})),
+        mocker.patch('csl.process_functions.format_process.get_compound_group',
+              return_value=['Pesticide', 'Herbicide']),
+        mocker.patch('csl.process_functions.format_process.get_collision_type', return_value='col_type'),
+        mocker.patch('csl.process_functions.format_process.get_experiment_id', return_value='experiment_id'),
+        mocker.patch('csl.process_functions.format_process.get_exact_mass_adduct_mass',
+              return_value=([9.9], [1.0])),
+        mocker.patch('csl.process_functions.format_process.get_isotope', return_value='isotope')
+        mocker.patch('csl.process_functions.format_process.get_retention_time_index', return_value=1022.11),
+        mocker.patch('csl.process_functions.format_process.get_pubchem_id', return_value=1005)
+
+    def test_process_data(self, workflow, mock_extract_data, mock_dsrc_def, mock_spec_adduct, mocked_format_process_functions):
         """Tests processing of sample data without creating warning or error flags."""
 
-        with patch('csl.process_functions.format_process.get_instrument', return_value='instrument'), \
-             patch('csl.process_functions.format_process.get_polarity', return_value='polarity'), \
-             patch('csl.process_functions.format_process.get_compound_and_adduct_name',
-                      return_value=('comp', 'adduct')), \
-             patch('csl.process_functions.format_process.format_adduct', return_value='formatted_adduct'), \
-             patch('csl.process_functions.format_process.get_collision_energy',
-                      return_value=('ce', 'ces')), \
-             patch('csl.process_functions.format_process.get_ionization_type', return_value='ionization_type'), \
-             patch('csl.process_functions.format_process.get_formula', return_value='formula'), \
-             patch('csl.process_functions.format_process.get_inchikey',
-                      return_value=('inchikey', 'inchikey_main')), \
-             patch('csl.process_functions.format_process.get_cas', return_value='cas'), \
-             patch('csl.process_functions.format_process.get_smiles', return_value='smiles'), \
-             patch('csl.process_functions.format_process.get_inchi_from_smiles', return_value='inchi'), \
-             patch('csl.process_functions.format_process.get_precursor_mz', return_value=99), \
-             patch('csl.process_functions.format_process.get_retention_time', return_value=99), \
-             patch('csl.process_functions.format_process.get_peaks',
-                      return_value=pd.DataFrame({'peak': [9.9, 9.9, 9.9]})), \
-             patch('csl.process_functions.format_process.get_compound_group',
-                      return_value=['Pesticide', 'Herbicide']), \
-             patch('csl.process_functions.format_process.get_collision_type', return_value='col_type'), \
-             patch('csl.process_functions.format_process.get_experiment_id', return_value='experiment_id'), \
-             patch('csl.process_functions.format_process.get_exact_mass_adduct_mass',
-                   return_value=([9.9], [1.0])):
+        # Call the process_data method
+        form_data = workflow.process_data(mock_extract_data, mock_dsrc_def, mock_spec_adduct)
 
-            # Call the process_data method
-            form_data = workflow.process_data(mock_extract_data, mock_dsrc_def, mock_spec_adduct)
-
-            # Assert that the returned data is a DataFrame and contains the expected flags
-            assert isinstance(form_data, pd.DataFrame)
-            assert 'form_err_flag' in form_data.columns
-            assert 'form_warn_flag' in form_data.columns
-            assert all(form_data['form_err_flag']) is False
-            assert all(form_data['form_warn_flag']) is False
+        # Assert that the returned data is a DataFrame and contains the expected flags
+        assert isinstance(form_data, pd.DataFrame)
+        assert 'form_err_flag' in form_data.columns
+        assert 'form_warn_flag' in form_data.columns
+        assert all(form_data['form_err_flag']) is False
+        assert all(form_data['form_warn_flag']) is False
 
 
-    def test_process_data_inchi_cas_none(self, workflow, mock_extract_data, mock_dsrc_def, mock_spec_adduct):
+    def test_process_data_inchi_cas_none(self, workflow, mock_extract_data, mock_dsrc_def, mock_spec_adduct, mocked_format_process_functions, mocker):
         """Tests processing of sample data with missing InChIKey and CAS."""
 
-        with patch('csl.process_functions.format_process.get_instrument', return_value='instrument'), \
-             patch('csl.process_functions.format_process.get_polarity',return_value='polarity'), \
-             patch('csl.process_functions.format_process.get_compound_and_adduct_name',
-                   return_value=('comp', 'adduct')), \
-             patch('csl.process_functions.format_process.format_adduct',return_value='formatted_adduct'), \
-             patch('csl.process_functions.format_process.get_collision_energy',
-                   return_value=('ce', 'ces')), \
-             patch('csl.process_functions.format_process.get_ionization_type', return_value='ionization_type'), \
-             patch('csl.process_functions.format_process.get_formula', return_value='formula'), \
-             patch('csl.process_functions.format_process.get_inchikey', return_value=(None, None)), \
-             patch('csl.process_functions.format_process.get_cas', return_value=None), \
-             patch('csl.process_functions.format_process.get_smiles', return_value='smiles'), \
-             patch('csl.process_functions.format_process.get_inchi_from_smiles', return_value='inchi'), \
-             patch('csl.process_functions.format_process.get_precursor_mz', return_value=99), \
-             patch('csl.process_functions.format_process.get_retention_time', return_value=99), \
-             patch('csl.process_functions.format_process.get_peaks',
-                  return_value=pd.DataFrame({'peak': [9.9, 9.9, 9.9]})), \
-             patch('csl.process_functions.format_process.get_compound_group',
-                  return_value=['Pesticide', 'Herbicide']), \
-             patch('csl.process_functions.format_process.get_collision_type', return_value='col_type'), \
-             patch('csl.process_functions.format_process.get_experiment_id', return_value='experiment_id'), \
-             patch('csl.process_functions.format_process.get_exact_mass_adduct_mass',
-                      return_value=([9.9], [1.0])):
+        mocker.patch('csl.process_functions.format_process.get_inchikey', return_value=(None, None))
+        mocker.patch('csl.process_functions.format_process.get_cas', return_value=None)
 
-            # Call the method
-            form_data = workflow.process_data(mock_extract_data, mock_dsrc_def, mock_spec_adduct)
+        # Call the method
+        form_data = workflow.process_data(mock_extract_data, mock_dsrc_def, mock_spec_adduct)
 
-            # Assert that the returned data is a DataFrame and contains the expected flags
-            assert isinstance(form_data, pd.DataFrame)
-            assert 'form_err_flag' in form_data.columns
-            assert 'form_warn_flag' in form_data.columns
-            assert all(form_data['form_err_flag']) is True
-            assert all(form_data['form_warn_flag']) is True
+        # Assert that the returned data is a DataFrame and contains the expected flags
+        assert isinstance(form_data, pd.DataFrame)
+        assert 'form_err_flag' in form_data.columns
+        assert 'form_warn_flag' in form_data.columns
+        assert all(form_data['form_err_flag']) is True
+        assert all(form_data['form_warn_flag']) is True
 
 
-    def test_process_data_all_err(self, workflow, mock_extract_data, mock_dsrc_def, mock_spec_adduct):
+    def test_process_data_all_err(self, workflow, mock_extract_data, mock_dsrc_def, mock_spec_adduct, mocked_format_process_functions, mocker):
         """Tests all errors with logger warnings where processing continues."""
         mock_logger = MagicMock()
-        with patch("logging.getLogger", return_value=mock_logger), \
-             patch('csl.process_functions.format_process.get_instrument', return_value='instrument'), \
-             patch('csl.process_functions.format_process.get_polarity',return_value=None), \
-             patch('csl.process_functions.format_process.get_compound_and_adduct_name',
-                   return_value=(None, None)), \
-             patch('csl.process_functions.format_process.format_adduct',return_value=None), \
-             patch('csl.process_functions.format_process.get_collision_energy',
-                   return_value=(None, None)), \
-             patch('csl.process_functions.format_process.get_ionization_type', return_value=None), \
-             patch('csl.process_functions.format_process.get_formula', return_value=None), \
-             patch('csl.process_functions.format_process.get_inchikey', return_value=(None, None)), \
-             patch('csl.process_functions.format_process.get_cas', return_value=None), \
-             patch('csl.process_functions.format_process.get_smiles', return_value=None), \
-             patch('csl.process_functions.format_process.get_inchi_from_smiles', return_value=None), \
-             patch('csl.process_functions.format_process.get_precursor_mz', return_value=None), \
-             patch('csl.process_functions.format_process.get_retention_time', return_value=None), \
-             patch('csl.process_functions.format_process.get_peaks', return_value=pd.DataFrame({'peak': []})), \
-             patch('csl.process_functions.format_process.get_compound_group', return_value=[]), \
-             patch('csl.process_functions.format_process.get_collision_type', return_value=None), \
-             patch('csl.process_functions.format_process.get_experiment_id', return_value=None), \
-             patch('csl.process_functions.format_process.get_exact_mass_adduct_mass', return_value=(None, None)):
+        with patch("logging.getLogger", return_value=mock_logger):
+
+            mocker.patch('csl.process_functions.format_process.get_polarity',return_value=None),
+            mocker.patch('csl.process_functions.format_process.get_compound_and_adduct_name', return_value=(None, None)),
+            mocker.patch('csl.process_functions.format_process.format_adduct',return_value=None),
+            mocker.patch('csl.process_functions.format_process.get_collision_energy', return_value=(None, None, None)),
+            mocker.patch('csl.process_functions.format_process.get_electron_energy', return_value=(None, None)),
+            mocker.patch('csl.process_functions.format_process.get_ionization_type', return_value=None),
+            mocker.patch('csl.process_functions.format_process.get_formula', return_value=None),
+            mocker.patch('csl.process_functions.format_process.get_inchikey', return_value=(None, None)),
+            mocker.patch('csl.process_functions.format_process.get_cas', return_value=None),
+            mocker.patch('csl.process_functions.format_process.get_smiles', return_value=None),
+            mocker.patch('csl.process_functions.format_process.get_inchi_from_smiles', return_value=None),
+            mocker.patch('csl.process_functions.format_process.get_precursor_mz', return_value=None),
+            mocker.patch('csl.process_functions.format_process.get_retention_time', return_value=None),
+            mocker.patch('csl.process_functions.format_process.get_peaks', return_value=pd.DataFrame({'peak': []})),
+            mocker.patch('csl.process_functions.format_process.get_compound_group', return_value=[]),
+            mocker.patch('csl.process_functions.format_process.get_collision_type', return_value=None),
+            mocker.patch('csl.process_functions.format_process.get_experiment_id', return_value=None),
+            mocker.patch('csl.process_functions.format_process.get_exact_mass_adduct_mass', return_value=(None, None))
+            mocker.patch('csl.process_functions.format_process.get_isotope', return_value=None)
 
             # Call the method
             form_data = workflow.process_data(mock_extract_data, mock_dsrc_def, mock_spec_adduct)
 
             # Assert the number of logger warning calls
-            assert mock_logger.warning.call_count == 14
+            assert mock_logger.warning.call_count == 17
 
             # Assert that the returned data is a DataFrame and contains the expected flags
             assert isinstance(form_data, pd.DataFrame)

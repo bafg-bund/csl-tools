@@ -39,12 +39,16 @@ def mock_spec_adduct():
 
 @pytest.fixture
 def mock_extract_data():
-    """Mocks the extracted data (DataFrame) used in process workflows."""
+    """Mocks the combined extracted data and configuration data (DataFrame) used in process workflows."""
     data = [{
         "par_comp": 'mock_compound',
         "par_adduct": 'mock_adduct',
         "par_mz": '900',
         "par_ce": '40',
+        "par_ces": '0',
+        "par_ce_unit": 'mock_ce_unit',
+        "par_ee": '70.0',
+        "par_ee_unit": 'mock_ee_unit',
         "par_ionization": 'mock_ionization',
         "par_ion_mode": 'mock_ion_mode',
         "par_rt": '22',
@@ -59,12 +63,12 @@ def mock_extract_data():
         "par_chrom_method": 'mock_chrom_method',
         "par_instrument": 'mock_instrument',
         "par_instrument_type": 'mock_instrument_type',
-        "par_isotope": 'mock_isotope',
         "par_col_type": 'mock_col_type',
-        "par_ce_unit": 'mock_ce_unit',
         "par_accession": 'mock_accession',
-        "par_ces": 'mock_ces',
-        "par_exact_mass": 'mock_exact_mass'
+        "par_exact_mass": 'mock_exact_mass',
+        "par_isotope": 'mock_isotope',
+        "par_rt_ind": '1022.11',
+        "par_pc_id": '1005',
     }]
     return pd.DataFrame(data)
 
@@ -89,6 +93,7 @@ def mock_entry_df():
         "par_mz": '900',
         "par_ce": '40',
         "par_ces": '0',
+        "par_ee": '70.0',
         "par_ionization": 'mock_ionization',
         "par_ion_mode": 'mock_ion_mode',
         "par_rt": '22',
@@ -104,14 +109,20 @@ def mock_entry_df():
         "par_isotope": 'mock_isotope',
         "par_col_type": 'mock_col_type',
         "par_ce_unit": 'mock_ce_unit',
+        "par_ee_unit": 'mock_ee_unit',
         "par_accession": 'mock_accession',
         "par_authors": 'mock_authors',
         "par_affiliation": 'mock_affiliation',
+        "par_rt_ind": '1022.11',
+        "par_pc_id": '1005',
         "pol_i": 'mock_pol_i',
         "comp_i": 'mock_comp_i',
         "adduct_i": 'mock_adduct_i',
         "ce_i": 40,
         "ces_i": 0,
+        "ee_i": 70,
+        "ce_unit_i": 'mock_ce_unit_i',
+        "ee_unit_i": 'mock_ee_unit_i',
         "ionization_i": 'mock_ionization_i',
         "formula_i": 'mock_formula_i',
         "inchikey_i": 'mock_inchikey_i',
@@ -126,6 +137,9 @@ def mock_entry_df():
         "col_type_i": "mock_col_type_i",
         "par_data_source": 'mock_data_source',
         "instrument_i": 'mock_instrument_i',
+        "isotope_i": 'mock_isotope_i',
+        "rt_ind_i": 1022.11,
+        "pc_id_i": 1005,
         "experiment_id_i": 'mock_experiment_id',
         "form_err_flag": False,
         "form_warn_flag": False
