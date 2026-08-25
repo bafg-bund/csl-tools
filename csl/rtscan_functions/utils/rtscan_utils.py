@@ -42,6 +42,26 @@ def load_rt_models():
     return models_from_bfg_to_x, models_from_x_to_bfg
 
 
+def get_unique_non_gc_comp_ids(session):
+    """."""
+    import numpy as np
+
+    # Query all compound IDs while excluding GC data
+    comp_ids = (
+        session.query(RetentionTime.compound_id)
+        .filter(
+            ~RetentionTime.chrom_method.contains("_gc"),
+            RetentionTime.chrom_method != "retention_index_kovats"
+        )
+        .distinct()
+        .all()
+    )
+    comp_ids = [comp_id[0] for comp_id in comp_ids]  # Flatten list
+    uq_comp_ids = np.unique(comp_ids).tolist()  # Unique IDs
+
+    return uq_comp_ids
+
+
 def get_dsrc_rt_info(uq_comp_id, session, dsrc_method_pairs):
     """
     Get lists of data sources that are linked to retention time (RT) data in the CSL for a specific compound ID.

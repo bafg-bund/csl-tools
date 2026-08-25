@@ -11,7 +11,6 @@ class RecalcRtscan(OperationRtscan):
         import os
         import shutil
         from tqdm import tqdm
-        import numpy as np
 
         logger = logging.getLogger(__name__)
         logger.info('Executing recalc rtscan workflow')
@@ -26,10 +25,15 @@ class RecalcRtscan(OperationRtscan):
         # Connect to the database
         session = create_session(new_path_csl)
 
-        # Get list of all unique compound IDs
-        comp_ids = session.query(RetentionTime.compound_id).all()
-        comp_ids = [comp_id[0] for comp_id in comp_ids]  # Flatten list
-        uq_comp_ids = np.unique(comp_ids).tolist()
+        # Get list of all (non-GC) unique compound IDs
+        uq_comp_ids = get_unique_non_gc_comp_ids(session)
+
+        # Filter data source dictionary for non-GC data sources
+        DEFAULT_PAIRS_DSOURCE_CHROM_filtered = {
+            key: value
+            for key, value in DEFAULT_PAIRS_DSOURCE_CHROM.items()
+            if "_gc" not in key and "_gc" not in value
+        }
 
         # Initialize empty list
         recalc_comp_id_all = []
@@ -39,10 +43,10 @@ class RecalcRtscan(OperationRtscan):
             for uq_comp_id in tqdm(uq_comp_ids):
 
                 # Get data sources linked to predicted retention time data in the CSL for each compound ID
-                _, dsrc_exp_rt, dsrc_pred_rt = get_dsrc_rt_info(uq_comp_id, session, DEFAULT_PAIRS_DSOURCE_CHROM)
+                _, dsrc_exp_rt, dsrc_pred_rt = get_dsrc_rt_info(uq_comp_id, session, DEFAULT_PAIRS_DSOURCE_CHROM_filtered)
 
                 # Recalculate the RTs for all data sources with predicted RT
-                recalc_comp_id = recalculate_pred_rt(uq_comp_id, session, dsrc_exp_rt, dsrc_pred_rt, DEFAULT_PAIRS_DSOURCE_CHROM)
+                recalc_comp_id = recalculate_pred_rt(uq_comp_id, session, dsrc_exp_rt, dsrc_pred_rt, DEFAULT_PAIRS_DSOURCE_CHROM_filtered)
                 recalc_comp_id_all.append(recalc_comp_id)
 
             # Summarize the result
