@@ -52,13 +52,13 @@ class Experiment(Base):
     # One-to-many relationship with fragment (Each experiment has a certain number of fragments)
     fragments = relationship("Fragment", back_populates='experiment', cascade="save-update, merge, delete")
     # Many-to-one relationship with data_source
-    data_source_id = Column(Integer, ForeignKey('data_source.data_source_id'))
+    data_source_id = Column(Integer, ForeignKey('data_source.data_source_id'), nullable=True)
     data_source = relationship("DataSource", back_populates="experiments")
     # Other columns
     mz = Column(Float, nullable=False)  # m/z (u)
-    time_added = Column(DateTime)
-    adduct = Column(String)
-    isotope = Column(String)
+    time_added = Column(DateTime, nullable=True)  # Timestamp when the experiment was added
+    adduct = Column(String, nullable=True)  # Adduct notation
+    isotope = Column(String, nullable=True)  # Type of molecular mass
 
     def __repr__(self):  # Define output
         return (f"experiment_id={self.experiment_id}, compound_id={self.compound_id}, compound={self.compound}, "
@@ -71,11 +71,11 @@ class Fragment(Base):
     # Primary key: fragment_id
     fragment_id = Column(Integer, primary_key=True)
     # Many-to-one relationship with experiment
-    experiment_id = Column(Integer, ForeignKey('experiment.experiment_id'))
+    experiment_id = Column(Integer, ForeignKey('experiment.experiment_id'), nullable=True)
     experiment = relationship("Experiment", back_populates='fragments')
     # Other columns
     mz = Column(Float, nullable=False)  # m/z (u)
-    int = Column(Float, nullable=False)
+    int = Column(Float, nullable=False)  # Intensity (-)
 
     def __repr__(self):
         return (f"fragment_id={self.fragment_id}, experiment_id={self.experiment_id}, experiment={self.experiment}, "
@@ -87,12 +87,12 @@ class Parameter(Base):
     # Primary key: parameter_id
     parameter_id = Column(Integer, primary_key=True)
     # Other columns
-    instrument = Column(String, nullable=False)
-    polarity = Column(String, nullable=False)
-    ionisation = Column(String, nullable=False)
-    ce = Column(Float, nullable=False)  # Collision energy
-    ces = Column(Float)  # Collision energy spread
-    ce_unit = Column(String, nullable=False)  # Collision energy units
+    instrument = Column(String, nullable=False)  # Instrument type and name
+    polarity = Column(String, nullable=False)  # Polarity
+    ionisation = Column(String, nullable=False)  # Ionization type
+    ce = Column(Float, nullable=True)  # Collision energy
+    ces = Column(Float, nullable=True)  # Collision energy spread
+    ce_unit = Column(String, nullable=True)  # Collision energy units
     collision_type = Column(String, nullable=False)  # Collision type
     electron_energy = Column(Float, nullable=True)  # Electron energy
     electron_energy_unit = Column(String, nullable=True)  # Collision energy units
@@ -114,12 +114,12 @@ class Compound(Base):
     # One-to-many relationship with retention_time
     retention_times = relationship('RetentionTime', back_populates='compound', cascade="save-update, merge, delete")
     # Other columns
-    cas = Column(String)  # CAS (Chemical Abstracts Service) registry number (CAS RN)
-    formula = Column(String, nullable=False)
-    smiles = Column(String)  # SMILES (Simplified Molecular Input Line Entry System) -code
-    name = Column(String, nullable=False, unique=True)
-    inchi = Column(String)
-    inchikey = Column(String)
+    cas = Column(String, nullable=True)  # CAS (Chemical Abstracts Service) registry number (CAS RN)
+    formula = Column(String, nullable=False)  # Chemical formula
+    smiles = Column(String, nullable=True)  # SMILES (Simplified Molecular Input Line Entry System)-code
+    name = Column(String, nullable=False, unique=True)  # Compound identifier name
+    inchi = Column(String, nullable=True)  # InChI
+    inchikey = Column(String, nullable=True)  # InChIKey
     pubchem_id = Column(Integer, nullable=True)  # PubChem Identifier
 
     def __repr__(self):
@@ -132,12 +132,12 @@ class RetentionTime(Base):
     # Primary key: retention_time_id
     retention_time_id = Column(Integer, primary_key=True)
     # Many-to-one relationship with compound
-    compound_id = Column(Integer, ForeignKey('compound.compound_id'))
+    compound_id = Column(Integer, ForeignKey('compound.compound_id'), nullable=True)
     compound = relationship('Compound', back_populates='retention_times')
     # Other columns
-    rt = Column(Float)  # retention time (min)
-    chrom_method = Column(String)  # name of method, refer to documentation for details
-    predicted = Column(String)
+    rt = Column(Float, nullable=True)  # Retention time (min)
+    chrom_method = Column(String, nullable=True)  # Chromatographic method identifier name
+    predicted = Column(String, nullable=True)  # FALSE: experimental value; TRUE: modeled value
 
     def __repr__(self):
         return (f"retention_time_id={self.retention_time_id}, compound_id={self.compound_id}, compound={self.compound}, rt={self.rt},"
@@ -152,23 +152,23 @@ class CompoundGroup(Base):
     # Many-to-many relationship with compound
     compounds = relationship("Compound", secondary=CompoundGroupMap, back_populates='compound_groups')
     # Other columns
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False)  # Compound group identifier name
 
     def __repr__(self):
         return f"compound_group_id={self.compound_group_id}, name={self.name}, no. of compounds={len(self.compounds)}"
 
 
 class DataSource(Base):
-    # This table is for data sources, e.g. bfg, uba, lfuby, ...
+    # This table is for data sources, e.g., bfg, uba, lfuby, lanuk, lubw, etc ...
     __tablename__ = 'data_source'
     # Primary key: data_source_id
     data_source_id = Column(Integer, primary_key=True)
     # One-to-many relationship with experiment
     experiments = relationship("Experiment", back_populates='data_source')
     # Other columns
-    name = Column(String, nullable=False)
-    long_name = Column(String)
-    authors = Column(String)
+    name = Column(String, nullable=False)  # Data source identifier name
+    long_name = Column(String, nullable=True)  # Author affiliation
+    authors = Column(String, nullable=True)  # Author name(s)
 
     def __repr__(self):
         return (f"data_source_id={self.data_source_id}, name={self.name}, long_name={self.long_name}, "
