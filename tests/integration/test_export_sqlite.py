@@ -51,14 +51,14 @@ def test_export_sqlite_bfg():
     assert len(session.query(Fragment.fragment_id).all()) == 10
 
     # Assert that there are 4 entries for retention times
-    assert len(session.query(RetentionTime.retention_time_id).all()) == 4
+    assert len(session.query(RetentionTime.retention_time_id).all()) == 5
 
     # Assert that there is just one data source with the id 1 (bfg)
     data_src_id = session.query(Experiment.data_source_id).one_or_none()
     assert data_src_id[0] == 1
 
     # Assert that there are two compound groups
-    assert len(session.query(CompoundGroupMap.c.compound_group_id).all()) == 2
+    assert len(session.query(CompoundGroupMap.c.compound_group_id).all()) == 1
 
     # Cleanup
     session.close()

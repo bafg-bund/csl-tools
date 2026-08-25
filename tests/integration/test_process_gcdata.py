@@ -11,8 +11,8 @@ def test_process_gcdata():
     """Tests processing of GC data experiments and import into the CSL."""
     # Prepare paths
     data_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/gcdata_testfiles/gcdata_testdata.txt')
-    csl_template_path = os.path.join(ROOT_DIR,'tests/fixtures/import/CSL_v0_gcdata.db')
-    csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_gcdata.db')
+    csl_template_path = os.path.join(ROOT_DIR,'tests/fixtures/import/CSL_v0_import_gcdata.db')
+    csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_import_gcdata.db')
     config_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/test_config/bfg_gc_config.yaml')
     temp_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 

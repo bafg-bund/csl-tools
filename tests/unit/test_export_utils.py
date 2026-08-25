@@ -144,9 +144,12 @@ def test_get_experiment_ids_by_data_src(data_source, expected_exp_id):
                           ('lanuk_nts_rp1', False, []),
                           ])
 def test_get_experiment_ids_by_chrom_method(chrom_method, predicted, expected_exp_id):
-    """Tests if the function returns the expected experiment ids with different chromatographic method filtering."""
+    """
+    Tests if the function returns the expected experiment ids
+    with different chromatographic method and predicted status filtering.
+    """
     # Prepare
-    csl_path = os.path.join(ROOT_DIR, 'tests/fixtures/csl_testfiles/CSL_v0_export_4expid_chrommethod.db')
+    csl_path = os.path.join(ROOT_DIR, 'tests/fixtures/export/CSL_v0_export_utils_4expid_chrommethod.db')
     session = create_session(csl_path)
     # Call the function
     exp_id = get_experiment_ids_by_chrom_method(session, chrom_method, predicted)

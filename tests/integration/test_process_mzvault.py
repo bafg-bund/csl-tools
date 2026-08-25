@@ -10,14 +10,14 @@ from unittest import mock
 
 @pytest.mark.parametrize("data_file_path, config_file_path",
                          [('tests/fixtures/import/mzvault_testfiles/v2-3-64-0','tests/fixtures/import/test_config/lfuby_config.yaml'),
-                          # ('tests/fixtures/import/mzvault_testfiles/v2-3-45-0','tests/fixtures/import/test_config/lubw_config.yaml')
+                          ('tests/fixtures/import/mzvault_testfiles/v2-3-45-15','tests/fixtures/import/test_config/lubw_config.yaml')
                           ])
 def test_process_mzvault(data_file_path, config_file_path):
-    """ Tests processing of mzVault-based experiments and import into the CSL."""
+    """Tests processing of mzVault-based experiments and import into the CSL."""
     # Prepare paths
     data_path = os.path.join(ROOT_DIR, data_file_path)
-    csl_template_path = os.path.join(ROOT_DIR,'tests/fixtures/import/CSL_v0_4entries.db')
-    csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_4entries.db')
+    csl_template_path = os.path.join(ROOT_DIR,'tests/fixtures/import/CSL_v0_import_4entries.db')
+    csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_import_4entries.db')
     config_path = os.path.join(ROOT_DIR, config_file_path)
     temp_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 

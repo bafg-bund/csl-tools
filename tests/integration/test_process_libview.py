@@ -1,6 +1,5 @@
 from csl.main_functions.process import process_data
-from csl.utils import RetentionTime
-from csl.utils.sql_utils import create_session, Experiment, Compound
+from csl.utils.sql_utils import create_session, Experiment, Compound, RetentionTime
 from csl.config import ROOT_DIR
 import os
 import shutil
@@ -13,8 +12,8 @@ def test_process_libview():
     # Prepare paths
     data_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/libview_testfiles/libview_testdata.sdf')
     extra_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/libview_testfiles/extrafile_testdata.CSV')
-    csl_template_path = os.path.join(ROOT_DIR,'tests/fixtures/import/CSL_v0_4entries.db')
-    csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_4entries.db')
+    csl_template_path = os.path.join(ROOT_DIR,'tests/fixtures/import/CSL_v0_import_4entries.db')
+    csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_import_4entries.db')
     config_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/test_config/lanuk_config.yaml')
     temp_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 
@@ -64,8 +63,8 @@ def test_process_replace_predicted_libview():
     # Prepare paths
     data_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/libview_testfiles/libview_replace_predicted.sdf')
     extra_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/libview_testfiles/extrafile_testdata.CSV')
-    csl_template_path = os.path.join(ROOT_DIR,'tests/fixtures/import/CSL_v0_4entries.db')
-    csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_4entries.db')
+    csl_template_path = os.path.join(ROOT_DIR,'tests/fixtures/import/CSL_v0_import_4entries.db')
+    csl_copy_path =  os.path.join(ROOT_DIR,'tests/integration/temp/CSL_v0_import_4entries.db')
     config_path = os.path.join(ROOT_DIR, 'tests/fixtures/import/test_config/lanuk_config.yaml')
     temp_path = os.path.join(ROOT_DIR,'tests/integration/temp')
 
