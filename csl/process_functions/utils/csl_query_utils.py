@@ -207,12 +207,15 @@ def add_exp_to_session(session, entry):
         return False
 
     if comp_res:  # If the compound exists in the CSL
-        # Check if the compound name of the record and the compound name of the CSL match
+        # Check for record compound name and CSL compound name mismatch
         if not comp_i == comp_res.name:
-            logger.warning(f'Current compound "{comp_i}" shares the same InChIkey (main layer) and/or CAS with compound "{comp_res.name}" in the CSL. \n'
-                           f'Please check the compound name (different spelling?). Note that the CSL currently does not support synonyms yet. \n'
-                           f'Current record will be skipped.')  # Todo: Implement synonym support
-            return False
+            if compgroup_i and 'Surrogate_standard' in compgroup_i:  # Allow mismatch for internal standard
+                pass
+            else:
+                logger.warning(f'Current compound "{comp_i}" shares the same InChIkey (main layer) and/or CAS with compound "{comp_res.name}" in the CSL. \n'
+                               f'Please check the compound name (different spelling?). Note that the CSL currently does not support synonyms yet. \n'
+                               f'Current record will be skipped.')  # Todo: Implement synonym support
+                return False
 
         # Add compound groups that do not exist yet for this compound
         for cg in comp_group:
