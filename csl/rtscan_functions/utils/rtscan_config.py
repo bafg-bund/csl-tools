@@ -7,6 +7,8 @@ DEFAULT_MODEL_BFG_TO_LANUK_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_function
 DEFAULT_MODEL_LANUK_TO_BFG_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'spline_lanuk_to_bfg.pkl')
 DEFAULT_MODEL_BFG_TO_LUBW_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'spline_bfg_to_lubw.pkl')
 DEFAULT_MODEL_LUBW_TO_BFG_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'spline_lubw_to_bfg.pkl')
+DEFAULT_MODEL_BFG_TO_ICPR_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'spline_bfg_to_icpr.pkl')
+DEFAULT_MODEL_ICPR_TO_BFG_PATH = os.path.join(ROOT_DIR, 'csl', 'rtscan_functions', 'utils', 'spline_icpr_to_bfg.pkl')
 
 def check_order_pred_bfg_rt():
     """
@@ -16,4 +18,4 @@ def check_order_pred_bfg_rt():
     Returns:
         list : List of data sources in order of importance to predict bfg retention times.
     """
-    return ['lfuby', 'uba', 'lubw', 'lanuk']
+    return ['lfuby', 'uba', 'lubw', 'lanuk', 'icpr']

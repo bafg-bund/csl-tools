@@ -15,6 +15,7 @@ DEFAULT_PAIRS_DSOURCE_CHROM = {
     'lfuby': 'lfuby_nts_rp1',
     'lanuk': 'lanuk_nts_rp1',
     'lubw': 'lubw_nts_rp1',
+    'icpr': 'icpr_nts_rp1',
     'bfg_gc': 'bfg_nts_gc1',  # GC data method is identified by '_gc' substring and filtered accordingly downstream
     # (e.g., excluded from rtscan functions; or different metadata rules)
 }
