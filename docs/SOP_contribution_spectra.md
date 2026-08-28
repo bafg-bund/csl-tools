@@ -85,17 +85,21 @@ Bezafibrate;11.03300
 | Instrument name                       | Yes             | [Instrument name and type](#instrument-name-and-type)                |
 | Instrument type                       | No              | [Instrument name and type](#instrument-name-and-type)                |
 | Ion mode                              | Yes             | [Ion mode](#ion-mode)                                                |
-| Collision energy                      | Yes             | [Collision energy](#collision-energy)                                |
-| Collision energy unit                 | Yes             | [Collision energy unit](#collision-energy-unit)                      |
+| Collision energy                      | Yes<sup>3</sup> | [Collision energy](#collision-energy)                                |
+| Collision energy unit                 | Yes<sup>3</sup> | [Collision energy unit](#collision-energy-unit)                      |
 | Collision type                        | Yes             | [Collision type](#collision-type)                                    |
+| Electron energy                       | Yes<sup>3</sup> | [Electron energy](#electron-energy)                                  |
+| Electron energy unit                  | Yes<sup>3</sup> | [Electron energy unit](#electron-energy-unit)                        |
 | Ionization type                       | Yes             | [Ionization type](#ionization-type)                                  |
 | Precursor m/z                         | Yes             | [Precursor m/z](#precursor-mz)                                       |
 | Type of molecular mass / Isotopologue | Yes             | [Isotopologue](#isotopologue)                                        |
 | Retention time                        | Yes             | [Retention time](#retention-time)                                    |
+| Kovats retention index                | No              | [Kovats retention index](#kovats-retention-index)                    |
 | Spectrum (m/z and intensity)          | Yes             | [Spectrum](#spectrum)                                                |
 
 <sup>1</sup> No adduct information results in assumption of `[M+H]+` or `[M–H]–` based on the polarity.  
-<sup>2</sup> At least one of InChIKey or CAS is required.
+<sup>2</sup> At least one is required: InChIKey or CAS.  
+<sup>3</sup> Exactly one is required: Collision energy and Collision energy unit or Electron energy and Electron energy unit.  
 
 ---
 
@@ -301,6 +305,8 @@ Instrument name and instrument type.
 | Agilent 6500 Series Q-TOF        | LC-ESI-QTOF          |
 | TripleTOF X500R SCIEX            | LC-ESI-QTOF          |
 | ZenoTOF 7600 SCIEX               | LC-ESI-QTOF          |
+| Exploris 240 Thermo              | LC-ESI-Orbitrap      |
+| Exploris 60K Thermo              | GC-EI-Orbitrap       |
 
 - If no instrument type is provided, it will be matched automatically
 
@@ -337,7 +343,7 @@ AC$MASS_SPECTROMETRY: ION_MODE NEGATIVE  # MassBank
 Collision energy (CE) used for fragmentation.
 - CE value can be `20` or `20.00`
 - The collision energy spread will be calculated if multiple collision energies are provided
-   + CE values separated by `,` (e.g. `20,30,40` or `20, 30, 40`)
+   + CE values separated by `,` (e.g., `20,30,40` or `20, 30, 40`)
    + CE values must be equidistant
 - The CE unit is defined separately
 
@@ -347,7 +353,7 @@ Collision energy (CE) used for fragmentation.
 
 ### Collision energy unit
 Collision energy unit. 
-- e.g. `V` for volts
+- Usually `V` for volts
 - See [SOP_acquisition_spectra.md](SOP_acquisition_spectra.md) for more details
 
 Example in configuration file: 
@@ -360,8 +366,10 @@ par_ce_unit: 'V'
 ---
 
 ### Collision type
-Collision type.
-- e.g. `HCD` or `Q`
+Collision type description.
+ + `HCD`: Fragmentation occurred in a higher-energy collisional dissociation (HCD) cell
+ + `Q`: Fragmentation occurred in a quadrupole
+ + `in-source`: Fragmentation occurred in the ion source (in-source fragmentation). Especially relevant for EI experiments.
 
 Example in configuration file:
 ```yaml
@@ -374,6 +382,11 @@ par_col_type: 'HCD'
 
 ### Ionization type
 Ionization type (LC-MS interface).
+ + `ESI`: Electrospray ionization
+ + `APCI`: Atmospheric pressure chemical ionization
+ + `APPI`: Atmospheric pressure photoionization
+ + `EI`: Electron ionization
+ + `CI`: Chemical ionization
 
 Example in configuration file:
 ```yaml
@@ -386,6 +399,7 @@ par_ionization: 'ESI'
 
 ### Precursor m/z
 Mass-to-charge ratio of the precursor ion selected for fragmentation (MS<sup>2</sup>).
+If no ion was isolated before fragmentation (DIA), the precursor m/z is the m/z of the fragment ion with the highest intensity.
 - Decimal separator: `.`
 
 Example:
@@ -399,10 +413,11 @@ Example:
 
 ### Isotopologue
 Isotopologue description.
-+ `monoisotopic`: all atoms are most abundant
-+ `37Cl`: one Cl atom replaced with <sup>37</sup>Cl
-+ `37Cl2`: two Cl atoms replaced with <sup>37</sup>Cl
-+ `37Cl81Br`: one Cl atom replaced with <sup>37</sup>Cl and one Br atom replaced with <sup>81</sup>Br
++ `monoisotopic`: All atoms are most abundant. The isotopologue with the highest abundance was isolated and fragmented.
++ `37Cl`: One Cl atom replaced with <sup>37</sup>Cl
++ `37Cl2`: Two Cl atoms replaced with <sup>37</sup>Cl
++ `37Cl81Br`: One Cl atom replaced with <sup>37</sup>Cl and one Br atom replaced with <sup>81</sup>Br
++ `polyisotopic`: All atoms are a mixture (the natural distribution) of isotopes. Relevant for DIA experiments.
 
 Example: 
 ```yaml
@@ -426,6 +441,44 @@ Examples:
 [go back](#parameter-requirements)
 
 ---
+
+### Kovats retention index
+Kovats retention index. Calculated for each compound based on the retention times of the n-alkanes in the same 
+chromatographic run. Only relevant for GC data.
+- Decimal separator: `.`
+
+Examples:
+```
+1242.24153
+908.4
+```
+
+[go back](#parameter-requirements)
+
+---
+
+### Electron energy
+Kinetic energy of the electrons used for ionization in electron ionization (EI). Usually 70 eV.
+- Value can be `70` or `70.00`
+- The electron energy unit is defined separately
+
+[go back](#parameter-requirements)
+
+---
+
+### Electron energy unit
+Unit of the electron energy. 
+- Usually `eV` for electron volts
+
+Example in configuration file: 
+```yaml
+par_ce_unit: 'eV' 
+```
+
+[go back](#parameter-requirements)
+
+---
+
 
 ### Spectrum
 List of fragment peaks with m/z and intensity values.
