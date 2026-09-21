@@ -23,7 +23,7 @@ def sql_query_with_filters_envi(session, chrom_method):
     query_result = (
         session.query(Experiment)
         .options(
-            selectinload(Experiment.compound),
+            selectinload(Experiment.compound).selectinload(Compound.compound_groups),
             selectinload(Experiment.parameter),
             selectinload(Experiment.fragments),
         )
@@ -59,7 +59,7 @@ def process_data_entry_envi(csl_data, chrom_method):
     envi_filter_def = default_sql_query_filter_envi()
     fragment_cutoff_percent = envi_filter_def['fragment_cutoff_percent_def']
 
-    # Extract an format data to meet enviMass-specific requirements
+    # Extract and format data to meet enviMass-specific requirements
     compound_name = get_compound_name_envi(csl_data.compound.name)
     if compound_name in skip_compounds_envi():
         return None  # Skip compounds defined in envi_config
@@ -71,11 +71,12 @@ def process_data_entry_envi(csl_data, chrom_method):
     cas = get_cas_envi(csl_data.compound.cas)
     smiles = get_smiles_envi(csl_data.compound.smiles)
     inchi = csl_data.compound.inchi
+    compound_groups = get_compound_groups_envi(csl_data.compound.compound_groups)
 
     # Build row entry in correct order using extracted data and default values for additional rows
     dv = additional_columns_with_def_values_envi()  # Additional columns with default values
     processed_entry = list([compound_name, formula, rt, dv['RTI'], dv['RT_tolerance'], dv['ID_internal_standard'], adduct, ion_mode,
-         dv['use_for_recalibration'], dv['use_for_screening'], restrict_adduct, fragments, dv['Remark'], dv['tag1'],
+         dv['use_for_recalibration'], dv['use_for_screening'], restrict_adduct, fragments, dv['Remark'], compound_groups,
          dv['tag2'], dv['tag3'], dv['from_date'], dv['from_time'], dv['to_date'], dv['to_time'], dv['warn_1'],
          dv['warn_2'], dv['Quant_adduct'], dv['Quant_peak'], dv['Quant_rule'], dv['homol_units'], cas, inchi, smiles,
          dv['NIST'], dv['identified_by'], dv['identified_when'], dv['CL'] ])
@@ -167,6 +168,14 @@ def get_smiles_envi(csl_smiles):
     else:
         smiles = csl_smiles
     return smiles
+
+
+def get_compound_groups_envi(csl_compound_groups):
+    """Returns the enviMass-specific format for the compound groups based on the CSL-specific format."""
+    # Extract compound group(s). Join multiple compound groups separated by ",".
+    cg_str = ", ".join(cg.name for cg in csl_compound_groups)
+    return cg_str
+
 
 def deduplicate_fragments_envi(frags):
     """
