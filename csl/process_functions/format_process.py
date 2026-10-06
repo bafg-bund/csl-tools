@@ -154,9 +154,10 @@ class FormatProcess(ABC):
             entry_err = False
             entry_warn = False
 
+            ce_ee = f"CE: {entry['par_ce']}; CES: {entry['par_ces']}" if entry['par_ce'] is not None else f"EE: {entry['par_ee']}"
             logger.info(f'Compound: {entry['par_comp']}; Adduct: {entry['par_adduct']}; '
-                        f'Instr.: {entry['par_instrument']}; Ion mode: {entry['par_ion_mode']}; CE: {entry['par_ce']}; '
-                        f'CES: {entry['par_ces']}; File path: {entry['file_path']}')
+                        f'Instr.: {entry['par_instrument']}; Ion mode: {entry['par_ion_mode']}; {ce_ee}; '
+                        f'File path: {entry['file_path']}')
 
             # Instrument
             instrument_i = get_instrument(entry['par_instrument'], entry['par_instrument_type'])
@@ -467,8 +468,12 @@ class FormatProcess(ABC):
                     f"{summary_df.to_markdown(index=False)}")
 
         # Data entries with missing parameters for potential correction
-        df_missing = form_data_match[['pol_i', 'comp_i', 'adduct_i', 'ce_i', 'ionization_i', 'formula_i', 'inchikey_i', 'cas_i',
-                         'smiles_i', 'mz_i', 'rt_i', 'spec_i', 'col_type_i' ]]
+        if any(form_data_match['ce_i']):
+            df_missing = form_data_match[['pol_i', 'comp_i', 'adduct_i', 'ce_i', 'ionization_i', 'formula_i', 'inchikey_i', 'cas_i',
+                             'smiles_i', 'mz_i', 'rt_i', 'spec_i', 'col_type_i' ]]
+        else:
+            df_missing = form_data_match[['pol_i', 'comp_i', 'adduct_i', 'ee_i', 'ionization_i', 'formula_i', 'inchikey_i', 'cas_i',
+                             'smiles_i', 'mz_i', 'rt_i', 'spec_i', 'col_type_i' ]]
         df_missing = df_missing[df_missing.isna().any(axis=1)]  # Keep rows with any missing data
         df_missing_md = df_missing.copy()
         df_missing_md["spec_i"] = df_missing_md["spec_i"].notna().map(
@@ -495,8 +500,12 @@ class FormatProcess(ABC):
                         f"{df_missing_md_unique.to_markdown(index=False)}")
 
         # Overview of data entry states and summary of unique substances
-        overview_cols = ['comp_i', 'cas_i', 'formula_i', 'inchikey_i', 'adduct_i', 'instrument_i', 'pol_i', 'ce_i', 'ces_i']
-        overview_cols_rename = ['Compound name', 'CAS', 'Formula', 'InChIKey', 'Adduct', 'Instrument', 'Ion mode', 'CE', 'CES']
+        if any(form_data_match['ce_i']):
+            overview_cols = ['comp_i', 'cas_i', 'formula_i', 'inchikey_i', 'adduct_i', 'instrument_i', 'pol_i', 'ce_i', 'ces_i']
+            overview_cols_rename = ['Compound name', 'CAS', 'Formula', 'InChIKey', 'Adduct', 'Instrument', 'Ion mode', 'CE', 'CES']
+        else:
+            overview_cols = ['comp_i', 'cas_i', 'formula_i', 'inchikey_i', 'adduct_i', 'instrument_i', 'pol_i', 'ee_i']
+            overview_cols_rename = ['Compound name', 'CAS', 'Formula', 'InChIKey', 'Adduct', 'Instrument', 'Ion mode', 'EE']
 
         if len(form_err_data) > 0:
             form_err_data_df = form_err_data[overview_cols]

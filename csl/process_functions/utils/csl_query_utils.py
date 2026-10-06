@@ -140,9 +140,10 @@ def add_exp_to_session(session, entry):
     pc_id_i = entry['pc_id_i']
 
     # Log entry information for reference
+    ce_ee = f"CE: {entry['par_ce']}; CES: {entry['par_ces']}" if entry['par_ce'] is not None else f"EE: {entry['par_ee']}"
     logger.info(f'Compound: {entry['par_comp']}; Adduct: {entry['par_adduct']}; '
-                f'Instr.: {entry['par_instrument']}; Ion mode: {entry['par_ion_mode']}; CE: {entry['par_ce']}; '
-                f'CES: {entry['par_ces']}; File path: {entry['file_path']}')
+                f'Instr.: {entry['par_instrument']}; Ion mode: {entry['par_ion_mode']}; {ce_ee}; '
+                f'File path: {entry['file_path']}')
 
     # Check if the combination of data source and authors exists (assumes correct spelling!) in the CSL and add it if necessary.
     data_src = session.query(DataSource).filter_by(name=dsrc_csl_def, authors=authors).one_or_none()
