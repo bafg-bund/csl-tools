@@ -223,7 +223,10 @@ def predict_bfg_rt(uq_comp_id, session, models_to_bfg, check_order, dsrc_rt, dsr
             if rt_dsrc:
                 rt_bfg_pred = models_to_bfg[dsrc_str](rt_dsrc[0])
                 logger.debug(f'Predicted BfG RT using experimental {dsrc_str} RT for compound {uq_comp_id}')
-                break
+                if rt_bfg_pred<0:
+                    rt_bfg_pred = None
+                else:
+                    break
 
     # Check if BfG RT was successfully predicted
     if rt_bfg_pred:
@@ -267,6 +270,8 @@ def predict_rt(uq_comp_id, session, models_from_bfg, dsrc_str, dsrc_method_pairs
     if rt_bfg:
         rt_pred = models_from_bfg[dsrc_str](rt_bfg[0])
         logger.debug(f'Predicted {dsrc_str} RT using {bfg_str} RT for compound {uq_comp_id}')
+        if rt_pred<0:
+            rt_pred=None
 
         # Add predicted BfG RT to the session
         max_rt_id = session.query(func.max(RetentionTime.retention_time_id)).scalar()

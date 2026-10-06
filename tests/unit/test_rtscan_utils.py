@@ -100,7 +100,7 @@ def test_check_predicted_flags_pred_data(mock_session, mock_dsrc_method_pairs, p
 def test_predict_bfg_rt(mock_session, mock_models_to_bfg, mock_dsrc_method_pairs):
     """Tests that the BfG retention time (RT) is predicted correctly and the expected model is used."""
     # Prepare function inputs and return values
-    mock_check_order = ['dsrc_c', 'dsrc_b']  # Order of preference
+    mock_check_order = ['dsrc_c', 'dsrc_b', 'dsrc_d']  # Order of preference
     mock_dsrc_rt = ['dsrc_b', 'dsrc_c']  # Available data sources with RTs
     mock_session.query().filter_by().one_or_none.return_value = [15.0]
     # Add 'bfg' to method pairs
@@ -117,10 +117,10 @@ def test_predict_bfg_rt(mock_session, mock_models_to_bfg, mock_dsrc_method_pairs
 
 
 def test_predict_bfg_rt_none(mock_session, mock_models_to_bfg, mock_dsrc_method_pairs):
-    """Tests that the BfG retention time (RT) is not predicted due to missing available data sources with RT data."""
+    """Tests that the BfG retention time (RT) is not predicted due to missing data sources with (positive) RT data."""
     # Prepare function inputs and return values
-    mock_check_order = ['dsrc_c', 'dsrc_b']  # Order of preference
-    mock_dsrc_rt = []  # No available data sources with RTs
+    mock_check_order = ['dsrc_c', 'dsrc_b', 'dsrc_d']  # Order of preference
+    mock_dsrc_rt = ['dsrc_d']  # Only available data source will result in negative predicted RT
 
     # Call the function
     predicted_rt = predict_bfg_rt(99, mock_session, mock_models_to_bfg, mock_check_order, mock_dsrc_rt,
@@ -152,6 +152,20 @@ def test_predict_rt_none(mock_session, mock_models_from_bfg, mock_dsrc_method_pa
     # Prepare function inputs and return values
     mock_dsrc_str = 'dsrc_b'  # Data source that needs prediction of an RT
     mock_session.query().filter_by().one_or_none.return_value = None
+    # Add 'bfg' to method pairs
+    mock_dsrc_method_pairs['bfg'] = 'method_a'
+
+    # Call the function
+    predicted_rt = predict_rt(99, mock_session, mock_models_from_bfg, mock_dsrc_str, mock_dsrc_method_pairs)
+
+    # Assert
+    assert predicted_rt is None
+
+def test_predict_rt_negative(mock_session, mock_models_from_bfg, mock_dsrc_method_pairs):
+    """Tests that the retention time (RT) is not predicted due to predicted value below zero."""
+    # Prepare function inputs and return values
+    mock_dsrc_str = 'dsrc_d'  # Data source that needs prediction of an RT
+    mock_session.query().filter_by().one_or_none.return_value = [7.0]
     # Add 'bfg' to method pairs
     mock_dsrc_method_pairs['bfg'] = 'method_a'
 

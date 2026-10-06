@@ -163,7 +163,8 @@ def mock_models_to_bfg():
     """Mocks the models for predicting BfG RTs from other RTs."""
     return {
         'dsrc_b': MagicMock(return_value=22.5),
-        'dsrc_c': MagicMock(return_value=7.0)
+        'dsrc_c': MagicMock(return_value=7.0),
+        'dsrc_d': MagicMock(return_value=-3.0)
     }
 
 
@@ -172,7 +173,8 @@ def mock_models_from_bfg():
     """Mocks the models for predicting RTs from BfG RTs."""
     return {
         'dsrc_b': MagicMock(return_value=12.5),
-        'dsrc_c': MagicMock(return_value=15.0)
+        'dsrc_c': MagicMock(return_value=15.0),
+        'dsrc_d': MagicMock(return_value=-1.0)
     }
 
 
