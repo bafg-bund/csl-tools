@@ -315,7 +315,9 @@ def get_inchikey(data_inchikey):
         inchikey_main_i (str) : Main component of the InChIKey (first segment before the hyphen).
                                 Returns None, if the input is invalid.
     """
-    if data_inchikey:
+    invalid_values = {"none", "nan", "null", ""}
+
+    if data_inchikey and str(data_inchikey).strip().lower() not in invalid_values:
         inchikey_i = data_inchikey
         parts = inchikey_i.split('-')
         inchikey_main_i = parts[0].strip()
@@ -335,7 +337,11 @@ def get_cas(data_cas):
     Returns:
         cas_i (str): CAS registry number. Returns None, if the input is invalid.
     """
-    if data_cas and not any(char.isalpha() for char in data_cas):
+    invalid_values = {"none", "nan", "null", ""}
+
+    if (data_cas
+            and str(data_cas).strip().lower() not in invalid_values
+            and not any(char.isalpha() for char in data_cas)):
         cas_i = data_cas
     else:
         cas_i = None

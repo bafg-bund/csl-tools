@@ -159,7 +159,7 @@ def test_get_formula(data_formula, expected_form_i):
 
 @pytest.mark.parametrize("data_inchikey, expected_inchikey_i, expected_inchikey_main_i", [
     ('WZJZMXBKUWKXTQ-UHFFFAOYSA-N', 'WZJZMXBKUWKXTQ-UHFFFAOYSA-N', 'WZJZMXBKUWKXTQ'),
-    ('', None, None)
+    ('', None, None), ('None', None, None)
 ])
 def test_get_inchikey(data_inchikey, expected_inchikey_i, expected_inchikey_main_i):
     """Tests the function with parametrized inputs."""
@@ -169,7 +169,7 @@ def test_get_inchikey(data_inchikey, expected_inchikey_i, expected_inchikey_main
 
 
 @pytest.mark.parametrize("data_cas, expected_cas_i",
-                         [('13684-56-5', '13684-56-5'), ('136BA-56-5', None), ('', None)])
+                         [('13684-56-5', '13684-56-5'), ('136BA-56-5', None), ('', None),('None', None)])
 def test_get_cas(data_cas, expected_cas_i):
     """Tests the function with parametrized inputs."""
     cas_i = get_cas(data_cas)
