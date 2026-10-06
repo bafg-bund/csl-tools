@@ -47,7 +47,7 @@ class RecalcRtscan(OperationRtscan):
 
                 # Recalculate the RTs for all data sources with predicted RT
                 recalc_comp_id = recalculate_pred_rt(uq_comp_id, session, dsrc_exp_rt, dsrc_pred_rt, DEFAULT_PAIRS_DSOURCE_CHROM_filtered)
-                recalc_comp_id_all.append(recalc_comp_id)
+                recalc_comp_id_all.extend(recalc_comp_id)
 
             # Summarize the result
             logger.info('### Summary')
