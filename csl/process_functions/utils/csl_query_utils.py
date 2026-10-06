@@ -267,7 +267,8 @@ def add_exp_to_session(session, entry):
     if not para_res:
         logger.info('Experimental parameters not found in CSL. Adding parameters from data entry.')
         para_res = Parameter(instrument=instrument, polarity=pol_i, ce=ce_i, ces=ces_i, ce_unit=ce_unit_i,
-                             collision_type=col_type_i, ionisation=ionization_i)
+                             collision_type=col_type_i, ionisation=ionization_i, electron_energy=ee_i,
+                             electron_energy_unit=ee_unit_i)
         session.add(para_res)
 
     # Create a new experiment entry in the CSL at the current time
