@@ -209,7 +209,7 @@ def add_exp_to_session(session, entry):
     if comp_res:  # If the compound exists in the CSL
         # Check for record compound name and CSL compound name mismatch
         if not comp_i == comp_res.name:
-            if compgroup_i and 'Surrogate_standard' in compgroup_i:  # Allow mismatch for internal standard
+            if compgroup_i and ('Surrogate_standard' in compgroup_i or 'Surrogate_standard' in comp_res.compound_groups[0].name):  # Allow mismatch if current compound or database match is an internal standard
                 pass
             else:
                 logger.warning(f'Current compound "{comp_i}" shares the same InChIkey (main layer) and/or CAS with compound "{comp_res.name}" in the CSL. \n'
