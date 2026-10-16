@@ -4,6 +4,7 @@ from csl.utils.sql_utils import Experiment, RetentionTime, Compound, Parameter
 def sql_query_with_filters_envi(session, chrom_method):
     """
     Queries CSL data based on the filters specified in envi_config and the specified chromatographic method.
+    Applies different filtering conditions for LC- or GC-based chrom. methods.
 
     Args:
         session (obj) : SQLAlchemy session object connected to the CSL database.
@@ -20,6 +21,16 @@ def sql_query_with_filters_envi(session, chrom_method):
     ce_filter = envi_filter_def['ce_def']
     ces_filter = envi_filter_def['ces_def']
 
+    conditions = [RetentionTime.chrom_method == chrom_method]
+    if "_gc" in chrom_method:
+        # GC
+        conditions.append(RetentionTime.predicted == "FALSE")
+        conditions.append(Parameter.electron_energy.isnot(None))
+    else:
+        # LC
+        conditions.append(Parameter.ce.between(ce_filter[0], ce_filter[1]))
+        conditions.append(Parameter.ces.between(ces_filter[0], ces_filter[1]))
+
     query_result = (
         session.query(Experiment)
         .options(
@@ -30,14 +41,7 @@ def sql_query_with_filters_envi(session, chrom_method):
         .join(Compound, Experiment.compound_id == Compound.compound_id)
         .join(Parameter, Experiment.parameter_id == Parameter.parameter_id)
         .join(RetentionTime, RetentionTime.compound_id == Compound.compound_id)
-        .filter(
-            and_(
-                Parameter.ce.between(ce_filter[0], ce_filter[1]),
-                Parameter.ces.between(ces_filter[0], ces_filter[1]),
-                # Parameter.instrument.in_(instrument_filter),  # Filtering by instrument currently not needed
-                RetentionTime.chrom_method == chrom_method,
-            )
-        )
+        .filter(and_(*conditions))
         .all()
     )
     return query_result
